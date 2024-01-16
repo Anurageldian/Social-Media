@@ -25,7 +25,7 @@ async function pindl(url) {
 }
 
 async function pinSearch(bot, chatId, query, userName) {
-  if (!query) return bot.sendMessage(chatId, '[Indonesia]\nGambar apa yang mau kamu cari di pinterest? contoh\n/pin anime\n\n[English]\nWhat images are you looking for on Pinterest? example\n/pin anime');
+  if (!query) return bot.sendMessage(chatId, 'What images are you looking for on Pinterest? example\n/pin anime');
   let load = await bot.sendMessage(chatId, 'Loading, please wait');
   try {
     let get = await axios.get(`https://www.pinterest.com/resource/BaseSearchResource/get/?source_url=/search/pins/?q=${query}&data={"options":{"isPrefetch":false,"query":"${query}","scope":"pins","no_fetch_context_on_resource":false},"context":{}}`)
