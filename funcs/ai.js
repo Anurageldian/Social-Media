@@ -2,7 +2,7 @@ require('dotenv').config();
 const axios = require('axios');
 
 async function getAiResponse(bot, chatId, input, userName) {
-  if (!input) return bot.sendMessage(chatId, `[Indonesia]\nMasukkan pertanyaan mu, contoh\n/ai apa itu javascript\n\n[English]\nEnter your question, example\n/ai what is javascript`);
+  if (!input) return bot.sendMessage(chatId, `Enter your question, example\n/ai what is javascript`);
   try {
     bot.sendChatAction(chatId, 'typing');
     let { data } = await axios(`https://onlinegpt.org/wp-json/mwai-ui/v1/chats/submit`, {
