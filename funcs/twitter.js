@@ -79,7 +79,7 @@ async function getDataTwitter(bot, chatId, url, userName) {
         let get2 = await twitterdl2(url);
         if (get2.type == 'video') {
           await bot.sendChatAction(chatId, 'upload_video');
-          await bot.sendVideo(chatId, get2.media[0].url, { caption: `Bot by @Krxuvv` })
+          await bot.sendVideo(chatId, get2.media[0].url, { caption: `Bot by @firespower` })
           return bot.deleteMessage(chatId, load.message_id);
         } else if (get2.type == 'image') {
           for (let i = 0;i < get2.media.length;i++) {
@@ -125,7 +125,7 @@ async function downloadTwitterHigh(bot, chatId, userName) {
   let load = await bot.sendMessage(chatId, 'Loading, please wait.');
   let db = await readDb('./database.json');
   try {
-    await bot.sendVideo(chatId, db[chatId].twhd, { caption: `Bot by @Krxuvv` });
+    await bot.sendVideo(chatId, db[chatId].twhd, { caption: `Bot by @firespower` });
     await bot.deleteMessage(chatId, load.message_id);
     db[chatId] = {
       twhd: '',
@@ -149,7 +149,7 @@ async function downloadTwitterLow(bot, chatId, userName) {
   let load = await bot.sendMessage(chatId, 'Loading, please wait.');
   let db = await readDb('./database.json');
   try {
-    await bot.sendVideo(chatId, db[chatId].twsd, { caption: `Bot by @Krxuvv` });
+    await bot.sendVideo(chatId, db[chatId].twsd, { caption: `Bot by @firespower` });
     await bot.deleteMessage(chatId, load.message_id);
     db[chatId] = {
       twhd: '',
@@ -175,7 +175,7 @@ async function downloadTwitterAudio(bot, chatId, userName) {
   try {
     let buff = await getBuffer(db[chatId].twaud)
     await fs.writeFileSync('content/Twitt_audio_' + chatId + '.mp3', buff);
-    await bot.sendAudio(chatId, 'content/Twitt_audio_' + chatId + '.mp3', { caption: `Bot by @Krxuvv` });
+    await bot.sendAudio(chatId, 'content/Twitt_audio_' + chatId + '.mp3', { caption: `Bot by @firespower` });
     await bot.deleteMessage(chatId, load.message_id);
     db[chatId] = {
       twhd: '',
