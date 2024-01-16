@@ -97,7 +97,7 @@ console.log('Bot is running...')
 bot.on('photo', async (msg) => {
   let chatId = msg.chat.id;
   let getban = await getBanned(chatId);
-  if (!getban.status) return bot.sendMessage(chatId, `You have been banned\n\nReason : ${getban.reason}\n\nDo you want to be able to use bots again? Please contact the owner to request removal of the ban\nOwner : @Krxuvv`)
+  if (!getban.status) return bot.sendMessage(chatId, `You have been banned\n\nReason : ${getban.reason}\n\nDo you want to be able to use bots again? Please contact the owner to request removal of the ban\nOwner : @firespower`)
   if (!fs.existsSync(`images/${chatId}`)) await fs.mkdirSync(`images/${chatId}`)
   try {
     let write = await bot.downloadFile(msg.photo[msg.photo.length - 1].file_id, `images/${chatId}`);
@@ -130,13 +130,9 @@ bot.on('photo', async (msg) => {
 // start
 bot.onText(/\/start/, async (msg) => {
   let getban = await getBanned(msg.chat.id);
-  if (!getban.status) return bot.sendMessage(msg.chat.id, `You have been banned\n\nReason : ${getban.reason}\n\nDo you want to be able to use bots again? Please contact the owner to request removal of the ban\nOwner : @Krxuvv`)
+  if (!getban.status) return bot.sendMessage(msg.chat.id, `You have been banned\n\nReason : ${getban.reason}\n\nDo you want to be able to use bots again? Please contact the owner to request removal of the ban\nOwner : @firespower`)
   let response = `Hello I am ${botName}
 
-[Indonesia]
-Silahkan kirim link video atau postingan yang mau didownload, bot hanya support pada sosial media pada list
-
-[English]
 Please send a link to the video or post you want to download, the bot only supports social media on the list
 
 LIST :
@@ -156,13 +152,9 @@ OTHER FEATURES
 /pin (Searching Pinterest)
 /google (Searching Google)
 
-[Indonesia]
-Kirim gambar, jika ingin menggunakan ocr (ekstrak teks pada gambar), telegraf (unggah ke telegraf), dan pomf2 (unggah ke pomf2)
-
-[English]
 Send images, if you want to use ocr (extract text on image), telegraph (upload to telegraph), and pomf2 (upload to pomf2)
 
-Bot by @Krxuvv`
+Bot by @firespower`
   let db = await readDb('./database.json');
   let chatId = msg.chat.id;
   if (!db[chatId]) {
@@ -223,7 +215,7 @@ bot.onText(/\$/, async (msg) => {
 // Gpt 3 / AI
 bot.onText(/\/ai/, async (msg) => {
   let getban = await getBanned(msg.chat.id);
-  if (!getban.status) return bot.sendMessage(msg.chat.id, `You have been banned\n\nReason : ${getban.reason}\n\nDo you want to be able to use bots again? Please contact the owner to request removal of the ban\nOwner : @Krxuvv`)
+  if (!getban.status) return bot.sendMessage(msg.chat.id, `You have been banned\n\nReason : ${getban.reason}\n\nDo you want to be able to use bots again? Please contact the owner to request removal of the ban\nOwner : @firespower`)
   let input = msg.text.split(' ').slice(1).join(' ');
   let userId = msg.from.id.toString();
   if (userLocksText[userId]) {
@@ -241,7 +233,7 @@ bot.onText(/\/ai/, async (msg) => {
 // Google
 bot.onText(/\/google/, async (msg) => {
   let getban = await getBanned(msg.chat.id);
-  if (!getban.status) return bot.sendMessage(msg.chat.id, `You have been banned\n\nReason : ${getban.reason}\n\nDo you want to be able to use bots again? Please contact the owner to request removal of the ban\nOwner : @Krxuvv`)
+  if (!getban.status) return bot.sendMessage(msg.chat.id, `You have been banned\n\nReason : ${getban.reason}\n\nDo you want to be able to use bots again? Please contact the owner to request removal of the ban\nOwner : @firespower`)
   let input = msg.text.split(' ').slice(1).join(' ');
   let userId = msg.from.id.toString();
   if (userLocksText[userId]) {
@@ -259,7 +251,7 @@ bot.onText(/\/google/, async (msg) => {
 // Brainly
 bot.onText(/\/brainly/, async (msg) => {
   let getban = await getBanned(msg.chat.id);
-  if (!getban.status) return bot.sendMessage(msg.chat.id, `You have been banned\n\nReason : ${getban.reason}\n\nDo you want to be able to use bots again? Please contact the owner to request removal of the ban\nOwner : @Krxuvv`)
+  if (!getban.status) return bot.sendMessage(msg.chat.id, `You have been banned\n\nReason : ${getban.reason}\n\nDo you want to be able to use bots again? Please contact the owner to request removal of the ban\nOwner : @firespower`)
   let input = msg.text.split(' ').slice(1).join(' ');
   let userId = msg.from.id.toString();
   if (userLocksText[userId]) {
@@ -277,7 +269,7 @@ bot.onText(/\/brainly/, async (msg) => {
 // Pinterest Search
 bot.onText(/^(\/(pin|pinterest))/, async (msg) => {
   let getban = await getBanned(msg.chat.id);
-  if (!getban.status) return bot.sendMessage(msg.chat.id, `You have been banned\n\nReason : ${getban.reason}\n\nDo you want to be able to use bots again? Please contact the owner to request removal of the ban\nOwner : @Krxuvv`)
+  if (!getban.status) return bot.sendMessage(msg.chat.id, `You have been banned\n\nReason : ${getban.reason}\n\nDo you want to be able to use bots again? Please contact the owner to request removal of the ban\nOwner : @firespower`)
   let input = msg.text.split(' ').slice(1).join(' ');
   let userId = msg.from.id.toString();
   if (userLocksImage[userId]) {
@@ -295,7 +287,7 @@ bot.onText(/^(\/(pin|pinterest))/, async (msg) => {
 // Tiktok Regex
 bot.onText(/https?:\/\/(?:.*\.)?tiktok\.com/, async (msg) => {
   let getban = await getBanned(msg.chat.id);
-  if (!getban.status) return bot.sendMessage(msg.chat.id, `You have been banned\n\nReason : ${getban.reason}\n\nDo you want to be able to use bots again? Please contact the owner to request removal of the ban\nOwner : @Krxuvv`)
+  if (!getban.status) return bot.sendMessage(msg.chat.id, `You have been banned\n\nReason : ${getban.reason}\n\nDo you want to be able to use bots again? Please contact the owner to request removal of the ban\nOwner : @firespower`)
   let userId = msg.from.id.toString();
   if (userLocks[userId]) {
     return;
@@ -312,7 +304,7 @@ bot.onText(/https?:\/\/(?:.*\.)?tiktok\.com/, async (msg) => {
 // Twitter Regex
 bot.onText(/https?:\/\/(?:.*\.)?twitter\.com/, async (msg) => {
   let getban = await getBanned(msg.chat.id);
-  if (!getban.status) return bot.sendMessage(msg.chat.id, `You have been banned\n\nReason : ${getban.reason}\n\nDo you want to be able to use bots again? Please contact the owner to request removal of the ban\nOwner : @Krxuvv`)
+  if (!getban.status) return bot.sendMessage(msg.chat.id, `You have been banned\n\nReason : ${getban.reason}\n\nDo you want to be able to use bots again? Please contact the owner to request removal of the ban\nOwner : @firespower`)
   let userId = msg.from.id.toString();
   if (userLocks[userId]) {
     return;
@@ -329,7 +321,7 @@ bot.onText(/https?:\/\/(?:.*\.)?twitter\.com/, async (msg) => {
 // Instagram Regex
 bot.onText(/(https?:\/\/)?(www\.)?(instagram\.com)\/.+/, async (msg) => {
   let getban = await getBanned(msg.chat.id);
-  if (!getban.status) return bot.sendMessage(msg.chat.id, `You have been banned\n\nReason : ${getban.reason}\n\nDo you want to be able to use bots again? Please contact the owner to request removal of the ban\nOwner : @Krxuvv`)
+  if (!getban.status) return bot.sendMessage(msg.chat.id, `You have been banned\n\nReason : ${getban.reason}\n\nDo you want to be able to use bots again? Please contact the owner to request removal of the ban\nOwner : @firespower`)
   let userId = msg.from.id.toString();
   if (userLocks[userId]) {
     return;
@@ -346,7 +338,7 @@ bot.onText(/(https?:\/\/)?(www\.)?(instagram\.com)\/.+/, async (msg) => {
 // Pinterest Regex
 bot.onText(/(https?:\/\/)?(www\.)?(pinterest\.ca|pinterest\.?com|pin\.?it)\/.+/, async (msg) => {
   let getban = await getBanned(msg.chat.id);
-  if (!getban.status) return bot.sendMessage(msg.chat.id, `You have been banned\n\nReason : ${getban.reason}\n\nDo you want to be able to use bots again? Please contact the owner to request removal of the ban\nOwner : @Krxuvv`)
+  if (!getban.status) return bot.sendMessage(msg.chat.id, `You have been banned\n\nReason : ${getban.reason}\n\nDo you want to be able to use bots again? Please contact the owner to request removal of the ban\nOwner : @firespower`)
   let userId = msg.from.id.toString();
   if (userLocks[userId]) {
     return;
@@ -363,7 +355,7 @@ bot.onText(/(https?:\/\/)?(www\.)?(pinterest\.ca|pinterest\.?com|pin\.?it)\/.+/,
 // Spotify Track Regex
 bot.onText(/(https?:\/\/)?(www\.)?(open\.spotify\.com|spotify\.?com)\/track\/.+/, async (msg, match) => {
   let getban = await getBanned(msg.chat.id);
-  if (!getban.status) return bot.sendMessage(msg.chat.id, `You have been banned\n\nReason : ${getban.reason}\n\nDo you want to be able to use bots again? Please contact the owner to request removal of the ban\nOwner : @Krxuvv`)
+  if (!getban.status) return bot.sendMessage(msg.chat.id, `You have been banned\n\nReason : ${getban.reason}\n\nDo you want to be able to use bots again? Please contact the owner to request removal of the ban\nOwner : @firespower`)
   let userId = msg.from.id.toString();
   if (userLocks[userId]) {
     return;
@@ -380,7 +372,7 @@ bot.onText(/(https?:\/\/)?(www\.)?(open\.spotify\.com|spotify\.?com)\/track\/.+/
 // Spotify Albums Regex
 bot.onText(/(https?:\/\/)?(www\.)?(open\.spotify\.com|spotify\.?com)\/album\/.+/, async (msg, match) => {
   let getban = await getBanned(msg.chat.id);
-  if (!getban.status) return bot.sendMessage(msg.chat.id, `You have been banned\n\nReason : ${getban.reason}\n\nDo you want to be able to use bots again? Please contact the owner to request removal of the ban\nOwner : @Krxuvv`)
+  if (!getban.status) return bot.sendMessage(msg.chat.id, `You have been banned\n\nReason : ${getban.reason}\n\nDo you want to be able to use bots again? Please contact the owner to request removal of the ban\nOwner : @firespower`)
   let userId = msg.from.id.toString();
   if (userLocks[userId]) {
     return;
@@ -397,7 +389,7 @@ bot.onText(/(https?:\/\/)?(www\.)?(open\.spotify\.com|spotify\.?com)\/album\/.+/
 // Spotify Playlist Regex
 bot.onText(/(https?:\/\/)?(www\.)?(open\.spotify\.com|spotify\.?com)\/playlist\/.+/, async (msg, match) => {
   let getban = await getBanned(msg.chat.id);
-  if (!getban.status) return bot.sendMessage(msg.chat.id, `You have been banned\n\nReason : ${getban.reason}\n\nDo you want to be able to use bots again? Please contact the owner to request removal of the ban\nOwner : @Krxuvv`)
+  if (!getban.status) return bot.sendMessage(msg.chat.id, `You have been banned\n\nReason : ${getban.reason}\n\nDo you want to be able to use bots again? Please contact the owner to request removal of the ban\nOwner : @firespower`)
   let userId = msg.from.id.toString();
   if (userLocks[userId]) {
     return;
@@ -414,7 +406,7 @@ bot.onText(/(https?:\/\/)?(www\.)?(open\.spotify\.com|spotify\.?com)\/playlist\/
 // Youtube Regex
 bot.onText(/^(?:https?:\/\/)?(?:www\.|m\.|music\.)?youtu\.?be(?:\.com)?\/?.*(?:watch|embed)?(?:.*v=|v\/|\/)([\w\-_]+)\&?/, async (msg, match) => {
   let getban = await getBanned(msg.chat.id);
-  if (!getban.status) return bot.sendMessage(msg.chat.id, `You have been banned\n\nReason : ${getban.reason}\n\nDo you want to be able to use bots again? Please contact the owner to request removal of the ban\nOwner : @Krxuvv`)
+  if (!getban.status) return bot.sendMessage(msg.chat.id, `You have been banned\n\nReason : ${getban.reason}\n\nDo you want to be able to use bots again? Please contact the owner to request removal of the ban\nOwner : @firespower`)
   let userId = msg.from.id.toString();
   if (userLocks[userId]) {
     return;
@@ -432,7 +424,7 @@ bot.onText(/^(?:https?:\/\/)?(?:www\.|m\.|music\.)?youtu\.?be(?:\.com)?\/?.*(?:w
 // Facebook Regex
 bot.onText(/^https?:\/\/(www\.)?(m\.)?facebook\.com\/.+/, async (msg, match) => {
   let getban = await getBanned(msg.chat.id);
-  if (!getban.status) return bot.sendMessage(msg.chat.id, `You have been banned\n\nReason : ${getban.reason}\n\nDo you want to be able to use bots again? Please contact the owner to request removal of the ban\nOwner : @Krxuvv`)
+  if (!getban.status) return bot.sendMessage(msg.chat.id, `You have been banned\n\nReason : ${getban.reason}\n\nDo you want to be able to use bots again? Please contact the owner to request removal of the ban\nOwner : @firespower`)
   let userId = msg.from.id.toString();
   if (userLocks[userId]) {
     return;
@@ -449,7 +441,7 @@ bot.onText(/^https?:\/\/(www\.)?(m\.)?facebook\.com\/.+/, async (msg, match) => 
 // Threads Regex
 bot.onText(/^https?:\/\/(www\.)?threads\.net\/.+/, async (msg, match) => {
   let getban = await getBanned(msg.chat.id);
-  if (!getban.status) return bot.sendMessage(msg.chat.id, `You have been banned\n\nReason : ${getban.reason}\n\nDo you want to be able to use bots again? Please contact the owner to request removal of the ban\nOwner : @Krxuvv`)
+  if (!getban.status) return bot.sendMessage(msg.chat.id, `You have been banned\n\nReason : ${getban.reason}\n\nDo you want to be able to use bots again? Please contact the owner to request removal of the ban\nOwner : @firespower`)
   let userId = msg.from.id.toString();
   if (userLocks[userId]) {
     return;
@@ -466,7 +458,7 @@ bot.onText(/^https?:\/\/(www\.)?threads\.net\/.+/, async (msg, match) => {
 // Github Clone Regex
 bot.onText(/(?:https|git)(?::\/\/|@)github\.com[\/:]([^\/:]+)\/(.+)/i, async (msg, match) => {
   let getban = await getBanned(msg.chat.id);
-  if (!getban.status) return bot.sendMessage(msg.chat.id, `You have been banned\n\nReason : ${getban.reason}\n\nDo you want to be able to use bots again? Please contact the owner to request removal of the ban\nOwner : @Krxuvv`)
+  if (!getban.status) return bot.sendMessage(msg.chat.id, `You have been banned\n\nReason : ${getban.reason}\n\nDo you want to be able to use bots again? Please contact the owner to request removal of the ban\nOwner : @firespower`)
   let userId = msg.from.id.toString();
   if (userLocks[userId]) {
     return;
