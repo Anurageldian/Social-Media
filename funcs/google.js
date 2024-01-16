@@ -2,7 +2,7 @@ require('dotenv').config()
 const { search } = require('google-sr');
 
 async function googleSearch(bot, chatId, query, userName) {
-  if (!query) return bot.sendMessage(chatId, `[Indonesia]\nMasukkan query pencarian googlemu, contoh\n/google apa itu javascript\n\n[English]\nEnter your Google search query, example\n/google what is javascript`)
+  if (!query) return bot.sendMessage(chatId, `Enter your Google search query, example\n/google what is javascript`)
   bot.sendChatAction(chatId, 'typing');
   try {
     const searchResults = await search({ query: query });
