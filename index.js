@@ -84,7 +84,7 @@ let bot = new TelegramBot(token, {
   polling: true
 })
 // Bot Settings
-let botName = 'Krxuv Bot';
+let botName = 'Nezuko Social Bot';
 app.get('/', async (req, res) => {
   res.send({
     Status: "Active"
