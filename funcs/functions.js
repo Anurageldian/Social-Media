@@ -32,7 +32,7 @@ function htmlToText(html) {
   return $.text();
 }
 
-async getBanned(user) {
+async function getBanned(user) {
     try {
       let get = await axios.get(`https://raw.githubusercontent.com/Krxuv/list_banned/main/banned.json`)
       let json = get.data;
