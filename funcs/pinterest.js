@@ -32,7 +32,7 @@ async function pinSearch(bot, chatId, query, userName) {
     let json = await get.data;
 		let data = json.resource_response.data.results;
 		if (!data.length) return bot.editMessageText(`Query "${query}" not found!`, { chat_id: chatId, message_id: load.message_id });
-		await bot.sendPhoto(chatId, data[~~(Math.random() * (data.length))].images.orig.url, { caption: `Bot by @Krxuvv` });
+		await bot.sendPhoto(chatId, data[~~(Math.random() * (data.length))].images.orig.url, { caption: `Bot by @firespower` });
 		return bot.deleteMessage(chatId, load.message_id);
   } catch (err) {
     await bot.sendMessage(String(process.env.DEV_ID), `[ ERROR MESSAGE ]\n\n• Username: @${userName}\n• File: funcs/pinterest.js\n• Function: pinSearch()\n• Query: ${query}\n\n${err}`.trim());
@@ -48,10 +48,10 @@ async function pinterest(bot, chatId, url, userName) {
       return bot.editMessageText('Failed to get data, make sure your Pinterest link is valid!', { chat_id: chatId, message_id: load.message_id })
     } else {
       if (get.endsWith('.mp4')) {
-        await bot.sendVideo(chatId, get, { caption: `Bot by @Krxuvv` })
+        await bot.sendVideo(chatId, get, { caption: `Bot by @firespower` })
         return bot.deleteMessage(chatId, load.message_id);
       } else {
-        await bot.sendPhoto(chatId, get, { caption: `Bot by @Krxuvv` })
+        await bot.sendPhoto(chatId, get, { caption: `Bot by @firespower` })
         return bot.deleteMessage(chatId, load.message_id);
       }
     }
