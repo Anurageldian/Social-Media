@@ -55,16 +55,6 @@ async getBanned(user) {
     }
   }
 
-  filterAlphanumericWithDash(inputText) {
-    return inputText.replace(/[^a-zA-Z0-9\s]/g, '').replace(/\s+/g, '-');
-  }
-
-  htmlToText(html) {
-    let $ = cheerio.load(html);
-    return $.text();
-  }
-}
-
 
 module.exports = {
   getBuffer,
