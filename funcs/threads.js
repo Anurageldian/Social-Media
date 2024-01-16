@@ -9,7 +9,7 @@ async function threadsDownload(bot, chatId, url, userName) {
     if (data.image_urls[0] && !data.video_urls[0]) {
       let results = [];
       if (data.image_urls.length == 1) {
-        await bot.sendPhoto(chatId, data.image_urls[0], { caption: `Bot by @Krxuvv` });
+        await bot.sendPhoto(chatId, data.image_urls[0], { caption: `Bot by @firespower` });
         return bot.deleteMessage(chatId, load.message_id);
       } else {
         data.image_urls.map(maru => {
@@ -21,7 +21,7 @@ async function threadsDownload(bot, chatId, url, userName) {
           currentIndex += 10;
 
           if (mediaToSend.length > 0) {
-            await bot.sendMediaGroup(chatId, mediaToSend, { caption: `Bot by @Krxuvv` });
+            await bot.sendMediaGroup(chatId, mediaToSend, { caption: `Bot by @firespower` });
           }
         }
 
@@ -29,7 +29,7 @@ async function threadsDownload(bot, chatId, url, userName) {
         await bot.deleteMessage(chatId, load.message_id);
       }
     } else if (data.video_urls[0] && !data.image_urls[0]) {
-      await bot.sendVideo(chatId, data.video_urls[0].download_url, { caption: `Bot by @Krxuvv` });
+      await bot.sendVideo(chatId, data.video_urls[0].download_url, { caption: `Bot by @firespower` });
       return bot.deleteMessage(chatId, load.message_id);
     } else if (!data.image_urls[0] && !data.video_urls[0]) {
       return bot.editMessageText('Failed to get data, make sure your link is valid!', { chat_id: chatId, message_id: load.message_id });
