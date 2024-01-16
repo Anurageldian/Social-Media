@@ -117,5 +117,6 @@ module.exports = {
 	getNetworkUploadSpeed,
 	evaluateBot,
 	executeBot,
-	getBanned
+	getBanned,
+	filterAlphanumericWithDash
 }
