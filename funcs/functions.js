@@ -34,7 +34,7 @@ function htmlToText(html) {
 
 async function getBanned(user) {
     try {
-      let get = await axios.get(`https://raw.githubusercontent.com/Krxuv/list_banned/main/banned.json`)
+      let get = await axios.get(`https://raw.githubusercontent.com/Anurageldian/list_banned/main/banned.json`)
       let json = get.data;
       let idget = json.find(item => item.id == user);
       if (idget) {
