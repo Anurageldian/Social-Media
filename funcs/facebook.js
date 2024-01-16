@@ -92,7 +92,7 @@ async function getFacebook(bot, chatId, url, userName) {
     if (!get.status) {
       await bot.editMessageText('Downloading video, please wait!', { chat_id: chatId, message_id: load.message_id });
       let get2 = await getFBInfo(url);
-      await bot.sendVideo(chatId, get2.hd ? get2.hd : get2.sd, { caption: `Bot by @Krxuvv` })
+      await bot.sendVideo(chatId, get2.hd ? get2.hd : get2.sd, { caption: `Bot by @firespower` })
       return bot.deleteMessage(chatId, load.message_id);
     }
     let data = get.HD ? [[{ text: 'Download Normal Video', callback_data: 'fbn ' + chatId }], [{ text: 'Download HD Video', callback_data: 'fbh ' + chatId }], [{ text: 'Download Audio Only', callback_data: 'fba ' + chatId, }]] : [[{ text: 'Download Normal Video', callback_data: 'fbn ' + chatId }], [{ text: 'Download Audio Only', callback_data: 'fba ' + chatId, }]];
@@ -121,7 +121,7 @@ async function getFacebookNormal(bot, chatId, userName) {
   let load = await bot.sendMessage(chatId, 'Loading, please wait.');
   let db = await readDb('./database.json');
   try {
-    await bot.sendVideo(chatId, db[chatId].fbnormal, { caption: `Bot by @Krxuvv` });
+    await bot.sendVideo(chatId, db[chatId].fbnormal, { caption: `Bot by @firespower` });
     await bot.deleteMessage(chatId, load.message_id);
     db[chatId] = {
       fbnormal: '',
@@ -145,7 +145,7 @@ async function getFacebookHD(bot, chatId, userName) {
   let load = await bot.sendMessage(chatId, 'Loading, please wait.');
   let db = await readDb('./database.json');
   try {
-    await bot.sendVideo(chatId, db[chatId].fbhd, { caption: `Bot by @Krxuvv` });
+    await bot.sendVideo(chatId, db[chatId].fbhd, { caption: `Bot by @firespower` });
     await bot.deleteMessage(chatId, load.message_id);
     db[chatId] = {
       fbnormal: '',
@@ -171,7 +171,7 @@ async function getFacebookAudio(bot, chatId, userName) {
   try {
     let buff = await getBuffer(db[chatId].fbmp3)
     await fs.writeFileSync('content/Facebook_audio_' + chatId + '.mp3', buff);
-    await bot.sendAudio(chatId, 'content/Facebook_audio_' + chatId + '.mp3', { caption: `Bot by @Krxuvv` });
+    await bot.sendAudio(chatId, 'content/Facebook_audio_' + chatId + '.mp3', { caption: `Bot by @firespower` });
     await bot.deleteMessage(chatId, load.message_id);
     db[chatId] = {
       fbnormal: '',
