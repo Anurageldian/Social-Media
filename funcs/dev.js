@@ -78,9 +78,6 @@ async function executeBot(bot, chatId, input) {
    }
 }
 
-
-
-
 module.exports = {
 	getNetworkDownloadSpeed,
 	getNetworkUploadSpeed,
