@@ -64,7 +64,6 @@ let {
   getNetworkDownloadSpeed,
   evaluateBot,
   executeBot,
-  getBanned
 } = require('./funcs/dev')
 let {
   telegraphUpload,
