@@ -126,7 +126,7 @@ async function getTiktokInfo(bot, chatId, url, userName) {
       let getbuff = await getBuffer(getdl.audio || getdl.audio2);
       await fs.writeFileSync(`content/${title}-${chatId}.mp3`, getbuff);
       await bot.sendChatAction(chatId, 'upload_voice');
-      await bot.sendAudio(chatId, `content/${title}-${chatId}.mp3`, { caption: 'Downloaded audio: ' + title + ' by @Krxuvv', filename: `${title}-${chatId}.mp3`, contentType: 'audio/mp3' })
+      await bot.sendAudio(chatId, `content/${title}-${chatId}.mp3`, { caption: 'Downloaded audio: ' + title + ' by @firespower', filename: `${title}-${chatId}.mp3`, contentType: 'audio/mp3' })
       await bot.deleteMessage(chatId, load.message_id);
       await fs.unlinkSync(`content/${title}-${chatId}.mp3`)
     } else if (getinfo.type === 'image') {
@@ -171,7 +171,7 @@ async function tiktokVideo(bot, chatId, url, userName) {
     let getbuff = await getBuffer(get.video);
     await fs.writeFileSync(`content/${fname}`, getbuff);
     await bot.sendChatAction(chatId, 'upload_video')
-    await bot.sendVideo(chatId, `content/${fname}`, { filename: fname, contentType: 'video/mp4', caption: `Bot by @Krxuvv` });
+    await bot.sendVideo(chatId, `content/${fname}`, { filename: fname, contentType: 'video/mp4', caption: `Bot by @firespower` });
     await bot.deleteMessage(chatId, load.message_id);
     await fs.unlinkSync('content/'+fname)
   } catch (err) {
@@ -188,7 +188,7 @@ async function tiktokAudio(bot, chatId, url, userName) {
     let getbuff = await getBuffer(get.audio || get.audio2);
     await fs.writeFileSync(`content/${fname}`, getbuff);
     await bot.sendChatAction(chatId, 'upload_voice');
-    await bot.sendAudio(chatId, `content/${fname}`, { filename: fname, contentType: 'audio/mp3', caption: `Bot by @Krxuvv` });
+    await bot.sendAudio(chatId, `content/${fname}`, { filename: fname, contentType: 'audio/mp3', caption: `Bot by @firespower` });
     await bot.deleteMessage(chatId, load.message_id);
     await fs.unlinkSync('content/'+fname)
   } catch (err) {
@@ -206,7 +206,7 @@ async function tiktokSound(bot, chatId, url, userName) {
     let getbuff = await getBuffer(get.audio || get.audio2);
     await fs.writeFileSync(`content/${fname}`, getbuff);
     await bot.sendChatAction(chatId, 'upload_voice');
-    await bot.sendAudio(chatId, `content/${fname}`, { filename: fname, contentType: 'audio/mp3', caption: `Bot by @Krxuvv` });
+    await bot.sendAudio(chatId, `content/${fname}`, { filename: fname, contentType: 'audio/mp3', caption: `Bot by @firespower` });
     await bot.deleteMessage(chatId, load.message_id);
     await fs.unlinkSync('content/'+fname)
   } catch (err) {
