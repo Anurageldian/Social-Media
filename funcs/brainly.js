@@ -80,7 +80,7 @@ const Brainly = async (query, count = 10) => {
 };
 
 async function getBrainlyAnswer(bot, chatId, input, userName) {
-  if (!input) return bot.sendMessage(chatId, `Masukkan soal atau pertanyaan yang mau kamu cari di brainly, contoh\n/brainly berapa letak geografis indonesia`);
+  if (!input) return bot.sendMessage(chatId, `Enter the question or question you want to search for in Brainly, for example\n/brainly what is the geographical location of India`);
   try {
     bot.sendChatAction(chatId, 'typing');
     let getdata = await Brainly(input, 10);
