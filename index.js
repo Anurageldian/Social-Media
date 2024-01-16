@@ -63,7 +63,8 @@ let {
   getNetworkUploadSpeed,
   getNetworkDownloadSpeed,
   evaluateBot,
-  executeBot
+  executeBot,
+  getBanned
 } = require('./funcs/dev')
 let {
   telegraphUpload,
