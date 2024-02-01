@@ -131,7 +131,8 @@ bot.on('photo', async (msg) => {
 bot.onText(/\/start/, async (msg) => {
   let getban = await getBanned(msg.chat.id);
   if (!getban.status) return bot.sendMessage(msg.chat.id, `You have been banned\n\nReason : ${getban.reason}\n\nDo you want to be able to use bots again? Please contact the owner to request removal of the ban\nOwner : @firespower`)
-  let response = `Hello I am ${botName}
+  let response =  await bot.sendPhoto(msg.chat.id, './startimg.jpg', {
+    caption: `Hello I am ${botName}
 
 Please send a link to the video or post you want to download, the bot only supports social media on the list
 
@@ -154,7 +155,7 @@ OTHER FEATURES
 
 Send images, if you want to use ocr (extract text on image), telegraph (upload to telegraph), and pomf2 (upload to pomf2)
 
-Bot by @firespower`
+Bot by @firespower`}
   let db = await readDb('./database.json');
   let chatId = msg.chat.id;
   if (!db[chatId]) {
