@@ -155,7 +155,7 @@ OTHER FEATURES
 
 Send images, if you want to use ocr (extract text on image), telegraph (upload to telegraph), and pomf2 (upload to pomf2)
 
-Bot by @firespower`
+Bot by @firespower`})
   let db = await readDb('./database.json');
   let chatId = msg.chat.id;
   if (!db[chatId]) {
