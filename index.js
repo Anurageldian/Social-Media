@@ -131,13 +131,7 @@ bot.on('photo', async (msg) => {
 bot.onText(/\/start/, async (msg) => {
   let getban = await getBanned(msg.chat.id);
   if (!getban.status) return bot.sendMessage(msg.chat.id, `You have been banned\n\nReason : ${getban.reason}\n\nDo you want to be able to use bots again? Please contact the owner to request removal of the ban\nOwner : @firespower`)
-const inlineKeyboard = [
-  [
-    { text: 'More Info',
-    callback_data: 'more_info' },
-  ],
-];
-   let response = await bot.sendPhoto(msg.chat.id, 'https://telegra.ph/file/57fabcc59ac97735de40b.jpg', {
+  let response =  await bot.sendPhoto(msg.chat.id, './startimg.jpg', {
     caption: `Hello I am ${botName}
 
 Please send a link to the video or post you want to download, the bot only supports social media on the list
@@ -150,41 +144,18 @@ LIST :
 • Facebook
 • Pinterest
 • Spotify
-• Github`, reply_markup:{ inline_keyboard: inlineKeyboard},
-   });
-  });
+• Github
 
 
-  // Handle button callback
-bot.on('callback_query', async (callbackQuery) => {
-  const chatId = callbackQuery.message.chat.id;
-  const messageId = callbackQuery.message.message_id;
-  const data = callbackQuery.data;
+OTHER FEATURES
+/ai (Question/Pertanyaan)
+/brainly (Pertanyaan/Soal)
+/pin (Searching Pinterest)
+/google (Searching Google)
 
-  if (data === 'more_info') {
-    // Send additional information when the button is pressed
-    await bot.editMessageCaption(
-      `OTHER FEATURES
-      /ai (Question/Pertanyaan)
-      /brainly (Pertanyaan/Soal)
-      /pin (Searching Pinterest)
-      /google (Searching Google)
-      
-      Send images, if you want to use ocr (extract text on image), telegraph (upload to telegraph), and pomf2 (upload to pomf2)
-      
-      Bot by @firespower`,
-      {
-        chat_id: chatId,
-        message_id: messageId,
-        reply_markup: { inline_keyboard: [] }, // Remove the inline keyboard
-      }
-    );
-  }
-});
+Send images, if you want to use ocr (extract text on image), telegraph (upload to telegraph), and pomf2 (upload to pomf2)
 
-
-
-
+Bot by @firespower`});
   let db = await readDb('./database.json');
   let chatId = msg.chat.id;
   if (!db[chatId]) {
