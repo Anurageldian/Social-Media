@@ -137,7 +137,7 @@ const inlineKeyboard = [
     callback_data: 'more_info' },
   ],
 ];
-   await bot.sendPhoto(msg.chat.id, 'https://telegra.ph/file/57fabcc59ac97735de40b.jpg', {
+  async await bot.sendPhoto(msg.chat.id, 'https://telegra.ph/file/57fabcc59ac97735de40b.jpg', {
     caption: `Hello I am ${botName}
 
 Please send a link to the video or post you want to download, the bot only supports social media on the list
