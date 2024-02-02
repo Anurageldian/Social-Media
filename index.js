@@ -140,19 +140,19 @@ const inlineKeyboard = [
    let response = await bot.sendPhoto(msg.chat.id, 'https://telegra.ph/file/57fabcc59ac97735de40b.jpg', {
     caption: `Hello I am ${botName}
 
-Please send a link to the video or post you want to download, the bot only supports social media on the list
+    Please send a link to the video or post you want to download, the bot only supports social media on the list
 
-LIST :
-• Threads
-• Tiktok
-• Instagram
-• Twitter
-• Facebook
-• Pinterest
-• Spotify
-• Github`, reply_markup:{ inline_keyboard: inlineKeyboard},
+    LIST :
+    • Threads
+    • Tiktok  
+    • Instagram
+    • Twitter  
+    • Facebook
+    • Pinterest
+    • Spotify
+    • Github`, reply_markup:{ inline_keyboard: inlineKeyboard},
    });
-  });
+  
 
 
   // Handle button callback
@@ -181,6 +181,10 @@ bot.on('callback_query', async (callbackQuery) => {
     );
   }
 });
+
+
+
+
   let db = await readDb('./database.json');
   let chatId = msg.chat.id;
   if (!db[chatId]) {
