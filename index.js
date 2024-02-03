@@ -190,6 +190,7 @@ Bot by @firespower`;
           chat_id: chatId,
           message_id: messageId,
           reply_markup: { inline_keyboard: inlineKeyboard },
+          text: initialCaption, 
         }
       );
     }
