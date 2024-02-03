@@ -148,7 +148,8 @@ LIST :
 • Facebook
 • Pinterest
 • Spotify
-• Github`;
+• Github
+Bot by @firespower`;
 
   const photoURL = 'https://telegra.ph/file/57fabcc59ac97735de40b.jpg';
 
@@ -166,16 +167,16 @@ LIST :
     if (data === 'more_info') {
       // Send additional information when the button is pressed
       await bot.sendMessage(
-        chatId,
+        chatId, photoURL,
         `OTHER FEATURES
         /ai (Question/Pertanyaan)
         /brainly (Pertanyaan/Soal)
         /pin (Searching Pinterest)
         /google (Searching Google)
+
+Send images, if you want to use ocr (extract text on image), telegraph (upload to telegraph), and pomf2 (upload to pomf2)
         
-        Send images, if you want to use ocr (extract text on image), telegraph (upload to telegraph), and pomf2 (upload to pomf2)
-        
-        Bot by @firespower`,
+Bot by @firespower`,
         {
           reply_markup: {
             inline_keyboard: [
