@@ -137,15 +137,20 @@ bot.onText(/\/start/, async (msg) => {
     ],
   ];
 
-  const initialCaption = `Hello I am ${botName}\nPlease send a link to the video or post you want to download, the bot only supports social media on the list\n\nLIST :
-  • Threads
-  • Tiktok  
-  • Instagram
-  • Twitter  
-  • Facebook
-  • Pinterest
-  • Spotify
-  • Github\n\nBot by @firespower`;
+  const initialCaption = `Hello I am ${botName}
+
+Please send a link to the video or post you want to download, the bot only supports social media on the list
+
+LIST :
+• Threads
+• Tiktok
+• Instagram
+• Twitter
+• Facebook
+• Pinterest
+• Spotify
+• Github
+Bot by @firespower`;
 
   let response = await bot.sendPhoto(msg.chat.id, 'https://telegra.ph/file/57fabcc59ac97735de40b.jpg', {
     caption: initialCaption,
