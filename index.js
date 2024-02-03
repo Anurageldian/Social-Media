@@ -136,8 +136,10 @@ bot.onText(/\/start/, async (msg) => {
       { text: 'More Info', callback_data: 'more_info' },
     ],
   ];
+  let response = await bot.sendPhoto(msg.chat.id, 'https://telegra.ph/file/57fabcc59ac97735de40b.jpg', {
+    caption: 
+`Hello I am ${botName}
 
-  const initialCaption = `Hello I am ${botName}
 Please send a link to the video or post you want to download, the bot only supports social media on the list
 
 LIST :
@@ -150,12 +152,7 @@ LIST :
 • Spotify
 • Github
 
-Bot by @firespower`;
-
-  const photoURL = 'https://telegra.ph/file/57fabcc59ac97735de40b.jpg';
-
-  let response = await bot.sendPhoto(msg.chat.id, photoURL, {
-    caption: initialCaption,
+Bot by @firespower`,
     reply_markup: { inline_keyboard: inlineKeyboard },
   });
 
@@ -167,18 +164,19 @@ Bot by @firespower`;
 
     if (data === 'more_info') {
       // Send additional information when the button is pressed
-     await bot.sendPhoto(msg.chat.id, photoURL, {
-    caption:
+      await bot.editMessageText(
         `OTHER FEATURES
         /ai (Question/Pertanyaan)
         /brainly (Pertanyaan/Soal)
         /pin (Searching Pinterest)
         /google (Searching Google)
         
-Send images, if you want to use ocr (extract text on image), telegraph (upload to telegraph), and pomf2 (upload to pomf2
-
+Send images, if you want to use ocr (extract text on image), telegraph (upload to telegraph), and pomf2 (upload to pomf2)
+        
 Bot by @firespower`,
-     
+        {
+          chat_id: chatId,
+          message_id: messageId,
           reply_markup: {
             inline_keyboard: [
               // Add the "Back to first caption" button
@@ -188,12 +186,24 @@ Bot by @firespower`,
         }
       );
     } else if (data === 'back_to_first_caption') {
-      // Use editMessageMedia to update both caption and media
-      await bot.editMessageMedia(
+      // Handle the callback for the "Back to first caption" button
+      await bot.editMessageText(
+`Hello I am ${botName}
+
+Please send a link to the video or post you want to download, the bot only supports social media on the list
+
+LIST :
+• Threads
+• Tiktok  
+• Instagram
+• Twitter  
+• Facebook
+• Pinterest
+• Spotify
+• Github
+
+Bot by @firespower`,
         {
-          type: 'photo',
-          media: photoURL,
-          caption: initialCaption,
           chat_id: chatId,
           message_id: messageId,
           reply_markup: { inline_keyboard: inlineKeyboard },
@@ -201,8 +211,6 @@ Bot by @firespower`,
       );
     }
   });
-
-
 
 
 
