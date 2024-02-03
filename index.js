@@ -178,7 +178,7 @@ Bot by @firespower`;
 Send images, if you want to use ocr (extract text on image), telegraph (upload to telegraph), and pomf2 (upload to pomf2
 
 Bot by @firespower`,
-        {
+     
           reply_markup: {
             inline_keyboard: [
               // Add the "Back to first caption" button
