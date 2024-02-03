@@ -163,7 +163,8 @@ LIST :
 
     if (data === 'more_info') {
       // Send additional information when the button is pressed
-      await bot.editMessageText(
+      await bot.sendMessage(
+        chatId,
         `OTHER FEATURES
         /ai (Question/Pertanyaan)
         /brainly (Pertanyaan/Soal)
@@ -174,8 +175,6 @@ LIST :
         
         Bot by @firespower`,
         {
-          chat_id: chatId,
-          message_id: messageId,
           reply_markup: {
             inline_keyboard: [
               // Add the "Back to first caption" button
@@ -196,6 +195,8 @@ LIST :
       );
     }
   });
+
+
 
 
 
