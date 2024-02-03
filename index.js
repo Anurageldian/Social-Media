@@ -134,8 +134,11 @@ bot.onText(/\/start/, async (msg) => {
   if (!getban.status) return bot.sendMessage(msg.chat.id, `You have been banned\n\nReason : ${getban.reason}\n\nDo you want to be able to use bots again? Please contact the owner to request removal of the ban\nOwner : @firespower`)
   const inlineKeyboard = [
     [
-      { text: 'More Info', callback_data: 'more_info' },
+      { text: 'More >', callback_data: 'more_info' },
     ],
+     [
+        { text: 'Owner', url: 'https://t.me/firespower' }, // Add your social media link
+      ],
   ];
   let response = await bot.sendPhoto(msg.chat.id, 'https://telegra.ph/file/57fabcc59ac97735de40b.jpg', {
     caption:
@@ -181,7 +184,7 @@ Bot by @firespower`,
           reply_markup: {
             inline_keyboard: [
               // Add the "Back to first caption" button
-              [{ text: 'Back to first caption', callback_data: 'back_to_first_caption' }],
+              [{ text: '< Back', callback_data: 'back_to_first_caption' }],
             ],
           },
         }
