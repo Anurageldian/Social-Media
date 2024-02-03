@@ -150,12 +150,12 @@ LIST :
 • Pinterest
 • Spotify
 • Github
-Bot by @firespower`;
+Bot by @firespower`,
 
   let response = await bot.sendPhoto(msg.chat.id, 'https://telegra.ph/file/57fabcc59ac97735de40b.jpg', {
     caption: initialCaption,
     reply_markup: { inline_keyboard: inlineKeyboard },
-  });
+  })
 
   // Handle button callback
   bot.on('callback_query', async (callbackQuery) => {
