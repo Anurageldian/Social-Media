@@ -150,7 +150,9 @@ LIST :
 • Spotify
 • Github`;
 
-  let response = await bot.sendPhoto(msg.chat.id, 'https://telegra.ph/file/57fabcc59ac97735de40b.jpg', {
+  const photoURL = 'https://telegra.ph/file/57fabcc59ac97735de40b.jpg';
+
+  let response = await bot.sendPhoto(msg.chat.id, photoURL, {
     caption: initialCaption,
     reply_markup: { inline_keyboard: inlineKeyboard },
   });
@@ -184,17 +186,17 @@ LIST :
         }
       );
     } else if (data === 'back_to_first_caption') {
-      // Handle the callback for the "Back to first caption" button
-      await bot.editMessageText(
-        initialCaption,
-        {
-          chat_id: chatId,
-          message_id: messageId,
-          reply_markup: { inline_keyboard: inlineKeyboard },
-        }
-      );
+      // Resend the photo along with the updated caption
+      await bot.sendPhoto(chatId, photoURL, {
+        caption: initialCaption,
+        reply_markup: { inline_keyboard: inlineKeyboard },
+      });
+
+      // Delete the previous message
+      await bot.deleteMessage(chatId, messageId);
     }
   });
+
 
 
 
