@@ -167,8 +167,8 @@ Bot by @firespower`;
 
     if (data === 'more_info') {
       // Send additional information when the button is pressed
-      await bot.sendMessage(
-        chatId,
+     await bot.sendPhoto(msg.chat.id, photoURL, {
+    caption:
         `OTHER FEATURES
         /ai (Question/Pertanyaan)
         /brainly (Pertanyaan/Soal)
