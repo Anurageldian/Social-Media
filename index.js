@@ -137,9 +137,7 @@ bot.onText(/\/start/, async (msg) => {
     ],
   ];
   let response = await bot.sendPhoto(msg.chat.id, 'https://telegra.ph/file/57fabcc59ac97735de40b.jpg', {
-    caption: `Hello I am ${botName}
-
-    Please send a link to the video or post you want to download, the bot only supports social media on the list
+    caption: `Hello I am ${botName}\nPlease send a link to the video or post you want to download, the bot only supports social media on the list
 
     LIST :
     • Threads
@@ -168,10 +166,10 @@ bot.onText(/\/start/, async (msg) => {
         /brainly (Pertanyaan/Soal)
         /pin (Searching Pinterest)
         /google (Searching Google)
+
+Send images, if you want to use ocr (extract text on image), telegraph (upload to telegraph), and pomf2 (upload to pomf2)
         
-    Send images, if you want to use ocr (extract text on image), telegraph (upload to telegraph), and pomf2 (upload to pomf2)
-        
-        Bot by @firespower`,
+  Bot by @firespower`,
         {
           chat_id: chatId,
           message_id: messageId,
