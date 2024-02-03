@@ -208,7 +208,7 @@ bot.onText(/\/start/, async (msg) => {
       );
     }
   });
-});
+
 
 
 
@@ -223,7 +223,7 @@ bot.onText(/\/start/, async (msg) => {
   } else if (db[chatId]) {
     await bot.sendMessage(chatId, response);
   }
-})
+});
 
 // !dev commands
 // get network upload speed
