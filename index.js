@@ -137,11 +137,7 @@ bot.onText(/\/start/, async (msg) => {
     ],
   ];
 
-  const initialCaption = `Hello I am ${botName}
-
-  Please send a link to the video or post you want to download, the bot only supports social media on the list
-
-  LIST :
+  const initialCaption = `Hello I am ${botName}\nPlease send a link to the video or post you want to download, the bot only supports social media on the list\n\nLIST :
   • Threads
   • Tiktok  
   • Instagram
@@ -149,9 +145,7 @@ bot.onText(/\/start/, async (msg) => {
   • Facebook
   • Pinterest
   • Spotify
-  • Github
-  
- Bot by @firespower`;
+  • Github\n\nBot by @firespower`;
 
   let response = await bot.sendPhoto(msg.chat.id, 'https://telegra.ph/file/57fabcc59ac97735de40b.jpg', {
     caption: initialCaption,
@@ -171,11 +165,7 @@ bot.onText(/\/start/, async (msg) => {
         /ai (Question/Pertanyaan)
         /brainly (Pertanyaan/Soal)
         /pin (Searching Pinterest)
-        /google (Searching Google)
-        
-  Send images, if you want to use ocr (extract text on image), telegraph (upload to telegraph), and pomf2 (upload to pomf2)
-        
-  Bot by @firespower`,
+        /google (Searching Google)\n\nSend images, if you want to use ocr (extract text on image), telegraph (upload to telegraph), and pomf2 (upload to pomf2)\n\nBot by @firespower`,
         {
           chat_id: chatId,
           message_id: messageId,
