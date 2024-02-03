@@ -150,7 +150,6 @@ bot.onText(/\/start/, async (msg) => {
     • Pinterest
     • Spotify
     • Github
-    
     Bot by @firespower`,
     reply_markup: { inline_keyboard: inlineKeyboard },
   });
@@ -170,7 +169,7 @@ bot.onText(/\/start/, async (msg) => {
         /pin (Searching Pinterest)
         /google (Searching Google)
         
-        Send images, if you want to use ocr (extract text on image), telegraph (upload to telegraph), and pomf2 (upload to pomf2)
+    Send images, if you want to use ocr (extract text on image), telegraph (upload to telegraph), and pomf2 (upload to pomf2)
         
         Bot by @firespower`,
         {
@@ -189,7 +188,7 @@ bot.onText(/\/start/, async (msg) => {
       await bot.editMessageCaption(
         `Hello I am ${botName}
 
-        Please send a link to the video or post you want to download, the bot only supports social media on the list
+    Please send a link to the video or post you want to download, the bot only supports social media on the list
 
         LIST :
         • Threads
@@ -199,7 +198,8 @@ bot.onText(/\/start/, async (msg) => {
         • Facebook
         • Pinterest
         • Spotify
-        • Github`,
+        • Github
+      Bot by @firespower`,
         {
           chat_id: chatId,
           message_id: messageId,
