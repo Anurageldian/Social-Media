@@ -133,22 +133,28 @@ bot.onText(/\/start/, async (msg) => {
   if (!getban.status) return bot.sendMessage(msg.chat.id, `You have been banned\n\nReason : ${getban.reason}\n\nDo you want to be able to use bots again? Please contact the owner to request removal of the ban\nOwner : @firespower`)
   const inlineKeyboard = [
     [
-      { text: 'More Features >', callback_data: 'more_info' },
+      { text: 'More >', callback_data: 'more_info' },
     ],
   ];
-  let response = await bot.sendPhoto(msg.chat.id, 'https://telegra.ph/file/57fabcc59ac97735de40b.jpg', {
-    caption: `Hello I am ${botName}\nPlease send a link to the video or post you want to download, the bot only supports social media on the list
 
-    LIST :
-    • Threads
-    • Tiktok  
-    • Instagram
-    • Twitter  
-    • Facebook
-    • Pinterest
-    • Spotify
-    • Github
-    Bot by @firespower`,
+  const initialCaption = `Hello I am ${botName}
+
+  Please send a link to the video or post you want to download, the bot only supports social media on the list
+
+  LIST :
+  • Threads
+  • Tiktok  
+  • Instagram
+  • Twitter  
+  • Facebook
+  • Pinterest
+  • Spotify
+  • Github
+  
+ Bot by @firespower`;
+
+  let response = await bot.sendPhoto(msg.chat.id, 'https://telegra.ph/file/57fabcc59ac97735de40b.jpg', {
+    caption: initialCaption,
     reply_markup: { inline_keyboard: inlineKeyboard },
   });
 
@@ -160,14 +166,14 @@ bot.onText(/\/start/, async (msg) => {
 
     if (data === 'more_info') {
       // Send additional information when the button is pressed
-      await bot.editMessageCaption(
+      await bot.editMessageText(
         `OTHER FEATURES
         /ai (Question/Pertanyaan)
         /brainly (Pertanyaan/Soal)
         /pin (Searching Pinterest)
         /google (Searching Google)
-
-Send images, if you want to use ocr (extract text on image), telegraph (upload to telegraph), and pomf2 (upload to pomf2)
+        
+  Send images, if you want to use ocr (extract text on image), telegraph (upload to telegraph), and pomf2 (upload to pomf2)
         
   Bot by @firespower`,
         {
@@ -183,21 +189,8 @@ Send images, if you want to use ocr (extract text on image), telegraph (upload t
       );
     } else if (data === 'back_to_first_caption') {
       // Handle the callback for the "Back to first caption" button
-      await bot.editMessageCaption(
-        `Hello I am ${botName}
-
-    Please send a link to the video or post you want to download, the bot only supports social media on the list
-
-        LIST :
-        • Threads
-        • Tiktok  
-        • Instagram
-        • Twitter  
-        • Facebook
-        • Pinterest
-        • Spotify
-        • Github
-      Bot by @firespower`,
+      await bot.editMessageText(
+        initialCaption,
         {
           chat_id: chatId,
           message_id: messageId,
@@ -206,7 +199,6 @@ Send images, if you want to use ocr (extract text on image), telegraph (upload t
       );
     }
   });
-
 
 
 
