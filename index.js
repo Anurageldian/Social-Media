@@ -127,6 +127,7 @@ bot.on('photo', async (msg) => {
   }
 })
 
+
 // start
 bot.onText(/\/start/, async (msg) => {
   let getban = await getBanned(msg.chat.id);
@@ -137,7 +138,7 @@ bot.onText(/\/start/, async (msg) => {
     ],
   ];
   let response = await bot.sendPhoto(msg.chat.id, 'https://telegra.ph/file/57fabcc59ac97735de40b.jpg', {
-    caption: 
+    caption:
 `Hello I am ${botName}
 
 Please send a link to the video or post you want to download, the bot only supports social media on the list
@@ -164,7 +165,7 @@ Bot by @firespower`,
 
     if (data === 'more_info') {
       // Send additional information when the button is pressed
-      await bot.editMessageText(
+      await bot.editMessageCaption(
         `OTHER FEATURES
         /ai (Question/Pertanyaan)
         /brainly (Pertanyaan/Soal)
@@ -187,7 +188,7 @@ Bot by @firespower`,
       );
     } else if (data === 'back_to_first_caption') {
       // Handle the callback for the "Back to first caption" button
-      await bot.editMessageText(
+      await bot.editMessageCaption(
 `Hello I am ${botName}
 
 Please send a link to the video or post you want to download, the bot only supports social media on the list
@@ -211,8 +212,6 @@ Bot by @firespower`,
       );
     }
   });
-
-
 
 
 
