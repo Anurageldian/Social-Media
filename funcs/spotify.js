@@ -49,7 +49,7 @@ async function getPlaylistSpotify(bot, chatId, url, userName) {
         inline_keyboard: data
       })
     };
-    await bot.sendPhoto(chatId, 'https://telegra.ph/file/a41e47f544ed99dd33783.jpg', options);
+    await bot.sendPhoto(chatId, images, options);
     await bot.deleteMessage(chatId, load.message_id);
   } catch (err) {
     await bot.sendMessage(String(process.env.DEV_ID), `[ ERROR MESSAGE ]\n\n• Username: @${userName}\n• File: funcs/spotify.js\n• Function: getPlaylistSpotify()\n• Url: ${url}\n\n${err}`.trim());
