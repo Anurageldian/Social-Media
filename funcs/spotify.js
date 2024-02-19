@@ -34,21 +34,35 @@ async function spotifyScraper(id, endpoint) {
   }
 }
 
+const axios = require('axios');
+
 async function getPlaylistSpotify(bot, chatId, url, userName) {
   let pars = await parse(url);
-  let load = await bot.sendMessage(chatId, 'Loading, please wait.')
+  let load = await bot.sendMessage(chatId, 'Loading, please wait.');
 
   try {
-    let playlistData = await spotifyScraper(`${pars.id}`, 'metadata/playlist');
-    
-    // Check if playlistData has images
-    if (playlistData && playlistData.images && playlistData.images.length > 0) {
-      let playlistImageUrl = playlistData.images[0].url;
+    // Fetch playlist metadata
+    const playlistMetadataResponse = await axios.get(`https://api.spotifydown.com/metadata/playlist/${pars.id}`, {
+      headers: {
+        'Origin': 'https://spotifydown.com',
+        'Referer': 'https://spotifydown.com/',
+      }
+    });
 
-      let getdata = await spotifyScraper(`${pars.id}`, 'trackList/playlist')
+    // Check if playlistMetadataResponse has images
+    if (playlistMetadataResponse.data && playlistMetadataResponse.data.images && playlistMetadataResponse.data.images.length > 0) {
+      let playlistImageUrl = playlistMetadataResponse.data.images[0].url;
+
+      // Fetch playlist track list
+      const playlistTrackListResponse = await axios.get(`https://api.spotifydown.com/trackList/playlist/${pars.id}`, {
+        headers: {
+          'Origin': 'https://spotifydown.com',
+          'Referer': 'https://spotifydown.com/',
+        }
+      });
+
       let data = [];
-
-      getdata.trackList.map(maru => {
+      playlistTrackListResponse.data.trackList.map(maru => {
         data.push([{ text: `${maru.title} - ${maru.artists}`, callback_data: 'spt ' + maru.id }])
       });
 
@@ -59,6 +73,7 @@ async function getPlaylistSpotify(bot, chatId, url, userName) {
         })
       };
 
+      // Send playlist photo and options
       await bot.sendPhoto(chatId, playlistImageUrl, options);
       await bot.deleteMessage(chatId, load.message_id);
     } else {
@@ -71,6 +86,7 @@ async function getPlaylistSpotify(bot, chatId, url, userName) {
     return bot.editMessageText('Error getting playlist data!', { chat_id: chatId, message_id: load.message_id });
   }
 }
+
 
 
 
