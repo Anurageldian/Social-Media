@@ -37,32 +37,41 @@ async function spotifyScraper(id, endpoint) {
 async function getPlaylistSpotify(bot, chatId, url, userName) {
   let pars = await parse(url);
   let load = await bot.sendMessage(chatId, 'Loading, please wait.')
-  
+
   try {
     let playlistData = await spotifyScraper(`${pars.id}`, 'metadata/playlist');
-    let playlistImageUrl = playlistData.images && playlistData.images.length > 0 ? playlistData.images[0].url : 'https://telegra.ph/file/a41e47f544ed99dd33783.jpg';
-
-    let getdata = await spotifyScraper(`${pars.id}`, 'trackList/playlist')
-    let data = [];
     
-    getdata.trackList.map(maru => {
-      data.push([{ text: `${maru.title} - ${maru.artists}`, callback_data: 'spt ' + maru.id }])
-    });
+    // Check if playlistData has images
+    if (playlistData && playlistData.images && playlistData.images.length > 0) {
+      let playlistImageUrl = playlistData.images[0].url;
 
-    let options = {
-      caption: 'Please select the music you want to download by pressing one of the buttons below!',
-      reply_markup: JSON.stringify({
-        inline_keyboard: data
-      })
-    };
+      let getdata = await spotifyScraper(`${pars.id}`, 'trackList/playlist')
+      let data = [];
 
-    await bot.sendPhoto(chatId, playlistImageUrl, options);
-    await bot.deleteMessage(chatId, load.message_id);
+      getdata.trackList.map(maru => {
+        data.push([{ text: `${maru.title} - ${maru.artists}`, callback_data: 'spt ' + maru.id }])
+      });
+
+      let options = {
+        caption: 'Please select the music you want to download by pressing one of the buttons below!',
+        reply_markup: JSON.stringify({
+          inline_keyboard: data
+        })
+      };
+
+      await bot.sendPhoto(chatId, playlistImageUrl, options);
+      await bot.deleteMessage(chatId, load.message_id);
+    } else {
+      // If no playlist images, use a default image
+      await bot.sendPhoto(chatId, 'https://telegra.ph/file/a41e47f544ed99dd33783.jpg');
+      await bot.deleteMessage(chatId, load.message_id);
+    }
   } catch (err) {
     await bot.sendMessage(String(process.env.DEV_ID), `[ ERROR MESSAGE ]\n\n• Username: @${userName}\n• File: funcs/spotify.js\n• Function: getPlaylistSpotify()\n• Url: ${url}\n\n${err}`.trim());
-    return bot.editMessageText('Error getting playlist data!', { chat_id: chatId, message_id: load.message_id })
+    return bot.editMessageText('Error getting playlist data!', { chat_id: chatId, message_id: load.message_id });
   }
 }
+
 
 
 async function getAlbumsSpotify(bot, chatId, url, userName) {
