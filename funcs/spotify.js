@@ -27,12 +27,13 @@ async function spotifyScraper(id, endpoint) {
         'Origin': 'https://spotifydown.com',
         'Referer': 'https://spotifydown.com/',
       }
-    }
+
      let coverImages = await axios.get(`https://api.spotifydown.com/${endpoint}/${id}`, {
         headers: {
         'Origin': 'https://spotifydown.com',
         'Referer': 'https://spotifydown.com/',
-      })
+      }
+    })
        
      }
     return data
