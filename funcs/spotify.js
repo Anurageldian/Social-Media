@@ -34,62 +34,28 @@ async function spotifyScraper(id, endpoint) {
   }
 }
 
-
 async function getPlaylistSpotify(bot, chatId, url, userName) {
   let pars = await parse(url);
-  let load = await bot.sendMessage(chatId, 'Loading, please wait.');
-
+  let load = await bot.sendMessage(chatId, 'Loading, please wait.')
   try {
-    // Fetch playlist metadata
-    const playlistMetadataResponse = await axios.get(`https://api.spotifydown.com/metadata/playlist/${pars.id}`, {
-      headers: {
-        'Origin': 'https://spotifydown.com',
-        'Referer': 'https://spotifydown.com/',
-      }
-    });
-
-    // Check if playlistMetadataResponse has images
-    if (playlistMetadataResponse.data && playlistMetadataResponse.data.images && playlistMetadataResponse.data.images.length > 0) {
-      // Find the first image, you can adjust this based on your requirements
-      let playlistImageUrl = playlistMetadataResponse.data.images[0].url;
-
-      // Fetch playlist track list
-      const playlistTrackListResponse = await axios.get(`https://api.spotifydown.com/trackList/playlist/${pars.id}`, {
-        headers: {
-          'Origin': 'https://spotifydown.com',
-          'Referer': 'https://spotifydown.com/',
-        }
-      });
-
-      let data = [];
-      playlistTrackListResponse.data.trackList.map(maru => {
-        data.push([{ text: `${maru.title} - ${maru.artists}`, callback_data: 'spt ' + maru.id }])
-      });
-
-      let options = {
-        caption: 'Please select the music you want to download by pressing one of the buttons below!',
-        reply_markup: JSON.stringify({
-          inline_keyboard: data
-        })
-      };
-
-      // Send playlist photo and options
-      await bot.sendPhoto(chatId, playlistImageUrl, options);
-      await bot.deleteMessage(chatId, load.message_id);
-    } else {
-      // If no playlist images, use a default image
-      await bot.sendPhoto(chatId, 'https://telegra.ph/file/a41e47f544ed99dd33783.jpg');
-      await bot.deleteMessage(chatId, load.message_id);
-    }
+    let getdata = await spotifyScraper(`${pars.id}`, 'trackList/playlist')
+    let data = [];
+    getdata.trackList.map(maru => {
+      data.push([{ text: `${maru.title} - ${maru.artists}`, callback_data: 'spt ' + maru.id }])
+    })
+    let options = {
+      caption: 'Please select the music you want to download by pressing one of the buttons below!',
+      reply_markup: JSON.stringify({
+        inline_keyboard: data
+      })
+    };
+    await bot.sendPhoto(chatId, 'https://telegra.ph/file/a41e47f544ed99dd33783.jpg', options);
+    await bot.deleteMessage(chatId, load.message_id);
   } catch (err) {
     await bot.sendMessage(String(process.env.DEV_ID), `[ ERROR MESSAGE ]\n\n• Username: @${userName}\n• File: funcs/spotify.js\n• Function: getPlaylistSpotify()\n• Url: ${url}\n\n${err}`.trim());
-    return bot.editMessageText('Error getting playlist data!', { chat_id: chatId, message_id: load.message_id });
+    return bot.editMessageText('Error getting playlist data!', { chat_id: chatId, message_id: load.message_id })
   }
 }
-
-
-
-
 
 async function getAlbumsSpotify(bot, chatId, url, userName) {
   let pars = await parse(url);
