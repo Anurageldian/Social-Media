@@ -57,6 +57,10 @@ async function getPlaylistSpotify(bot, chatId, url, userName) {
   }
 }
 
+
+
+
+
 async function getAlbumsSpotify(bot, chatId, url, userName) {
   let pars = await parse(url);
   let load = await bot.sendMessage(chatId, 'Loading, please wait.')
