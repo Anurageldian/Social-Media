@@ -32,7 +32,7 @@ async function spotifyScraper(id, endpoint) {
         headers: {
         'Origin': 'https://spotifydown.com',
         'Referer': 'https://spotifydown.com/',
-      }
+      })
        
      }
     return data
