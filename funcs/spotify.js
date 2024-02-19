@@ -50,6 +50,7 @@ async function getPlaylistSpotify(bot, chatId, url, userName) {
 
     // Check if playlistMetadataResponse has images
     if (playlistMetadataResponse.data && playlistMetadataResponse.data.images && playlistMetadataResponse.data.images.length > 0) {
+      // Find the first image, you can adjust this based on your requirements
       let playlistImageUrl = playlistMetadataResponse.data.images[0].url;
 
       // Fetch playlist track list
@@ -85,6 +86,7 @@ async function getPlaylistSpotify(bot, chatId, url, userName) {
     return bot.editMessageText('Error getting playlist data!', { chat_id: chatId, message_id: load.message_id });
   }
 }
+
 
 
 
