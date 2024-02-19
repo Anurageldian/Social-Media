@@ -34,7 +34,6 @@ async function spotifyScraper(id, endpoint) {
   }
 }
 
-const axios = require('axios');
 
 async function getPlaylistSpotify(bot, chatId, url, userName) {
   let pars = await parse(url);
