@@ -28,6 +28,13 @@ async function spotifyScraper(id, endpoint) {
         'Referer': 'https://spotifydown.com/',
       }
     })
+     let coverImages = await axios.get(`https://api.spotifydown.com/${endpoint}/${id}`, {
+        headers: {
+        'Origin': 'https://spotifydown.com',
+        'Referer': 'https://spotifydown.com/',
+      }
+       
+     }
     return data
   } catch (err) {
     return 'Error: ' + err
@@ -49,17 +56,13 @@ async function getPlaylistSpotify(bot, chatId, url, userName) {
         inline_keyboard: data
       })
     };
-    await bot.sendPhoto(chatId, images, options);
+    await bot.sendPhoto(chatId, coverImages, options);
     await bot.deleteMessage(chatId, load.message_id);
   } catch (err) {
     await bot.sendMessage(String(process.env.DEV_ID), `[ ERROR MESSAGE ]\n\n• Username: @${userName}\n• File: funcs/spotify.js\n• Function: getPlaylistSpotify()\n• Url: ${url}\n\n${err}`.trim());
     return bot.editMessageText('Error getting playlist data!', { chat_id: chatId, message_id: load.message_id })
   }
 }
-
-
-
-
 
 async function getAlbumsSpotify(bot, chatId, url, userName) {
   let pars = await parse(url);
