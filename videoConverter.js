@@ -4,7 +4,7 @@ const ffmpeg = require('fluent-ffmpeg');
 // Function to convert video to GIF using ffmpeg
 async function convertVideoToGif(videoPath) {
   return new Promise((resolve, reject) => {
-    const gifPath = 'path/to/output.gif';
+    const gifPath = './images/output.gif';
 
     ffmpeg(videoPath)
       .inputFormat('mp4') // Change this based on the input video format
