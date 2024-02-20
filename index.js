@@ -345,6 +345,9 @@ bot.onText(/^(\/(pin|pinterest))/, async (msg) => {
   }
 })
 
+
+
+
 // Tiktok Regex
 bot.onText(/https?:\/\/(?:.*\.)?tiktok\.com/, async (msg) => {
   let getban = await getBanned(msg.chat.id);
@@ -530,27 +533,6 @@ bot.onText(/(?:https|git)(?::\/\/|@)github\.com[\/:]([^\/:]+)\/(.+)/i, async (ms
     await gitClone(bot, msg.chat.id, match[0], msg.chat.username)
   } finally {
     userLocks[userId] = false;
-  }
-})
-
-// Listen for incoming messages
-bot.onText(/\/convert/, (msg) => {
-  const chatId = msg.chat.id;
-
-  // Check if the message is a video
-  if (msg.video) {
-    const videoId = msg.video.file_id;
-
-    // Get the file path for the video
-    bot.getFile(videoId).then((videoFile) => {
-      const videoFilePath = `https://api.telegram.org/file/bot${token}/${videoFile.file_path}`;
-
-      // Convert the video to GIF using ffmpeg
-      convertVideoToGif(videoFilePath, (gifPath) => {
-        // Send the GIF to the chat
-        bot.sendAnimation(chatId, gifPath, { caption: 'Video converted to GIF' });
-      });
-    });
   }
 })
 
