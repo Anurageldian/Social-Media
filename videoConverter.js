@@ -5,7 +5,7 @@ require('dotenv').config(); // Load environment variables from .env file
 
 // Replace 'YOUR_TELEGRAM_BOT_TOKEN' with your actual Telegram bot token from the .env file
 const token = process.env.BOT_TOKEN;
-const bot = new TelegramBot(token, { polling: true });
+
 
 // Listen for incoming messages
 bot.onText(/\/convert/, (msg) => {
