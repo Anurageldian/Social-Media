@@ -3,8 +3,6 @@ const path = require('path');
 const fs = require('fs').promises;
 require('dotenv').config(); // Load environment variables from .env file
 
-// Replace 'YOUR_TELEGRAM_BOT_TOKEN' with your actual Telegram bot token from the .env file
-const token = process.env.BOT_TOKEN;
 
 
 // Listen for incoming messages
