@@ -73,7 +73,7 @@ let {
 
 let { 
   convertVideoToGif 
-} = require('.funcs/videoConverter')
+} = require('./videoConverter')
 let {
   readDb,
   writeDb,
