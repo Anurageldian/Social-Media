@@ -349,10 +349,6 @@ bot.onText(/^(\/(pin|pinterest))/, async (msg) => {
   }
 })
 
-// index.js
-
- // Assuming both files are in the same directory
-
 // Listen for incoming messages
 bot.onText(/\/convert/, async (msg) => {
   const chatId = msg.chat.id;
@@ -362,20 +358,20 @@ bot.onText(/\/convert/, async (msg) => {
     const videoId = msg.video.file_id;
 
     // Get the file path for the video
-    const videoFile = await bot.getFile(videoId);
-    const videoFilePath = `https://api.telegram.org/file/bot${token}/${videoFile.file_path}`;
+    bot.getFile(videoId).then((videoFile) => {
+      const videoFilePath = `https://api.telegram.org/file/bot${token}/${videoFile.file_path}`;
 
-    // Convert the video to GIF using ffmpeg
-    try {
-      const gifPath = await convertVideoToGif(videoFilePath);
-      // Send the GIF to the chat
-      bot.sendAnimation(chatId, gifPath, { caption: 'Video converted to GIF' });
-    } catch (error) {
-      console.error('Conversion failed:', error);
-    }
+      // Convert the video to GIF using ffmpeg
+      convertVideoToGif(videoFilePath, async (gifPath) => {
+        // Send the GIF to the chat
+        await bot.sendAnimation(chatId, gifPath, { caption: 'Video converted to GIF' });
+        
+        // Optionally, you can delete the generated GIF file after sending
+        await fs.unlink(gifPath);
+      });
+    });
   }
 });
-
 
 
 // Tiktok Regex
