@@ -5,29 +5,6 @@ require('dotenv').config(); // Load environment variables from .env file
 
 
 
-// Listen for incoming messages
-bot.onText(/\/convert/, (msg) => {
-  const chatId = msg.chat.id;
-
-  // Check if the message is a video
-  if (msg.video) {
-    const videoId = msg.video.file_id;
-
-    // Get the file path for the video
-    bot.getFile(videoId).then((videoFile) => {
-      const videoFilePath = `https://api.telegram.org/file/bot${token}/${videoFile.file_path}`;
-
-      // Convert the video to GIF using ffmpeg
-      convertVideoToGif(videoFilePath, async (gifPath) => {
-        // Send the GIF to the chat
-        await bot.sendAnimation(chatId, gifPath, { caption: 'Video converted to GIF' });
-        
-        // Optionally, you can delete the generated GIF file after sending
-        await fs.unlink(gifPath);
-      });
-    });
-  }
-});
 
 // Function to convert video to GIF using ffmpeg
 async function convertVideoToGif(videoPath, callback) {
