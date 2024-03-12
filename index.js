@@ -204,7 +204,7 @@ LIST :
 • Facebook
 • Pinterest
 • Spotify
-• Github`,}
+• Github`,})
         {
           chat_id: chatId,
           message_id: messageId,
