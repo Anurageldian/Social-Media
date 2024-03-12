@@ -191,7 +191,7 @@ Send images, if you want to use ocr (extract text on image), telegraph (upload t
       );
     } else if (data === 'back_to_first_caption') {
       // Handle the callback for the "Back to first caption" button
-      await bot.editMessageCaption(
+      await bot.editMessageCaption({ text:
 `Hello I am ${botName}
 
 Please send a link to the video or post you want to download, the bot only supports social media on the list
@@ -204,7 +204,7 @@ LIST :
 • Facebook
 • Pinterest
 • Spotify
-• Github`,
+• Github`,}
         {
           chat_id: chatId,
           message_id: messageId,
