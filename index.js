@@ -533,6 +533,36 @@ bot.onText(/(?:https|git)(?::\/\/|@)github\.com[\/:]([^\/:]+)\/(.+)/i, async (ms
   }
 })
 
+// /stickers command
+bot.onText(/\/stickers (.+)/, async (msg, match) => {
+  const chatId = msg.chat.id;
+  const searchTerm = match[1];
+  
+  try {
+    const response = await axios.get(`https://combot.org/telegram/stickers?q=${encodeURIComponent(searchTerm)}`);
+    
+    if (response.status === 200) {
+      const stickers = response.data;
+      
+      if (stickers && stickers.length > 0) {
+        let stickerList = '';
+        stickers.forEach((sticker, index) => {
+          stickerList += `${index + 1}. ${sticker.set_name}\n${sticker.sticker_url}\n\n`;
+        });
+
+        bot.sendMessage(chatId, `Stickers found for "${searchTerm}":\n\n${stickerList}`);
+      } else {
+        bot.sendMessage(chatId, `No stickers found for "${searchTerm}".`);
+      }
+    } else {
+      bot.sendMessage(chatId, `Failed to fetch stickers for "${searchTerm}".`);
+    }
+  } catch (error) {
+    console.error("Error fetching stickers:", error);
+    bot.sendMessage(chatId, `Failed to fetch stickers for "${searchTerm}".`);
+  }
+})
+
 bot.on('callback_query', async (mil) => {
   let data = mil.data;
   let url = data.split(' ').slice(1).join(' ');
