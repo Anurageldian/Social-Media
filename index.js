@@ -534,35 +534,67 @@ bot.onText(/(?:https|git)(?::\/\/|@)github\.com[\/:]([^\/:]+)\/(.+)/i, async (ms
   }
 })
 
+// Function to fetch stickers based on search term and page number
+async function fetchStickers(searchTerm, page) {
+  try {
+    const response = await axios.get(`https://combot.org/telegram/stickers?q=${encodeURIComponent(searchTerm)}&p=${page}`);
+    
+    if (response.status === 200) {
+      return response.data;
+    } else {
+      throw new Error(`Failed to fetch stickers for "${searchTerm}" (Page ${page})`);
+    }
+  } catch (error) {
+    console.error("Error fetching stickers:", error);
+    throw new Error(`Failed to fetch stickers for "${searchTerm}" (Page ${page})`);
+  }
+}
+
 // /stickers command
 bot.onText(/\/stickers (.+)/, async (msg, match) => {
   const chatId = msg.chat.id;
   const searchTerm = match[1];
 
   try {
-    const response = await axios.get(`https://combot.org/telegram/stickers?q=${encodeURIComponent(searchTerm)}`);
+    const stickers = await fetchStickers(searchTerm, currentPage);
     
-    if (response.status === 200) {
-      const stickers = response.data;
-      
-      if (stickers && stickers.length > 0) {
-        let stickerList = '';
-        stickers.forEach((sticker, index) => {
-          stickerList += `${index + 1}. ${sticker.set_name}\n${sticker.sticker_url}\n\n`;
-        });
+    if (stickers && stickers.length > 0) {
+      let stickerList = '';
+      stickers.forEach((sticker, index) => {
+        stickerList += `${index + 1 + ((currentPage - 1) * resultsPerPage)}. [${sticker.set_name}](${sticker.sticker_url})\n\n`;
+      });
 
-        bot.sendMessage(chatId, `Stickers found for "${searchTerm}":\n\n${stickerList}`);
-      } else {
-        bot.sendMessage(chatId, `No stickers found for "${searchTerm}".`);
-      }
+      // Pagination buttons
+      const prevButton = currentPage > 1 ? '◀️ Previous' : '';
+      const nextButton = stickers.length === resultsPerPage ? 'Next ▶️' : '';
+      const pagination = `${prevButton}${prevButton && nextButton ? ' | ' : ''}${nextButton}`;
+
+      bot.sendMessage(chatId, `Stickers found for "${searchTerm}" (Page ${currentPage}):\n\n${stickerList}${pagination}`, { parse_mode: 'Markdown' });
     } else {
-      bot.sendMessage(chatId, `Failed to fetch stickers for "${searchTerm}".`);
+      bot.sendMessage(chatId, `No stickers found for "${searchTerm}".`);
     }
   } catch (error) {
-    console.error("Error fetching stickers:", error);
     bot.sendMessage(chatId, `Failed to fetch stickers for "${searchTerm}".`);
   }
 });
+
+// Command to handle next page
+bot.onText(/Next ▶️/, async (msg) => {
+  if (currentPage < 1000) { // Limiting to 1000 pages to avoid infinite pagination
+    currentPage++;
+    bot.emit('sticker-pagination', msg);
+  }
+});
+
+// Command to handle previous page
+bot.onText(/◀️ Previous/, async (msg) => {
+  if (currentPage > 1) {
+    currentPage--;
+    bot.emit('sticker-pagination', msg);
+  }
+});
+
+// Rest of your code...
 
 bot.on('callback_query', async (mil) => {
   let data = mil.data;
