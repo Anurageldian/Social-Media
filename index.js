@@ -538,7 +538,7 @@ bot.onText(/(?:https|git)(?::\/\/|@)github\.com[\/:]([^\/:]+)\/(.+)/i, async (ms
 bot.onText(/\/stickers (.+)/, async (msg, match) => {
   const chatId = msg.chat.id;
   const searchTerm = match[1];
-  
+
   try {
     const response = await axios.get(`https://combot.org/telegram/stickers?q=${encodeURIComponent(searchTerm)}`);
     
@@ -562,7 +562,9 @@ bot.onText(/\/stickers (.+)/, async (msg, match) => {
     console.error("Error fetching stickers:", error);
     bot.sendMessage(chatId, `Failed to fetch stickers for "${searchTerm}".`);
   }
-})
+});
+
+// Rest of your code...
 
 bot.on('callback_query', async (mil) => {
   let data = mil.data;
