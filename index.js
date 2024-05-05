@@ -564,8 +564,6 @@ bot.onText(/\/stickers (.+)/, async (msg, match) => {
   }
 });
 
-// Rest of your code...
-
 bot.on('callback_query', async (mil) => {
   let data = mil.data;
   let url = data.split(' ').slice(1).join(' ');
