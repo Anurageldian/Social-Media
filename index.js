@@ -537,7 +537,7 @@ bot.onText(/(?:https|git)(?::\/\/|@)github\.com[\/:]([^\/:]+)\/(.+)/i, async (ms
 // Function to fetch stickers based on search term and page number
 async function fetchStickers(searchTerm, page) {
   try {
-    const response = await axios.get(`https://combot.org/telegram/stickers?q=${encodeURIComponent(searchTerm)}&p=${page}`);
+    const response = await axios.get(`https://combot.org/api/telegram/stickers?q=${encodeURIComponent(searchTerm)}&p=${page}`);
     
     if (response.status === 200) {
       return response.data;
