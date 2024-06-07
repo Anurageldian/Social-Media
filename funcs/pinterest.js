@@ -50,6 +50,9 @@ async function pinterest(bot, chatId, url, userName) {
       if (get.endsWith('.mp4')) {
         await bot.sendVideo(chatId, get, { caption: `Bot by @firespower` })
         return bot.deleteMessage(chatId, load.message_id);
+      } else if (get.endsWith('.gif')) {
+        await bot.sendAnimation(chatId, get, { caption: `Bot by @firespower` })
+        return bot.deleteMessage(chatId, load.message_id);
       } else {
         await bot.sendPhoto(chatId, get, { caption: `Bot by @firespower` })
         return bot.deleteMessage(chatId, load.message_id);
@@ -60,7 +63,6 @@ async function pinterest(bot, chatId, url, userName) {
     return bot.editMessageText('Failed to download media, make sure your link is valid!', { chat_id: chatId, message_id: load.message_id })
   }
 }
-
 module.exports = {
   pinterest,
   pinSearch
