@@ -599,17 +599,22 @@ bot.onText(/◀️ Previous/, async (msg) => {
 // Event listener for /getprofilepics command with username argument
 // Event listener for /info command
 bot.onText(/\/info/, async (msg) => {
+  console.log('Received /info command:', msg);
+
   const chatId = msg.chat.id;
 
   if (!msg.reply_to_message || !msg.reply_to_message.from) {
+    console.log('No user message found in reply:', msg.reply_to_message);
     await bot.sendMessage(chatId, 'Please reply to a user\'s message to get their info.');
     return;
   }
 
   const user = msg.reply_to_message.from;
+  console.log('Replied user:', user);
 
   // Get the user's profile picture
   const photoId = user.photo ? user.photo.big_file_id : null;
+  console.log('User photo ID:', photoId);
 
   // Get the user's information
   const userId = user.id;
@@ -618,6 +623,8 @@ bot.onText(/\/info/, async (msg) => {
   const lastName = user.last_name || 'N/A';
   const dcId = user.dc_id;
   const status = user.status;
+
+  console.log('User info:', { userId, username, firstName, lastName, dcId, status });
 
   // Construct user info caption
   const caption = `
@@ -628,6 +635,7 @@ bot.onText(/\/info/, async (msg) => {
     - DC ID: ${dcId}
     - Status: ${status}
   `;
+  console.log('Caption:', caption);
 
   // Send the user's profile picture with the info caption
   if (photoId) {
@@ -636,6 +644,7 @@ bot.onText(/\/info/, async (msg) => {
     await bot.sendMessage(chatId, caption, { parse_mode: 'Markdown' });
   }
 });
+
 
 
 
