@@ -632,7 +632,6 @@ bot.onText(/\/info/, async (msg) => {
   const chatId = msg.chat.id;
 
   try {
-   const userId = msg.from.id;
 
     // Get the user's profile photos
     const profilePhotos = await bot.getUserProfilePhotos(user.id);
