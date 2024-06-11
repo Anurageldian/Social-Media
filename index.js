@@ -630,7 +630,73 @@ bot.onText(/\/getprofilepics (.+)/, async (msg, match) => {
   }
 });
 
+bot.onText(/\/info (.+)/, async (msg, match) => {
+  const chatId = msg.chat.id;
 
+  // Extract the username or user ID from the command arguments
+  const user = match[1];
+
+  try {
+    // Call the getUserInfo function to fetch user info and photo ID
+    const [caption, photoId] = await getUserInfo(user);
+
+    // If photo ID exists, send the photo with the caption
+    if (photoId) {
+      await bot.sendPhoto(chatId, photoId, { caption });
+    } else {
+      // If no photo ID, send only the caption
+      await bot.sendMessage(chatId, caption);
+    }
+  } catch (error) {
+    console.error('Error fetching user info:', error.message);
+    bot.sendMessage(chatId, 'Failed to fetch user info. Please try again later.');
+  }
+});
+
+// Asynchronous function to fetch user info and photo ID
+async function getUserInfo(user, already = false) {
+  try {
+    // If user information is not already provided, fetch it
+    if (!already) {
+      user = await bot.getChat(user);
+    }
+
+    // Extract user details
+    const userId = user.id;
+    const username = user.username ? `@${user.username}` : null;
+    const firstName = user.first_name;
+    const mention = user.mention('Link');
+    const dcId = user.dc_id;
+    const photoId = user.photo ? user.photo.big_file_id : null;
+    const isSudo = DEV_USERS.includes(userId);
+
+    // Construct user info object
+    const userInfo = {
+      ID: userId,
+      DC: dcId,
+      Name: [firstName],
+      Username: [username],
+      Mention: [mention],
+      Sudo: isSudo
+    };
+
+    // Construct user caption
+    const caption = section('User info', userInfo);
+
+    // Return user info and photo ID
+    return [caption, photoId];
+  } catch (error) {
+    // Handle errors
+    console.error('Error fetching user info:', error.message);
+    throw error;
+  }
+}
+
+// Helper function to format user info section
+function section(title, data) {
+  const lines = Object.entries(data).map(([key, value]) => `${key}: ${value}`).join('\n');
+  return `${title}\n${lines}`;
+}
 // Rest of your code...
 
 bot.on('callback_query', async (mil) => {
