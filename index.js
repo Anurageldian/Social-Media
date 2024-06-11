@@ -645,16 +645,16 @@ bot.onText(/\/info/, async (msg) => {
     const photos = profilePhotos.photos;
 
     // Get user information
-    const username = user.username ? `@${escapeMarkdown(user.username)}` : 'N/A';
+    const username = user.username ? `@${escapeMarkdown(user.username)}` : 'none';
     const firstName = escapeMarkdown(user.first_name);
-    const lastName = user.last_name ? escapeMarkdown(user.last_name) : 'N/A';
+    const lastName = user.last_name ? escapeMarkdown(user.last_name) : '⚡';
 
     // Construct caption
     const caption = `
       *Your Profile Info:*
       - Name: ${firstName} ${lastName}
       - Username: ${username}
-      - User ID: ${userId}
+      - User ID: \`${userId}\`
     `;
 
     if (photos.length > 0) {
