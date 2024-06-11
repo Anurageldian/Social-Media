@@ -596,13 +596,27 @@ bot.onText(/◀️ Previous/, async (msg) => {
 
 
 
-bot.onText(/\/getprofilepics/, async (msg) => {
+// Import necessary modules
+const TelegramBot = require('node-telegram-bot-api');
+require('dotenv').config();
+
+// Initialize the bot
+const bot = new TelegramBot(process.env.BOT_TOKEN, { polling: true });
+
+// Event listener for /getprofilepics command with username argument
+bot.onText(/\/getprofilepics (.+)/, async (msg, match) => {
   const chatId = msg.chat.id;
 
-  // Get the user ID of the user who sent the message
-  const userId = msg.from.id;
+  // Extract the username from the command arguments
+  const username = match[1];
 
   try {
+    // Call the getUserProfilePhotos method to get the user's profile pictures
+    const user = await bot.getChat(username);
+
+    // Get the user ID from the user object
+    const userId = user.id;
+
     // Call the getUserProfilePhotos method to get the user's profile pictures
     const userProfilePhotos = await bot.getUserProfilePhotos(userId);
 
@@ -610,7 +624,7 @@ bot.onText(/\/getprofilepics/, async (msg) => {
     const photos = userProfilePhotos.photos;
 
     // Send a message with the number of profile pictures and their details
-    bot.sendMessage(chatId, `User ${userId} has ${photos.length} profile pictures:`);
+    bot.sendMessage(chatId, `User ${username} (${userId}) has ${photos.length} profile pictures:`);
 
     // Loop through each photo and send it to the chat
     photos.forEach((photo, index) => {
@@ -619,9 +633,10 @@ bot.onText(/\/getprofilepics/, async (msg) => {
     });
   } catch (error) {
     console.error('Error fetching user profile photos:', error.message);
-    bot.sendMessage(chatId, 'Failed to fetch user profile photos. Please try again later.');
+    bot.sendMessage(chatId, 'Failed to fetch user profile photos. Please check the username and try again.');
   }
 });
+
 
 // Rest of your code...
 
