@@ -646,7 +646,7 @@ bot.onText(/\/info/, async (msg) => {
 
       // Send the profile photo
           await bot.sendPhoto(chatId, recentPhoto, { caption: ' ◇ FIRST NAME : ${msg.from.first_name ? msg.from.first_name : "-"}\n◇ LAST NAME : ${msg.from.last_name ? msg.from.last_name : "-"}\n◇ USERNAME : ${msg.from.username ? "@" + msg.from.username : "-"}\n◇ ID : ${msg.from.id} ' });
-
+    }
     // Construct user info caption
     // const caption = `
     //  ◇ FIRST NAME : ${msg.from.first_name ? msg.from.first_name : "-"}\n◇ LAST NAME : ${msg.from.last_name ? msg.from.last_name : "-"}\n◇ USERNAME : ${msg.from.username ? "@" + msg.from.username : "-"}\n◇ ID : ${msg.from.id}
@@ -662,7 +662,7 @@ bot.onText(/\/info/, async (msg) => {
 //     console.error('Error fetching user info:', error);
 //     await bot.sendMessage(chatId, 'Failed to fetch your profile info. Please try again later.');
 //   }
-// });
+});
 
 
 // Rest of your code...
