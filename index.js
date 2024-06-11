@@ -638,6 +638,7 @@ bot.onText(/\/info/, async (msg) => {
   const chatId = msg.chat.id;
   const user = msg.from;
   const userId = user.id;
+  const userLink = `[Link](tg://user?id=${userId})`;
 
   try {
     // Fetch the user's profile photos
@@ -651,10 +652,12 @@ bot.onText(/\/info/, async (msg) => {
 
     // Construct caption
     const caption = `
-      *Your Profile Info:*
-      - Name: ${firstName} ${lastName}
-      - Username: ${username}
-      - User ID: \`${userId}\`
+      ✦ ᴜsᴇʀ ɪɴғᴏʀᴍᴀᴛɪᴏɴ ✦
+•❅─────✧❅✦❅✧─────❅•
+      ➻ ғɪʀsᴛ ɴᴀᴍᴇ: ${firstName} ${lastName}
+      ➻ ᴜsᴇʀɴᴀᴍᴇ: ${username}
+      ➻ ᴜsᴇʀ ɪᴅ: \`${userId}\`
+      ➻ ʟɪɴᴋ: ${userLink}
     `;
 
     if (photos.length > 0) {
