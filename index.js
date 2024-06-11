@@ -632,6 +632,7 @@ bot.onText(/\/getprofilepics (.+)/, async (msg, match) => {
 
 // Event listener for /info command
 // Event listener for /info command
+// Event listener for /info command
 bot.onText(/\/info (.+)/, async (msg, match) => {
   const chatId = msg.chat.id;
 
@@ -639,6 +640,12 @@ bot.onText(/\/info (.+)/, async (msg, match) => {
   const user = match[1];
 
   try {
+    // Check if the chat exists before fetching user info
+    const chatExists = await checkChatExists(chatId);
+    if (!chatExists) {
+      throw new Error('Chat not found or inaccessible.');
+    }
+
     // Call the getUserInfo function to fetch user info and photo ID
     const [caption, photoId] = await getUserInfo(user);
 
@@ -651,11 +658,21 @@ bot.onText(/\/info (.+)/, async (msg, match) => {
     }
   } catch (error) {
     console.error('Error fetching user info:', error.message);
-
     // Send an error message to the chat
     await bot.sendMessage(chatId, 'Failed to get user info. Please ensure the username or user ID is correct and try again.');
   }
 });
+
+// Asynchronous function to check if the chat exists
+async function checkChatExists(chatId) {
+  try {
+    // Call the getChat method to check if the chat exists
+    await bot.getChat(chatId);
+    return true; // Chat exists
+  } catch (error) {
+    return false; // Chat does not exist or is inaccessible
+  }
+}
 
 // Asynchronous function to fetch user info and photo ID
 async function getUserInfo(user, already = false) {
