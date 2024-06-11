@@ -14,9 +14,9 @@ async function igdl(url) {
   }
 }
 
-async function downloadInstagram(bot, chatId, url, userName) {
+async function downloadInstagram(bot, chatId, url, userName, messageId) {
   let load = await bot.sendMessage(chatId, 'Loading, please wait.')
-await bot.setMessageReaction(chatId, load.url, { reaction: '👍' });
+await bot.setMessageReaction(chatId, messageId, { reaction: 'like' });
   try {
     let get = await igdl(url);
     if (!get[0]) {
