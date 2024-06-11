@@ -631,7 +631,7 @@ bot.onText(/\/getprofilepics/, async (msg) => {
 bot.onText(/\/info/, async (msg) => {
   const chatId = msg.chat.id;
   const userId = msg.from.id;
-  const caption = `◇ FIRST NAME : ${msg.from.first_name ? msg.from.first_name : "-"}\n◇ LAST NAME : ${msg.from.last_name ? msg.from.last_name : "-"}\n◇ USERNAME : ${msg.from.username ? "@" + msg.from.username : "-"}\n◇ ID : ${msg.from.id}`
+  const caption = `◇ FIRST NAME : ${msg.from.first_name ? msg.from.first_name : "-"}\n◇ LAST NAME : ${msg.from.last_name ? msg.from.last_name : "-"}\n◇ USERNAME : ${msg.from.username ? "@" + msg.from.username : "-"}\n◇ ID : ${msg.from.id}`;
 
   try {
 
