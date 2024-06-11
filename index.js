@@ -654,10 +654,10 @@ bot.onText(/\/info/, async (msg) => {
     const caption = `
       ✦ ᴜsᴇʀ ɪɴғᴏʀᴍᴀᴛɪᴏɴ ✦
 •❅─────✧❅✦❅✧─────❅•
-      ➻ ғɪʀsᴛ ɴᴀᴍᴇ: ${firstName} ${lastName}
-      ➻ ᴜsᴇʀɴᴀᴍᴇ: ${username}
-      ➻ ᴜsᴇʀ ɪᴅ: \`${userId}\`
-      ➻ ʟɪɴᴋ: ${userLink}
+ ➻ ғɪʀsᴛ ɴᴀᴍᴇ:  ${firstName} ${lastName}
+ ➻ ᴜsᴇʀɴᴀᴍᴇ:  ${username}
+ ➻ ᴜsᴇʀ ɪᴅ:  \`${userId}\`
+ ➻ ʟɪɴᴋ:  ${userLink}
     `;
 
     if (photos.length > 0) {
