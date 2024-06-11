@@ -634,7 +634,7 @@ bot.onText(/\/info/, async (msg) => {
   try {
 
     // Get the user's profile photos
-    const profilePhotos = await bot.getUserProfilePhotos(user.id);
+    const profilePhotos = await bot.getUserProfilePhotos(userId);
     const photo = profilePhotos.photos.length > 0 ? profilePhotos.photos[0][0].file_id : null;
 
     // Get the user's information
