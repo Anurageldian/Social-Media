@@ -645,7 +645,7 @@ bot.onText(/\/info/, async (msg) => {
       const recentPhoto = photos[0][0].file_id;
 
       // Send the profile photo
-          await bot.sendPhoto(chatId, recentPhoto, { caption: ' ◇ FIRST NAME : ${msg.from.first_name ? msg.from.first_name : "-"}\n◇ LAST NAME : ${msg.from.last_name ? msg.from.last_name : "-"}\n◇ USERNAME : ${msg.from.username ? "@" + msg.from.username : "-"}\n◇ ID : ${msg.from.id} ]' });
+          await bot.sendPhoto(chatId, recentPhoto, {caption '\n◇ FIRST NAME : ${msg.from.first_name ? msg.from.first_name : "-"}\n◇ LAST NAME : ${msg.from.last_name ? msg.from.last_name : "-"}\n◇ USERNAME : ${msg.from.username ? "@" + msg.from.username : "-"}\n◇ ID : ${msg.from.id}'});
     });
      catch (error) {
     console.error('Error fetching user profile photos:', error.message);
