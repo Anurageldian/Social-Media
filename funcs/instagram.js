@@ -14,10 +14,26 @@ async function igdl(url) {
   }
 }
 
+  async function setMessageReaction(chatId, messageId, reaction) {
+  const token = process.env.BOT_TOKEN; // Ensure your bot token is stored in the .env file
+  const url = `https://api.telegram.org/bot${token}/setMessageReaction`;
+
+  try {
+    const response = await axios.post(url, {
+      chat_id: chatId,
+      message_id: messageId,
+      reaction: reaction,
+    });
+
+    return response.data;
+  } catch (error) {
+    console.error('Failed to send reaction:', error.response ? error.response.data : error.message);
+  }
+}
+
 async function downloadInstagram(bot, chatId, url, userName, messageId) {
   let load = await bot.sendMessage(chatId, 'Loading, please wait.')
- await bot.sendChatAction(chatId, 'typing');
-    await bot.callApi('setMessageReaction', { chat_id: chatId, message_id: messageId, reaction: 'like' });
+  await setMessageReaction(chatId, messageId, 'like');
   try {
     let get = await igdl(url);
     if (!get[0]) {
