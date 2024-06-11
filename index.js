@@ -630,6 +630,10 @@ bot.onText(/\/getprofilepics/, async (msg) => {
 // Event listener for /info command
 
 
+function escapeMarkdown(text) {
+  return text.replace(/(\*|_|`|\[|\])/g, '\\$1');
+}
+
 bot.onText(/\/info/, async (msg) => {
   const chatId = msg.chat.id;
   const user = msg.from;
