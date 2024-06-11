@@ -637,18 +637,9 @@ bot.onText(/\/info/, async (msg) => {
     const profilePhotos = await bot.getUserProfilePhotos(userId);
     const photo = profilePhotos.photos.length > 0 ? profilePhotos.photos[0][0].file_id : null;
 
-    // Get the user's information
-    const userId = user.id;
-    const username = user.username ? `@${user.username}` : 'N/A';
-    const firstName = user.first_name;
-    const lastName = user.last_name || 'N/A';
-
     // Construct user info caption
     const caption = `
-      *Your Profile Info:*
-      - Name: ${firstName} ${lastName}
-      - Username: ${username}
-      - User ID: ${userId}
+     ◇ FIRST NAME : ${msg.from.first_name ? msg.from.first_name : "-"}\n◇ LAST NAME : ${msg.from.last_name ? msg.from.last_name : "-"}\n◇ USERNAME : ${msg.from.username ? "@" + msg.from.username : "-"}\n◇ ID : ${msg.from.id}
     `;
 
     // Send the user's profile picture with the info caption
