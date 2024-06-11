@@ -631,6 +631,7 @@ bot.onText(/\/getprofilepics (.+)/, async (msg, match) => {
 });
 
 // Event listener for /info command
+// Event listener for /info command
 bot.onText(/\/info (.+)/, async (msg, match) => {
   const chatId = msg.chat.id;
 
@@ -651,14 +652,54 @@ bot.onText(/\/info (.+)/, async (msg, match) => {
   } catch (error) {
     console.error('Error fetching user info:', error.message);
 
-    // Handle chat not found error
-    if (error.response && error.response.status === 400 && error.response.data === 'Bad Request: chat not found') {
-      await bot.sendMessage(chatId, 'Chat not found or inaccessible. Please ensure the bot is added to the chat.');
-    } else {
-      await bot.sendMessage(chatId, 'Failed to fetch user info. Please try again later.');
-    }
+    // Send an error message to the chat
+    await bot.sendMessage(chatId, 'Failed to get user info. Please ensure the username or user ID is correct and try again.');
   }
 });
+
+async function getUserInfo(user, already = false) {
+  try {
+    // If user information is not already provided, fetch it
+    if (!already) {
+      user = await bot.getChat(user);
+    }
+
+    // Extract user details
+    const userId = user.id;
+    const username = user.username ? `@${user.username}` : null;
+    const firstName = user.first_name;
+    const mention = user.mention('Link');
+    const dcId = user.dc_id;
+    const photoId = user.photo ? user.photo.big_file_id : null;
+    const isSudo = DEV_USERS.includes(userId);
+
+    // Construct user info object
+    const userInfo = {
+      ID: userId,
+      DC: dcId,
+      Name: [firstName],
+      Username: [username],
+      Mention: [mention],
+      Sudo: isSudo
+    };
+
+    // Construct user caption
+    const caption = section('User info', userInfo);
+
+    // Return user info and photo ID
+    return [caption, photoId];
+  } catch (error) {
+    // Handle errors
+    console.error('Error fetching user info:', error.message);
+    throw error;
+  }
+}
+
+// Helper function to format user info section
+function section(title, data) {
+  const lines = Object.entries(data).map(([key, value]) => `${key}: ${value}`).join('\n');
+  return `${title}\n${lines}`;
+}
 
 // Rest of your code...
 
