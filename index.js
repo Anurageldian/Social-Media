@@ -647,7 +647,7 @@ bot.onText(/\/info/, async (msg) => {
       // Send the profile photo
           await bot.sendPhoto(chatId, recentPhoto, { caption: ' ◇ FIRST NAME : ${msg.from.first_name ? msg.from.first_name : "-"}\n◇ LAST NAME : ${msg.from.last_name ? msg.from.last_name : "-"}\n◇ USERNAME : ${msg.from.username ? "@" + msg.from.username : "-"}\n◇ ID : ${msg.from.id} ' });
       
-     )}; catch (error) {
+    }; catch (error) {
     console.error('Error fetching user profile photos:', error.message);
     bot.sendMessage(chatId, 'Failed to fetch user profile photos. Please try again later.');
   }
