@@ -598,53 +598,73 @@ bot.onText(/◀️ Previous/, async (msg) => {
 
 // Event listener for /getprofilepics command with username argument
 // Event listener for /info command
-bot.onText(/\/info/, async (msg) => {
-  console.log('Received /info command:', msg);
-
+bot.onText(/\/info (.+)/, async (msg, match) => {
   const chatId = msg.chat.id;
 
-  if (!msg.reply_to_message || !msg.reply_to_message.from) {
-    console.log('No user message found in reply:', msg.reply_to_message);
-    await bot.sendMessage(chatId, 'Please reply to a user\'s message to get their info.');
-    return;
-  }
+  // Extract the username or user ID from the command arguments
+  const userQuery = match[1];
 
-  const user = msg.reply_to_message.from;
-  console.log('Replied user:', user);
+  try {
+    // Fetch information about the user
+    const user = await getUserInfo(userQuery);
 
-  // Get the user's profile picture
-  const photoId = user.photo ? user.photo.big_file_id : null;
-  console.log('User photo ID:', photoId);
+    // If user not found, send a message indicating that
+    if (!user) {
+      await bot.sendMessage(chatId, 'User not found.');
+      return;
+    }
 
-  // Get the user's information
-  const userId = user.id;
-  const username = user.username ? `@${user.username}` : 'N/A';
-  const firstName = user.first_name;
-  const lastName = user.last_name || 'N/A';
-  const dcId = user.dc_id;
-  const status = user.status;
+    // Get the user's profile picture
+    const photoId = user.photo ? user.photo.big_file_id : null;
 
-  console.log('User info:', { userId, username, firstName, lastName, dcId, status });
+    // Get the user's information
+    const userId = user.id;
+    const username = user.username ? `@${user.username}` : 'N/A';
+    const firstName = user.first_name;
+    const lastName = user.last_name || 'N/A';
+    const dcId = user.dc_id;
+    const status = user.status;
 
-  // Construct user info caption
-  const caption = `
-    *User Info:*
-    - Name: ${firstName} ${lastName}
-    - Username: ${username}
-    - User ID: ${userId}
-    - DC ID: ${dcId}
-    - Status: ${status}
-  `;
-  console.log('Caption:', caption);
+    // Construct user info caption
+    const caption = `
+      *User Info:*
+      - Name: ${firstName} ${lastName}
+      - Username: ${username}
+      - User ID: ${userId}
+      - DC ID: ${dcId}
+      - Status: ${status}
+    `;
 
-  // Send the user's profile picture with the info caption
-  if (photoId) {
-    await bot.sendPhoto(chatId, photoId, { caption, parse_mode: 'Markdown' });
-  } else {
-    await bot.sendMessage(chatId, caption, { parse_mode: 'Markdown' });
+    // Send the user's profile picture with the info caption
+    if (photoId) {
+      await bot.sendPhoto(chatId, photoId, { caption, parse_mode: 'Markdown' });
+    } else {
+      await bot.sendMessage(chatId, caption, { parse_mode: 'Markdown' });
+    }
+  } catch (error) {
+    console.error('Error fetching user info:', error.message);
+    await bot.sendMessage(chatId, 'Failed to fetch user info. Please try again later.');
   }
 });
 
+// Function to fetch user information by username or user ID
+async function getUserInfo(userQuery) {
+  try {
+    // Check if the user query is a username
+    const user = await bot.getChat(userQuery);
+    return user;
+  } catch (error) {
+    // If not a username, assume it's a user ID and try fetching by ID
+    console.error('Error fetching user by username:', error.message);
+    try {
+      const user = await bot.getChat(Number(userQuery));
+      return user;
+    } catch (error) {
+      console.error('Error fetching user by ID:', error.message);
+      return null; // User not found
+    }
+  }
+}
 
 
 
