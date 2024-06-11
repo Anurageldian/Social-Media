@@ -601,7 +601,6 @@ bot.onText(/◀️ Previous/, async (msg) => {
 bot.onText(/\/info/, async (msg) => {
   const chatId = msg.chat.id;
 
-  // Check if the message is a reply and get the replied user's information
   if (!msg.reply_to_message || !msg.reply_to_message.from) {
     await bot.sendMessage(chatId, 'Please reply to a user\'s message to get their info.');
     return;
@@ -619,7 +618,7 @@ bot.onText(/\/info/, async (msg) => {
   const lastName = user.last_name || 'N/A';
   const dcId = user.dc_id;
   const status = user.status;
-  
+
   // Construct user info caption
   const caption = `
     *User Info:*
