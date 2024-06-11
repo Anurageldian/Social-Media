@@ -597,127 +597,54 @@ bot.onText(/◀️ Previous/, async (msg) => {
 
 
 // Event listener for /getprofilepics command with username argument
-bot.onText(/\/getprofilepics (.+)/, async (msg, match) => {
+// Event listener for /info command
+bot.onText(/\/info/, async (msg) => {
   const chatId = msg.chat.id;
 
-  // Extract the username from the command arguments
-  const username = match[1];
+  // Check if the message is a reply and get the replied user's information
+  if (!msg.reply_to_message || !msg.reply_to_message.from) {
+    await bot.sendMessage(chatId, 'Please reply to a user\'s message to get their info.');
+    return;
+  }
 
-  try {
-    // Call the getUserProfilePhotos method to get the user's profile pictures
-    const user = await bot.getChat(username);
+  const user = msg.reply_to_message.from;
 
-    // Get the user ID from the user object
-    const userId = user.id;
+  // Get the user's profile picture
+  const photoId = user.photo ? user.photo.big_file_id : null;
 
-    // Call the getUserProfilePhotos method to get the user's profile pictures
-    const userProfilePhotos = await bot.getUserProfilePhotos(userId);
+  // Get the user's information
+  const userId = user.id;
+  const username = user.username ? `@${user.username}` : 'N/A';
+  const firstName = user.first_name;
+  const lastName = user.last_name || 'N/A';
+  const dcId = user.dc_id;
+  const status = user.status;
+  
+  // Check if the user is banned
+  const getBan = await getBanned(chatId);
+  if (getBan.status) {
+    await bot.sendMessage(chatId, `This user is banned. Reason: ${getBan.reason}.`);
+    return;
+  }
 
-    // Extract the list of photos from the response
-    const photos = userProfilePhotos.photos;
+  // Construct user info caption
+  const caption = `
+    *User Info:*
+    - Name: ${firstName} ${lastName}
+    - Username: ${username}
+    - User ID: ${userId}
+    - DC ID: ${dcId}
+    - Status: ${status}
+  `;
 
-    // Send a message with the number of profile pictures and their details
-    bot.sendMessage(chatId, `User ${username} (${userId}) has ${photos.length} profile pictures:`);
-
-    // Loop through each photo and send it to the chat
-    photos.forEach((photo, index) => {
-      // Send each photo as a separate message
-      bot.sendPhoto(chatId, photo[0].file_id, { caption: `Photo ${index + 1}` });
-    });
-  } catch (error) {
-    console.error('Error fetching user profile photos:', error.message);
-    bot.sendMessage(chatId, 'Failed to fetch user profile photos. Please check the username and try again.');
+  // Send the user's profile picture with the info caption
+  if (photoId) {
+    await bot.sendPhoto(chatId, photoId, { caption, parse_mode: 'Markdown' });
+  } else {
+    await bot.sendMessage(chatId, caption, { parse_mode: 'Markdown' });
   }
 });
 
-// Event listener for /info command
-// Event listener for /info command
-// Event listener for /info command
-bot.onText(/\/info (.+)/, async (msg, match) => {
-  const chatId = msg.chat.id;
-
-  // Extract the username or user ID from the command arguments
-  const user = match[1];
-
-  try {
-    // Check if the chat exists before fetching user info
-    const chatExists = await checkChatExists(chatId);
-    if (!chatExists) {
-      throw new Error('Chat not found or inaccessible.');
-    }
-
-    // Call the getUserInfo function to fetch user info and photo ID
-    const [caption, photoId] = await getUserInfo(user);
-
-    // If photo ID exists, send the photo with the caption
-    if (photoId) {
-      await bot.sendPhoto(chatId, photoId, { caption });
-    } else {
-      // If no photo ID, send only the caption
-      await bot.sendMessage(chatId, caption);
-    }
-  } catch (error) {
-    console.error('Error fetching user info:', error.message);
-    // Send an error message to the chat
-    await bot.sendMessage(chatId, 'Failed to get user info. Please ensure the username or user ID is correct and try again.');
-  }
-});
-
-// Asynchronous function to check if the chat exists
-async function checkChatExists(chatId) {
-  try {
-    // Call the getChat method to check if the chat exists
-    await bot.getChat(chatId);
-    return true; // Chat exists
-  } catch (error) {
-    return false; // Chat does not exist or is inaccessible
-  }
-}
-
-// Asynchronous function to fetch user info and photo ID
-async function getUserInfo(user, already = false) {
-  try {
-    // Fetch user information if not already provided
-    if (!already) {
-      user = await bot.getChat(user);
-    }
-
-    // Extract user details
-    const userId = user.id;
-    const username = user.username ? `@${user.username}` : null;
-    const firstName = user.first_name;
-    const dcId = user.dc_id;
-    const photoId = user.photo ? user.photo.big_file_id : null;
-    const isSudo = DEV_USERS.includes(userId);
-
-    // Construct mention string
-    const mention = username ? `[${username}](tg://user?id=${userId})` : firstName;
-
-    // Construct user info object
-    const userInfo = {
-      ID: userId,
-      DC: dcId,
-      Name: [firstName],
-      Username: [username],
-      Mention: [mention],
-      Sudo: isSudo
-    };
-
-    // Construct user caption
-    const caption = section('User info', userInfo);
-
-    // Return user info and photo ID
-    return [caption, photoId];
-  } catch (error) {
-    // Handle "chat not found" error
-    if (error.response && error.response.status === 400 && error.response.data === 'Bad Request: chat not found') {
-      throw new Error('Chat not found or inaccessible.');
-    }
-    // Handle other errors
-    console.error('Error fetching user info:', error.message);
-    throw error;
-  }
-}
 
 
 // Rest of your code...
