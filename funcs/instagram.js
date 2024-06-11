@@ -16,7 +16,8 @@ async function igdl(url) {
 
 async function downloadInstagram(bot, chatId, url, userName, messageId) {
   let load = await bot.sendMessage(chatId, 'Loading, please wait.')
-await bot.setMessageReaction(chatId, messageId, { reaction: 'like' });
+ await bot.sendChatAction(chatId, 'typing');
+    await bot.callApi('setMessageReaction', { chat_id: chatId, message_id: messageId, reaction: 'like' });
   try {
     let get = await igdl(url);
     if (!get[0]) {
