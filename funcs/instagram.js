@@ -14,8 +14,8 @@ async function igdl(url) {
   }
 }
 
-  async function setMessageReaction(chatId, messageId, reaction) {
-  const token = process.env.BOT_TOKEN; // Ensure your bot token is stored in the .env file
+ async function setMessageReaction(chatId, messageId, reaction) {
+  const token = process.env.BOT_TOKEN;
   const url = `https://api.telegram.org/bot${token}/setMessageReaction`;
 
   try {
@@ -25,12 +25,15 @@ async function igdl(url) {
       reaction: reaction,
     });
 
+    if (!response.data.ok) {
+      throw new Error(response.data.description);
+    }
+
     return response.data;
   } catch (error) {
     console.error('Failed to send reaction:', error.response ? error.response.data : error.message);
   }
 }
-
 async function downloadInstagram(bot, chatId, url, userName, messageId) {
   let load = await bot.sendMessage(chatId, 'Loading, please wait.')
   await setMessageReaction(chatId, messageId, 'like');
