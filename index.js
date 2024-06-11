@@ -598,21 +598,12 @@ bot.onText(/◀️ Previous/, async (msg) => {
 
 // Event listener for /getprofilepics command with username argument
 // Event listener for /info command
-bot.onText(/\/info (.+)/, async (msg, match) => {
+bot.onText(/\/info/, async (msg) => {
   const chatId = msg.chat.id;
 
-  // Extract the username or user ID from the command arguments
-  const userQuery = match[1];
-
-  try {
-    // Fetch information about the user
-    const user = await getUserInfo(userQuery);
-
-    // If user not found, send a message indicating that
-    if (!user) {
-      await bot.sendMessage(chatId, 'User not found.');
-      return;
-    }
+  // Check if the message is from a user in a private chat (DM)
+  if (msg.chat.type === 'private') {
+    const user = msg.from;
 
     // Get the user's profile picture
     const photoId = user.photo ? user.photo.big_file_id : null;
@@ -627,7 +618,7 @@ bot.onText(/\/info (.+)/, async (msg, match) => {
 
     // Construct user info caption
     const caption = `
-      *User Info:*
+      *Your Profile Info:*
       - Name: ${firstName} ${lastName}
       - Username: ${username}
       - User ID: ${userId}
@@ -641,30 +632,11 @@ bot.onText(/\/info (.+)/, async (msg, match) => {
     } else {
       await bot.sendMessage(chatId, caption, { parse_mode: 'Markdown' });
     }
-  } catch (error) {
-    console.error('Error fetching user info:', error.message);
-    await bot.sendMessage(chatId, 'Failed to fetch user info. Please try again later.');
+  } else {
+    // If the command is not issued in a private chat, inform the user to use it in a private chat
+    await bot.sendMessage(chatId, 'Please use the /info command in a private chat with the bot to get your profile info.');
   }
 });
-
-// Function to fetch user information by username or user ID
-async function getUserInfo(userQuery) {
-  try {
-    // Check if the user query is a username
-    const user = await bot.getChat(userQuery);
-    return user;
-  } catch (error) {
-    // If not a username, assume it's a user ID and try fetching by ID
-    console.error('Error fetching user by username:', error.message);
-    try {
-      const user = await bot.getChat(Number(userQuery));
-      return user;
-    } catch (error) {
-      console.error('Error fetching user by ID:', error.message);
-      return null; // User not found
-    }
-  }
-}
 
 
 
