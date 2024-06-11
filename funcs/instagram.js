@@ -26,6 +26,7 @@ async function setMessageReaction(bot, chatId, messageId, reaction) {
 
 
 async function downloadInstagram(bot, chatId, url, userName, messageId) {
+  await setMessageReaction(bot, chatId, messageId, '😂');
   let load = await bot.sendMessage(chatId, 'Loading, please wait.')
   await setMessageReaction(bot, chatId, messageId, '😂');
   try {
