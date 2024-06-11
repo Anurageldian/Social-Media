@@ -601,20 +601,18 @@ bot.onText(/◀️ Previous/, async (msg) => {
 bot.onText(/\/info/, async (msg) => {
   const chatId = msg.chat.id;
 
-  // Check if the message is from a user in a private chat (DM)
-  if (msg.chat.type === 'private') {
+  try {
     const user = msg.from;
 
-    // Get the user's profile picture
-    const photoId = user.photo ? user.photo.big_file_id : null;
+    // Get the user's profile photos
+    const profilePhotos = await bot.getUserProfilePhotos(user.id);
+    const photo = profilePhotos.photos.length > 0 ? profilePhotos.photos[0][0].file_id : null;
 
     // Get the user's information
     const userId = user.id;
     const username = user.username ? `@${user.username}` : 'N/A';
     const firstName = user.first_name;
     const lastName = user.last_name || 'N/A';
-    const dcId = user.dc_id;
-    const status = user.status;
 
     // Construct user info caption
     const caption = `
@@ -622,22 +620,19 @@ bot.onText(/\/info/, async (msg) => {
       - Name: ${firstName} ${lastName}
       - Username: ${username}
       - User ID: ${userId}
-      - DC ID: ${dcId}
-      - Status: ${status}
     `;
 
     // Send the user's profile picture with the info caption
-    if (photoId) {
-      await bot.sendPhoto(chatId, photoId, { caption, parse_mode: 'Markdown' });
+    if (photo) {
+      await bot.sendPhoto(chatId, photo, { caption, parse_mode: 'Markdown' });
     } else {
       await bot.sendMessage(chatId, caption, { parse_mode: 'Markdown' });
     }
-  } else {
-    // If the command is not issued in a private chat, inform the user to use it in a private chat
-    await bot.sendMessage(chatId, 'Please use the /info command in a private chat with the bot to get your profile info.');
+  } catch (error) {
+    console.error('Error fetching user info:', error);
+    await bot.sendMessage(chatId, 'Failed to fetch your profile info. Please try again later.');
   }
 });
-
 
 
 // Rest of your code...
