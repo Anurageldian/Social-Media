@@ -657,9 +657,10 @@ bot.onText(/\/info (.+)/, async (msg, match) => {
   }
 });
 
+// Asynchronous function to fetch user info and photo ID
 async function getUserInfo(user, already = false) {
   try {
-    // If user information is not already provided, fetch it
+    // Fetch user information if not already provided
     if (!already) {
       user = await bot.getChat(user);
     }
@@ -668,10 +669,12 @@ async function getUserInfo(user, already = false) {
     const userId = user.id;
     const username = user.username ? `@${user.username}` : null;
     const firstName = user.first_name;
-    const mention = user.mention('Link');
     const dcId = user.dc_id;
     const photoId = user.photo ? user.photo.big_file_id : null;
     const isSudo = DEV_USERS.includes(userId);
+
+    // Construct mention string
+    const mention = username ? `[${username}](tg://user?id=${userId})` : firstName;
 
     // Construct user info object
     const userInfo = {
@@ -689,17 +692,16 @@ async function getUserInfo(user, already = false) {
     // Return user info and photo ID
     return [caption, photoId];
   } catch (error) {
-    // Handle errors
+    // Handle "chat not found" error
+    if (error.response && error.response.status === 400 && error.response.data === 'Bad Request: chat not found') {
+      throw new Error('Chat not found or inaccessible.');
+    }
+    // Handle other errors
     console.error('Error fetching user info:', error.message);
     throw error;
   }
 }
 
-// Helper function to format user info section
-function section(title, data) {
-  const lines = Object.entries(data).map(([key, value]) => `${key}: ${value}`).join('\n');
-  return `${title}\n${lines}`;
-}
 
 // Rest of your code...
 
