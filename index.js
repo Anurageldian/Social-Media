@@ -628,31 +628,74 @@ bot.onText(/\/getprofilepics/, async (msg) => {
 
 
 // Event listener for /info command
+
+
 bot.onText(/\/info/, async (msg) => {
   const chatId = msg.chat.id;
-  const userId = msg.from.id;
-  const caption = `◇ FIRST NAME : ${msg.from.first_name ? msg.from.first_name : "-"}\n◇ LAST NAME : ${msg.from.last_name ? msg.from.last_name : "-"}\n◇ USERNAME : ${msg.from.username ? "@" + msg.from.username : "-"}\n◇ ID : ${msg.from.id}`;
+  const user = msg.from;
+  const userId = user.id;
 
   try {
-
-    // Get the user's profile photos
-    // const profilePhotos = await bot.getUserProfilePhotos(userId);
-    // const photo = profilePhotos.photos.length > 0 ? profilePhotos.photos[0][0].file_id : null;
-     const profilePhotos = await bot.getUserProfilePhotos(userId);
+    // Fetch the user's profile photos
+    const profilePhotos = await bot.getUserProfilePhotos(userId);
     const photos = profilePhotos.photos;
+
+    // Get user information
+    const username = user.username ? `@${escapeMarkdown(user.username)}` : 'N/A';
+    const firstName = escapeMarkdown(user.first_name);
+    const lastName = user.last_name ? escapeMarkdown(user.last_name) : 'N/A';
+
+    // Construct caption
+    const caption = `
+      *Your Profile Info:*
+      - Name: ${firstName} ${lastName}
+      - Username: ${username}
+      - User ID: ${userId}
+    `;
 
     if (photos.length > 0) {
       // Get the most recent profile photo
       const recentPhoto = photos[0][0].file_id;
 
-      // Send the profile photo
-          await bot.sendPhoto(chatId, recentPhoto, { caption, parse_mode: 'Markdown' });
-    }}
-     catch (error) {
+      // Send the profile photo with user info
+      await bot.sendPhoto(chatId, recentPhoto, { caption, parse_mode: 'Markdown' });
+    } else {
+      // No profile photos found, send only user info
+      await bot.sendMessage(chatId, caption, { parse_mode: 'Markdown' });
+    }
+  } catch (error) {
     console.error('Error fetching user profile photos:', error.message);
-    bot.sendMessage(chatId, 'Failed to fetch user profile photos. Please try again later.');
+    await bot.sendMessage(chatId, 'Failed to fetch user profile photos. Please try again later.');
   }
 });
+
+
+
+// bot.onText(/\/info/, async (msg) => {
+//   const chatId = msg.chat.id;
+//   const userId = msg.from.id;
+//   const caption = `◇ FIRST NAME : ${msg.from.first_name ? msg.from.first_name : "-"}\n◇ LAST NAME : ${msg.from.last_name ? msg.from.last_name : "-"}\n◇ USERNAME : ${msg.from.username ? "@" + msg.from.username : "-"}\n◇ ID : ${msg.from.id}`;
+
+//   try {
+
+//     // Get the user's profile photos
+//     // const profilePhotos = await bot.getUserProfilePhotos(userId);
+//     // const photo = profilePhotos.photos.length > 0 ? profilePhotos.photos[0][0].file_id : null;
+//      const profilePhotos = await bot.getUserProfilePhotos(userId);
+//     const photos = profilePhotos.photos;
+
+//     if (photos.length > 0) {
+//       // Get the most recent profile photo
+//       const recentPhoto = photos[0][0].file_id;
+
+//       // Send the profile photo
+//           await bot.sendPhoto(chatId, recentPhoto, { caption, parse_mode: 'Markdown' });
+//     }}
+//      catch (error) {
+//     console.error('Error fetching user profile photos:', error.message);
+//     bot.sendMessage(chatId, 'Failed to fetch user profile photos. Please try again later.');
+//   }
+// });
     // Construct user info caption
     // const caption = `
     //  ◇ FIRST NAME : ${msg.from.first_name ? msg.from.first_name : "-"}\n◇ LAST NAME : ${msg.from.last_name ? msg.from.last_name : "-"}\n◇ USERNAME : ${msg.from.username ? "@" + msg.from.username : "-"}\n◇ ID : ${msg.from.id}
