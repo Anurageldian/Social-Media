@@ -596,13 +596,6 @@ bot.onText(/◀️ Previous/, async (msg) => {
 
 
 
-// Import necessary modules
-const TelegramBot = require('node-telegram-bot-api');
-require('dotenv').config();
-
-// Initialize the bot
-const bot = new TelegramBot(process.env.BOT_TOKEN, { polling: true });
-
 // Event listener for /getprofilepics command with username argument
 bot.onText(/\/getprofilepics (.+)/, async (msg, match) => {
   const chatId = msg.chat.id;
