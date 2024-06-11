@@ -645,12 +645,13 @@ bot.onText(/\/info/, async (msg) => {
       const recentPhoto = photos[0][0].file_id;
 
       // Send the profile photo
-          await bot.sendPhoto(chatId, recentPhoto, { caption: ' ◇ FIRST NAME : ${msg.from.first_name ? msg.from.first_name : "-"}\n◇ LAST NAME : ${msg.from.last_name ? msg.from.last_name : "-"}\n◇ USERNAME : ${msg.from.username ? "@" + msg.from.username : "-"}\n◇ ID : ${msg.from.id} ' });
-      
-    }} catch (error) {
+          await bot.sendPhoto(chatId, recentPhoto, { caption: ' ◇ FIRST NAME : ${msg.from.first_name ? msg.from.first_name : "-"}\n◇ LAST NAME : ${msg.from.last_name ? msg.from.last_name : "-"}\n◇ USERNAME : ${msg.from.username ? "@" + msg.from.username : "-"}\n◇ ID : ${msg.from.id} ]' });
+    });
+     catch (error) {
     console.error('Error fetching user profile photos:', error.message);
     bot.sendMessage(chatId, 'Failed to fetch user profile photos. Please try again later.');
   }
+});
     // Construct user info caption
     // const caption = `
     //  ◇ FIRST NAME : ${msg.from.first_name ? msg.from.first_name : "-"}\n◇ LAST NAME : ${msg.from.last_name ? msg.from.last_name : "-"}\n◇ USERNAME : ${msg.from.username ? "@" + msg.from.username : "-"}\n◇ ID : ${msg.from.id}
@@ -666,7 +667,6 @@ bot.onText(/\/info/, async (msg) => {
 //     console.error('Error fetching user info:', error);
 //     await bot.sendMessage(chatId, 'Failed to fetch your profile info. Please try again later.');
 //   }
-});
 
 
 // Rest of your code...
