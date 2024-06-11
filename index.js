@@ -620,13 +620,6 @@ bot.onText(/\/info/, async (msg) => {
   const dcId = user.dc_id;
   const status = user.status;
   
-  // Check if the user is banned
-  const getBan = await getBanned(chatId);
-  if (getBan.status) {
-    await bot.sendMessage(chatId, `This user is banned. Reason: ${getBan.reason}.`);
-    return;
-  }
-
   // Construct user info caption
   const caption = `
     *User Info:*
