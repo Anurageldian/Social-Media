@@ -27,14 +27,27 @@ async function spotifyScraper(id, endpoint) {
         headers: {
           Origin: "https://spotifydown.com",
           Referer: "https://spotifydown.com/",
-        }
-      })
-    return data
+        },
+      }
+    );
+
+    // Assuming data.image contains the URL of the album cover image
+    if (data.image) {
+      return {
+        metadata: data,
+        image: data.image.url, // Adjust this based on actual API response structure
+      };
+    } else {
+      return {
+        metadata: data,
+        image: null, // Handle case where image URL is not available
+      };
+    }
   } catch (err) {
-    console.error("Error in spotifyScraper:", err)
-    return { error: "Error: " + err }
+    return "Error: " + err;
   }
 }
+
 
 async function getPlaylistSpotify(bot, chatId, url, userName) {
   let pars = await parse(url)
