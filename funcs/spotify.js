@@ -2,6 +2,7 @@ const axios = require('axios');
 const { parse } = require('spotify-uri');
 const util = require('util');
 const fs = require('fs');
+const cheerio = require('cheerio');
 const { getBuffer, filterAlphanumericWithDash } = require('./functions');
 
 const Spotify = {};
