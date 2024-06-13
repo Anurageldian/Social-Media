@@ -40,8 +40,33 @@ async function spotifyScraper(id, endpoint) {
     }
 }
 
+
+
+// Example function to get playlist data and send the image
+async function getPlaylistSpotify(bot, chatId, url, userName) {
+    let pars = parse(url); // Assuming parse function exists to parse Spotify URL
+    let load = await bot.sendMessage(chatId, "Loading, please wait.");
+    try {
+        let getdata = await spotifyScraper(`${pars.id}`, "trackList/playlist");
+        let data = getdata.trackList.map(maru => [{ text: `${maru.title} - ${maru.artists}`, callback_data: "spt " + maru.id }]);
+
+        let imageUrl = await extractPlaylistImage(url); // Get the playlist image URL
+        let options = {
+            caption: "Please select the music you want to download by pressing one of the buttons below!",
+            reply_markup: JSON.stringify({ inline_keyboard: data })
+        };
+        await bot.sendPhoto(chatId, imageUrl, options); // Use the extracted image URL
+        await bot.deleteMessage(chatId, load.message_id);
+    } catch (err) {
+        await bot.sendMessage(String(process.env.DEV_ID), `[ ERROR MESSAGE ]\n\n• Username: @${userName}\n• File: funcs/spotify.js\n• Function: getPlaylistSpotify()\n• Url: ${url}\n\n${err}`.trim());
+        return bot.editMessageText("Error getting playlist data!", { chat_id: chatId, message_id: load.message_id });
+    }
+}
+
+
 // Export the functions
 module.exports = {
     extractPlaylistImage,
     spotifyScraper,
+    getPlaylistSpotify,
 };
