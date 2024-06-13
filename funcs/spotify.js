@@ -135,35 +135,21 @@ async function getSpotifySong(bot, chatId, url, userName) {
       }
     } else {
       let getdata = await spotifyScraper(url, "download")
-      let fname = `${Func.filterAlphanumericWithDash(getdata.metadata.title)}-${filterAlphanumericWithDash(getdata.metadata.artists)}_${chatId}.mp3`
+      let fname = `${filterAlphanumericWithDash(getdata.metadata.title)}-${filterAlphanumericWithDash(getdata.metadata.artists)}_${chatId}.mp3`
       if (getdata.success) {
-        await bot.editMessageText(
-          `Downloading song ${getdata.metadata.title} - ${getdata.metadata.artists}, please wait...`,
-          {chat_id: chatId, message_id: load.message_id}
-        )
+        await bot.editMessageText(`Downloading song ${getdata.metadata.title} - ${getdata.metadata.artists}, please wait...`,{chat_id: chatId, message_id: load.message_id })
         let buff = await getBuffer(getdata.link)
         await fs.writeFileSync("content/" + fname, buff)
-        await bot.sendAudio(chatId, "content/" + fname, {
-          caption: `Success download song ${getdata.metadata.title} - ${getdata.metadata.artists}`,
-        })
+        await bot.sendAudio(chatId, "content/" + fname, {caption: `Success download song ${getdata.metadata.title} - ${getdata.metadata.artists}`});
         await bot.deleteMessage(chatId, load.message_id)
         await fs.unlinkSync("content/" + fname)
       } else {
-        await bot.editMessageText("Error, failed to get data", {
-          chat_id: chatId,
-          message_id: load.message_id,
-        })
+        await bot.editMessageText("Error, failed to get data", {chat_id: chatId,message_id: load.message_id })
       }
     }
   } catch (err) {
-    await bot.sendMessage(
-      String(process.env.DEV_ID),
-      `[ ERROR MESSAGE ]\n\n• Username: @${userName}\n• File: funcs/spotify.js\n• Function: getSpotifySong()\n• Url: ${url}\n\n${err}`.trim()
-    )
-    return bot.editMessageText("Failed to download song!", {
-      chat_id: chatId,
-      message_id: load.message_id,
-    })
+    await bot.sendMessage(String(process.env.DEV_ID),`[ ERROR MESSAGE ]\n\n• Username: @${userName}\n• File: funcs/spotify.js\n• Function: getSpotifySong()\n• Url: ${url}\n\n${err}`.trim());
+    return bot.editMessageText("Failed to download song!", {chat_id: chatId, message_id: load.message_id })
   }
 }
 
