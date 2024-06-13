@@ -43,35 +43,20 @@ async function getPlaylistSpotify(bot, chatId, url, userName) {
     let getdata = await spotifyScraper(`${pars.id}`, "trackList/playlist")
     let data = []
     getdata.trackList.map((maru) => {
-      data.push([
-        {
-          text: `${maru.title} - ${maru.artists}`,
-          callback_data: "spt " + maru.id,
-        },
-      ])
+      data.push([{text: `${maru.title} - ${maru.artists}`,callback_data: "spt " + maru.id,}])
     })
     let options = {
       caption:
         "Please select the music you want to download by pressing one of the buttons below!",
       reply_markup: JSON.stringify({
-        inline_keyboard: data,
-      }),
-    }
-    await bot.sendPhoto(
-      chatId,
-      "https://telegra.ph/file/a41e47f544ed99dd33783.jpg",
-      options
-    )
+        inline_keyboard: data
+      })
+    };
+    await bot.sendPhoto(chatId,"https://telegra.ph/file/a41e47f544ed99dd33783.jpg",options);
     await bot.deleteMessage(chatId, load.message_id)
   } catch (err) {
-    await bot.sendMessage(
-      String(process.env.DEV_ID),
-      `[ ERROR MESSAGE ]\n\n• Username: @${userName}\n• File: funcs/spotify.js\n• Function: getPlaylistSpotify()\n• Url: ${url}\n\n${err}`.trim()
-    )
-    return bot.editMessageText("Error getting playlist data!", {
-      chat_id: chatId,
-      message_id: load.message_id,
-    })
+    await bot.sendMessage(String(process.env.DEV_ID), `[ ERROR MESSAGE ]\n\n• Username: @${userName}\n• File: funcs/spotify.js\n• Function: getPlaylistSpotify()\n• Url: ${url}\n\n${err}`.trim());
+    return bot.editMessageText("Error getting playlist data!", { chat_id: chatId, message_id: load.message_id })
   }
 }
 
@@ -80,11 +65,8 @@ async function getAlbumsSpotify(bot, chatId, url, userName) {
   let load = await bot.sendMessage(chatId, "Loading, please wait.")
   try {
     let getdata = await spotifyScraper(`${pars.id}`, "trackList/album")
-    let data = []
-    getdata.trackList.map((maru) => {
-      data.push([
-        {
-          text: `${maru.title} - ${maru.artists}`,
+    let data = [];
+    getdata.trackList.map((maru) => {data.push([{text: `${maru.title} - ${maru.artists}`,
           callback_data: "spt " + maru.id,
         },
       ])
