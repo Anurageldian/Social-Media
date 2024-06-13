@@ -448,7 +448,7 @@ bot.onText(/(https?:\/\/)?(www\.)?(open\.spotify\.com|spotify\.?com)\/album\/.+/
   }
 })
 
-const { extractPlaylistImage } = require('./funcs/spotify'); // Adjust path as per your directory structure
+const { extractPlaylistImage, spotifyScraper } = require('./funcs/spotify'); // Ensure the path is correct
 
 // Spotify Playlist Regex
 bot.onText(/(https?:\/\/)?(www\.)?(open\.spotify\.com|spotify\.?com)\/playlist\/.+/, async (msg, match) => {
