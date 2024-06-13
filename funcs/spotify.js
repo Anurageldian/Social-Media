@@ -16,7 +16,9 @@ async function extractPlaylistImage(url) {
     return null;
   }
 }
-
+module.exports = {
+  extractPlaylistImage
+}
 
 // Call function to handle the Spotify playlist URL
-handleSpotifyLink(spotifyPlaylistUrl);
+// handleSpotifyLink(spotifyPlaylistUrl);
