@@ -121,32 +121,21 @@ async function getSpotifySong(bot, chatId, url, userName) {
     if (url.includes("spotify.com")) {
       let pars = await parse(url)
       let getdata = await spotifyScraper(pars.id, "download")
-      let fname = `${filterAlphanumericWithDash(
-        getdata.metadata.title
-      )}-${filterAlphanumericWithDash(getdata.metadata.artists)}_${chatId}.mp3`
+      let fname = `${filterAlphanumericWithDash(getdata.metadata.title)}-${filterAlphanumericWithDash(getdata.metadata.artists)}_${chatId}.mp3`
       if (getdata.success) {
-        await bot.editMessageText(
-          `Downloading song ${getdata.metadata.title} - ${getdata.metadata.artists}, please wait...`,
-          {chat_id: chatId, message_id: load.message_id}
-        )
+        await bot.editMessageText(`Downloading song ${getdata.metadata.title} - ${getdata.metadata.artists}, please wait...`,{chat_id: chatId, message_id: load.message_id})
         let buff = await getBuffer(getdata.link)
         await fs.writeFileSync("content/" + fname, buff)
-        await bot.sendAudio(chatId, "content/" + fname, {
-          caption: `Success download song ${getdata.metadata.title} - ${getdata.metadata.artists}`,
-        })
+        // let buf = await fs.readFileSync(`/tmp/${fname}`)
+        await bot.sendAudio(chatId, "content/" + fname, {caption: `Success download song ${getdata.metadata.title} - ${getdata.metadata.artists}`});
         await bot.deleteMessage(chatId, load.message_id)
         await fs.unlinkSync("content/" + fname)
       } else {
-        await bot.editMessageText("Error, failed to get data", {
-          chat_id: chatId,
-          message_id: load.message_id,
-        })
+        await bot.editMessageText("Error, failed to get data", {chat_id: chatId,message_id: load.message_id,})
       }
     } else {
       let getdata = await spotifyScraper(url, "download")
-      let fname = `${filterAlphanumericWithDash(
-        getdata.metadata.title
-      )}-${filterAlphanumericWithDash(getdata.metadata.artists)}_${chatId}.mp3`
+      let fname = `${Func.filterAlphanumericWithDash(getdata.metadata.title)}-${filterAlphanumericWithDash(getdata.metadata.artists)}_${chatId}.mp3`
       if (getdata.success) {
         await bot.editMessageText(
           `Downloading song ${getdata.metadata.title} - ${getdata.metadata.artists}, please wait...`,
