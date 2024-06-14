@@ -688,12 +688,8 @@ bot.onText(/\/listadmins/, (msg) => {
       const adminList = admins.map(admin => {
         let username = admin.user.username;
         if (username) {
-          // Check if username contains underscores and format accordingly
-          if (username.includes('_')) {
-            username = `@${username}`;
-          } else {
-            username = `@${username}`;
-          }
+          // Replace underscores with HTML entity to prevent Markdown interpretation
+          username = `@${username.replace(/_/g, '&#95;')}`;
         } else {
           // If username is not available, use first name as a clickable link
           username = `[${admin.user.first_name}](tg://user?id=${admin.user.id})`;
@@ -701,7 +697,7 @@ bot.onText(/\/listadmins/, (msg) => {
         return `${username}`;
       }).join('\n');
       
-      bot.sendMessage(chatId, `Admins:\n${adminList}`, { parse_mode: 'Markdown' });
+      bot.sendMessage(chatId, `Admins:\n${adminList}`, { parse_mode: 'HTML' });
     })
     .catch(error => bot.sendMessage(chatId, `Failed to list admins: ${error}`));
 });
