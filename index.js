@@ -603,7 +603,7 @@ bot.onText(/◀️ Previous/, async (msg) => {
 bot.onText(/\/ban (.+)/, (msg, match) => {
   const chatId = msg.chat.id;
      bot.banChatMember(msg.chat.id, msg.from.id);
-       bot.sendMessage(chatId, `User ${userId} banned.`));
+       bot.sendMessage(chatId, `User ${userId} banned.`);
     .catch(error => bot.sendMessage(chatId, `Failed to Ban user: ${error}`));
   });
 // iikkk
