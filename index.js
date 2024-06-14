@@ -667,10 +667,10 @@ bot.onText(/\/setgrouppic/, (msg) => {
     .catch(error => bot.sendMessage(chatId, `Failed to change group picture: ${error}`));
 });
 
+//wihout username markdown xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 // Command: List Admins
 // bot.onText(/\/listadmins/, (msg) => {
 //   const chatId = msg.chat.id;
-
 //   bot.getChatAdministrators(chatId)
 //     .then(admins => {
 //       const adminList = admins.map(admin => `${admin.user.username[Link](tg://user?id=${userId}) || admin.user.first_name}`).join('\n');
@@ -680,6 +680,8 @@ bot.onText(/\/setgrouppic/, (msg) => {
 // });
 
 
+
+// without (owner) display in front of username
 // bot.onText(/\/listadmins/, (msg) => {
 //   const chatId = msg.chat.id;
 
@@ -704,6 +706,8 @@ bot.onText(/\/setgrouppic/, (msg) => {
 //     .catch(error => bot.sendMessage(chatId, `Failed to list admins: ${error}`));
 // });
 
+
+// with (owner) display infront of username
 bot.onText(/\/listadmins/, (msg) => {
   const chatId = msg.chat.id;
 
@@ -723,19 +727,19 @@ bot.onText(/\/listadmins/, (msg) => {
 
       let ownerDisplay = '';
       if (owner) {
-        ownerDisplay = `=> <b>${owner.username ? `@${owner.username.replace(/_/g, '&#95;')}` : `<a href="tg://user?id=${owner.id}">${owner.first_name}</a>`} (Owner)</b>`;
+        ownerDisplay = `⚜ <b>${owner.username ? `@${owner.username.replace(/_/g, '&#95;')}` : `<a href="tg://user?id=${owner.id}">${owner.first_name}</a>`} (Owner)</b>\n\n`;
       }
 
       const adminList = otherAdmins.map(admin => {
         let username = admin.username;
         if (username) {
           // Replace underscores with HTML entity to prevent Markdown interpretation
-          username = `=> @${username.replace(/_/g, '&#95;')}`;
+          username = `➻  @${username.replace(/_/g, '&#95;')}`;
         } else {
           // If username is not available, use first name as a clickable link
           username = admin.first_name ? 
-            `=> <a href="tg://user?id=${admin.id}">${admin.first_name}</a>` :
-            `=> Deleted Account`; // Default to 'Deleted Account' if no first name available
+            `➻  <a href="tg://user?id=${admin.id}">${admin.first_name}</a>` :
+            `❅  Deleted Account`; // Default to 'Deleted Account' if no first name available
         }
         return username;
       }).join('\n');
