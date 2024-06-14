@@ -668,13 +668,29 @@ bot.onText(/\/setgrouppic/, (msg) => {
 });
 
 // Command: List Admins
+// bot.onText(/\/listadmins/, (msg) => {
+//   const chatId = msg.chat.id;
+
+//   bot.getChatAdministrators(chatId)
+//     .then(admins => {
+//       const adminList = admins.map(admin => `${admin.user.username[Link](tg://user?id=${userId}) || admin.user.first_name}`).join('\n');
+//       bot.sendMessage(chatId, `Admins:\n${adminList}`);
+//     })
+//     .catch(error => bot.sendMessage(chatId, `Failed to list admins: ${error}`));
+// });
+
+
 bot.onText(/\/listadmins/, (msg) => {
   const chatId = msg.chat.id;
 
   bot.getChatAdministrators(chatId)
     .then(admins => {
-      const adminList = admins.map(admin => `${admin.user.username || admin.user.first_name}`).join('\n');
-      bot.sendMessage(chatId, `Admins:\n${adminList}`);
+      const adminList = admins.map(admin => {
+        const username = admin.user.username ? `@${admin.user.username}` : `[${admin.user.first_name}](tg://user?id=${admin.user.id})`;
+        return `${username}`;
+      }).join('\n');
+      
+      bot.sendMessage(chatId, `Admins:\n${adminList}`, { parse_mode: 'Markdown' });
     })
     .catch(error => bot.sendMessage(chatId, `Failed to list admins: ${error}`));
 });
