@@ -692,15 +692,18 @@ bot.onText(/\/listadmins/, (msg) => {
           username = `@${username.replace(/_/g, '&#95;')}`;
         } else {
           // If username is not available, use first name as a clickable link
-          username = `[${admin.user.first_name}](tg://user?id=${admin.user.id})`;
+          username = admin.user.first_name ? 
+            `<a href="tg://user?id=${admin.user.id}">${admin.user.first_name}</a>` :
+            `[User](tg://user?id=${admin.user.id})`; // Default to 'User' if no first name available
         }
-        return `${username}`;
+        return username;
       }).join('\n');
       
       bot.sendMessage(chatId, `Admins:\n${adminList}`, { parse_mode: 'HTML' });
     })
     .catch(error => bot.sendMessage(chatId, `Failed to list admins: ${error}`));
 });
+
 
 
 // Event listener for /getprofilepics command with username argument
