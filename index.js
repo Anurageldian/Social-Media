@@ -601,11 +601,48 @@ bot.onText(/◀️ Previous/, async (msg) => {
 // Command: Ban User
 bot.onText(/\/ban (.+)/, (msg, match) => {
   const chatId = msg.chat.id;
-  const userId = match[1];
+  const input = match[1];
 
-  bot.kickChatMember(chatId, userId)
-    .then(() => bot.sendMessage(chatId, `User ${userId} banned.`))
-    .catch(error => bot.sendMessage(chatId, `Failed to ban user: ${error}`));
+  const sendMessage = (message) => {
+    bot.sendMessage(chatId, message);
+  };
+
+  const banUser = (userId) => {
+    bot.kickChatMember(chatId, userId)
+      .then(() => sendMessage(`User ${userId} banned.`))
+      .catch(error => sendMessage(`Failed to ban user: ${error.message}`));
+  };
+
+  if (input.startsWith('@')) {
+    // Input is a username
+    const username = input.slice(1);
+    bot.getChatMembersCount(chatId)
+      .then(count => {
+        let userFound = false;
+        for (let i = 0; i < count; i++) {
+          bot.getChatMember(chatId, i).then(member => {
+            if (member.user.username === username) {
+              userFound = true;
+              banUser(member.user.id);
+              return;
+            }
+          }).catch(error => {
+            if (i === count - 1 && !userFound) {
+              sendMessage(`User @${username} not found.`);
+            }
+          });
+        }
+      })
+      .catch(error => sendMessage(`Failed to get chat members: ${error.message}`));
+  } else {
+    // Input is a user ID
+    const userId = parseInt(input, 10);
+    if (isNaN(userId)) {
+      sendMessage(`Invalid user ID: ${input}`);
+    } else {
+      banUser(userId);
+    }
+  }
 });
 
 // Command: Unban User
