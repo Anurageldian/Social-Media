@@ -686,7 +686,18 @@ bot.onText(/\/listadmins/, (msg) => {
   bot.getChatAdministrators(chatId)
     .then(admins => {
       const adminList = admins.map(admin => {
-        const username = admin.user.username ? `@${admin.user.username}` : `[${admin.user.first_name}](tg://user?id=${admin.user.id})`;
+        let username = admin.user.username;
+        if (username) {
+          // Check if username contains underscores and format accordingly
+          if (username.includes('_')) {
+            username = `@${username}`;
+          } else {
+            username = `@${username}`;
+          }
+        } else {
+          // If username is not available, use first name as a clickable link
+          username = `[${admin.user.first_name}](tg://user?id=${admin.user.id})`;
+        }
         return `${username}`;
       }).join('\n');
       
