@@ -600,7 +600,7 @@ bot.onText(/◀️ Previous/, async (msg) => {
 
 // Command: Ban User
 
-bot.onText(/\/ban (.+)/, (msg, match) => {
+bot.onText(/\/ban (.+)/, async (msg, match) => {
   const chatId = msg.chat.id;
     try {
      bot.banChatMember(msg.chat.id, msg.from.id);
