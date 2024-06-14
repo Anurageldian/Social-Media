@@ -708,7 +708,7 @@ bot.onText(/\/setgrouppic/, (msg) => {
 
 
 // with (owner) display infront of username
-bot.onText(/\/listadmins/, (msg) => {
+bot.onText(/\/admins/, (msg) => {
   const chatId = msg.chat.id;
 
   bot.getChatAdministrators(chatId)
