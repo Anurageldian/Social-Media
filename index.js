@@ -680,30 +680,71 @@ bot.onText(/\/setgrouppic/, (msg) => {
 // });
 
 
+// bot.onText(/\/listadmins/, (msg) => {
+//   const chatId = msg.chat.id;
+
+//   bot.getChatAdministrators(chatId)
+//     .then(admins => {
+//       const adminList = admins.map(admin => {
+//         let username = admin.user.username;
+//         if (username) {
+//           // Replace underscores with HTML entity to prevent Markdown interpretation
+//           username = `➻  @${username.replace(/_/g, '&#95;')}`;
+//         } else {
+//           // If username is not available, use first name as a clickable link
+//           username = admin.user.first_name ? 
+//             `➻  <a href="tg://user?id=${admin.user.id}">${admin.user.first_name}</a>` :
+//             `❅  Deleted Account`; // Default to 'User' if no first name available
+//         }
+//         return username;
+//       }).join('\n');
+      
+//       bot.sendMessage(chatId, `Admins:\n${adminList}`, { parse_mode: 'HTML' });
+//     })
+//     .catch(error => bot.sendMessage(chatId, `Failed to list admins: ${error}`));
+// });
+
 bot.onText(/\/listadmins/, (msg) => {
   const chatId = msg.chat.id;
 
   bot.getChatAdministrators(chatId)
     .then(admins => {
-      const adminList = admins.map(admin => {
-        let username = admin.user.username;
+      // Separate the owner from other administrators
+      let owner = null;
+      const otherAdmins = [];
+
+      admins.forEach(admin => {
+        if (admin.status === 'creator') {
+          owner = admin.user;
+        } else {
+          otherAdmins.push(admin.user);
+        }
+      });
+
+      let ownerDisplay = '';
+      if (owner) {
+        ownerDisplay = `=> <b>${owner.username ? `@${owner.username.replace(/_/g, '&#95;')}` : `<a href="tg://user?id=${owner.id}">${owner.first_name}</a>`} (Owner)</b>`;
+      }
+
+      const adminList = otherAdmins.map(admin => {
+        let username = admin.username;
         if (username) {
           // Replace underscores with HTML entity to prevent Markdown interpretation
-          username = `➻  @${username.replace(/_/g, '&#95;')}`;
+          username = `=> @${username.replace(/_/g, '&#95;')}`;
         } else {
           // If username is not available, use first name as a clickable link
-          username = admin.user.first_name ? 
-            `➻  <a href="tg://user?id=${admin.user.id}">${admin.user.first_name}</a>` :
-            `❅  Deleted Account`; // Default to 'User' if no first name available
+          username = admin.first_name ? 
+            `=> <a href="tg://user?id=${admin.id}">${admin.first_name}</a>` :
+            `=> Deleted Account`; // Default to 'Deleted Account' if no first name available
         }
         return username;
       }).join('\n');
       
-      bot.sendMessage(chatId, `Admins:\n${adminList}`, { parse_mode: 'HTML' });
+      const response = `Admins:\n${ownerDisplay}\n${adminList}`;
+      bot.sendMessage(chatId, response, { parse_mode: 'HTML' });
     })
     .catch(error => bot.sendMessage(chatId, `Failed to list admins: ${error}`));
 });
-
 
 
 // Event listener for /getprofilepics command with username argument
