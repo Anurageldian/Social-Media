@@ -616,21 +616,13 @@ bot.onText(/\/ban (.+)/, (msg, match) => {
   if (input.startsWith('@')) {
     // Input is a username
     const username = input.slice(1);
-    bot.getChatMembersCount(chatId)
-      .then(count => {
-        let userFound = false;
-        for (let i = 0; i < count; i++) {
-          bot.getChatMember(chatId, i).then(member => {
-            if (member.user.username === username) {
-              userFound = true;
-              banUser(member.user.id);
-              return;
-            }
-          }).catch(error => {
-            if (i === count - 1 && !userFound) {
-              sendMessage(`User @${username} not found.`);
-            }
-          });
+    bot.getChatAdministrators(chatId)
+      .then((admins) => {
+        const admin = admins.find(admin => admin.user.username === username);
+        if (admin) {
+          banUser(admin.user.id);
+        } else {
+          sendMessage(`User @${username} not found.`);
         }
       })
       .catch(error => sendMessage(`Failed to get chat members: ${error.message}`));
@@ -644,6 +636,12 @@ bot.onText(/\/ban (.+)/, (msg, match) => {
     }
   }
 });
+
+// Error handling
+bot.on('polling_error', (error) => {
+  console.log(`Polling error: ${error.code} - ${error.message}`);
+});
+
 
 // Command: Unban User
 bot.onText(/\/unban (.+)/, (msg, match) => {
