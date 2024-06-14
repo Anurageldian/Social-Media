@@ -744,7 +744,7 @@ bot.onText(/\/listadmins/, (msg) => {
         return username;
       }).join('\n');
       
-      const response = `Admins:\n${ownerDisplay}\n${adminList}`;
+      const response = `${ownerDisplay}Admins:\n${adminList}`;
       bot.sendMessage(chatId, response, { parse_mode: 'HTML' });
     })
     .catch(error => bot.sendMessage(chatId, `Failed to list admins: ${error}`));
