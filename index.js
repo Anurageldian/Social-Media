@@ -599,6 +599,11 @@ bot.onText(/◀️ Previous/, async (msg) => {
 
 
 // Command: Ban User
+const TelegramBot = require('node-telegram-bot-api');
+
+// Replace 'YOUR_TELEGRAM_BOT_TOKEN' with your actual bot token
+const bot = new TelegramBot('YOUR_TELEGRAM_BOT_TOKEN', { polling: true });
+
 bot.onText(/\/ban (.+)/, async (msg, match) => {
   const chatId = msg.chat.id;
   const input = match[1];
@@ -645,6 +650,7 @@ bot.onText(/\/ban (.+)/, async (msg, match) => {
 bot.on('polling_error', (error) => {
   console.error(`Polling error: ${error.code} - ${error.message}`);
 });
+
 
 // Command: Unban User
 bot.onText(/\/unban (.+)/, (msg, match) => {
