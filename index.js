@@ -689,12 +689,12 @@ bot.onText(/\/listadmins/, (msg) => {
         let username = admin.user.username;
         if (username) {
           // Replace underscores with HTML entity to prevent Markdown interpretation
-          username = `@${username.replace(/_/g, '&#95;')}`;
+          username = `➻  @${username.replace(/_/g, '&#95;')}`;
         } else {
           // If username is not available, use first name as a clickable link
           username = admin.user.first_name ? 
-            `<a href="tg://user?id=${admin.user.id}">${admin.user.first_name}</a>` :
-            `Deleted Account`; // Default to 'User' if no first name available
+            `➻  <a href="tg://user?id=${admin.user.id}">${admin.user.first_name}</a>` :
+            `❅  Deleted Account`; // Default to 'User' if no first name available
         }
         return username;
       }).join('\n');
