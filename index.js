@@ -599,7 +599,7 @@ bot.onText(/◀️ Previous/, async (msg) => {
 
 
 // Command: Ban User
-bot.onText(/\/ban (.+)/, (msg, match) => {
+bot.onText(/\/ban (.+)/, async (msg, match) => {
   const chatId = msg.chat.id;
   const input = match[1];
 
@@ -607,41 +607,44 @@ bot.onText(/\/ban (.+)/, (msg, match) => {
     bot.sendMessage(chatId, message);
   };
 
-  const banUser = (userId) => {
-    bot.kickChatMember(chatId, userId)
-      .then(() => sendMessage(`User ${userId} banned.`))
-      .catch(error => sendMessage(`Failed to ban user: ${error.message}`));
+  const banUser = async (userId) => {
+    try {
+      await bot.banChatMember(chatId, userId);
+      sendMessage(`User ${userId} banned.`);
+    } catch (error) {
+      sendMessage(`Failed to ban user: ${error.message}`);
+    }
   };
 
   if (input.startsWith('@')) {
     // Input is a username
     const username = input.slice(1);
-    bot.getChatAdministrators(chatId)
-      .then((admins) => {
-        const admin = admins.find(admin => admin.user.username === username);
-        if (admin) {
-          banUser(admin.user.id);
-        } else {
-          sendMessage(`User @${username} not found.`);
-        }
-      })
-      .catch(error => sendMessage(`Failed to get chat members: ${error.message}`));
+    try {
+      const chatMembers = await bot.getChatAdministrators(chatId);
+      const user = chatMembers.find(member => member.user.username === username);
+      if (user) {
+        await banUser(user.user.id);
+      } else {
+        sendMessage(`User @${username} not found.`);
+      }
+    } catch (error) {
+      sendMessage(`Failed to get chat members: ${error.message}`);
+    }
   } else {
     // Input is a user ID
     const userId = parseInt(input, 10);
     if (isNaN(userId)) {
       sendMessage(`Invalid user ID: ${input}`);
     } else {
-      banUser(userId);
+      await banUser(userId);
     }
   }
 });
 
 // Error handling
 bot.on('polling_error', (error) => {
-  console.log(`Polling error: ${error.code} - ${error.message}`);
+  console.error(`Polling error: ${error.code} - ${error.message}`);
 });
-
 
 // Command: Unban User
 bot.onText(/\/unban (.+)/, (msg, match) => {
