@@ -608,7 +608,7 @@ bot.onText(/\/ban (.+)/, async (msg, match) => {
     } catch (error) {
       sendMessage(`Failed to ban user: ${error.message}`);
     }
-  };
+  });
 // iikkk
   if (input.startsWith('@')) {
     // Input is a username
