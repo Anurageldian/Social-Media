@@ -694,7 +694,7 @@ bot.onText(/\/listadmins/, (msg) => {
           // If username is not available, use first name as a clickable link
           username = admin.user.first_name ? 
             `<a href="tg://user?id=${admin.user.id}">${admin.user.first_name}</a>` :
-            `[User](tg://user?id=${admin.user.id})`; // Default to 'User' if no first name available
+            `Deleted Account`; // Default to 'User' if no first name available
         }
         return username;
       }).join('\n');
