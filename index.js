@@ -610,13 +610,13 @@ bot.onText(/\/ban (.+)/, async (msg, match) => {
 
   const banUser = async (userId) => {
     try {
-      await bot.banChatMember(chatId, userId);
+      await bot.banChatMember(msg.chat.id, msg.message_id);
       sendMessage(`User ${userId} banned.`);
     } catch (error) {
       sendMessage(`Failed to ban user: ${error.message}`);
     }
   };
-
+// iikkk
   if (input.startsWith('@')) {
     // Input is a username
     const username = input.slice(1);
