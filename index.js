@@ -602,15 +602,8 @@ bot.onText(/◀️ Previous/, async (msg) => {
 
 bot.onText(/\/ban (.+)/, async (msg, match) => {
   const chatId = msg.chat.id;
-  const input = match[1];
-
-  const sendMessage = (message) => {
-    bot.sendMessage(chatId, message);
-  };
-
-  const banUser = async (userId) => {
     try {
-      await bot.banChatMember(msg.chat.id, msg.message_id);
+      await bot.banChatMember(msg.chat.id, msg.from.id);
       sendMessage(`User ${userId} banned.`);
     } catch (error) {
       sendMessage(`Failed to ban user: ${error.message}`);
