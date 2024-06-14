@@ -598,6 +598,58 @@ bot.onText(/◀️ Previous/, async (msg) => {
 });
 
 
+// Command: Ban User
+bot.onText(/\/ban (.+)/, (msg, match) => {
+  const chatId = msg.chat.id;
+  const userId = match[1];
+
+  bot.kickChatMember(chatId, userId)
+    .then(() => bot.sendMessage(chatId, `User ${userId} banned.`))
+    .catch(error => bot.sendMessage(chatId, `Failed to ban user: ${error}`));
+});
+
+// Command: Unban User
+bot.onText(/\/unban (.+)/, (msg, match) => {
+  const chatId = msg.chat.id;
+  const userId = match[1];
+
+  bot.unbanChatMember(chatId, userId)
+    .then(() => bot.sendMessage(chatId, `User ${userId} unbanned.`))
+    .catch(error => bot.sendMessage(chatId, `Failed to unban user: ${error}`));
+});
+
+// Command: Kick User
+bot.onText(/\/kick (.+)/, (msg, match) => {
+  const chatId = msg.chat.id;
+  const userId = match[1];
+
+  bot.kickChatMember(chatId, userId)
+    .then(() => bot.sendMessage(chatId, `User ${userId} kicked.`))
+    .catch(error => bot.sendMessage(chatId, `Failed to kick user: ${error}`));
+});
+
+// Command: Change Group Picture
+bot.onText(/\/setgrouppic/, (msg) => {
+  const chatId = msg.chat.id;
+  const photo = msg.photo[msg.photo.length - 1].file_id; // Assume last photo is highest resolution
+
+  bot.setChatPhoto(chatId, photo)
+    .then(() => bot.sendMessage(chatId, `Group picture changed.`))
+    .catch(error => bot.sendMessage(chatId, `Failed to change group picture: ${error}`));
+});
+
+// Command: List Admins
+bot.onText(/\/listadmins/, (msg) => {
+  const chatId = msg.chat.id;
+
+  bot.getChatAdministrators(chatId)
+    .then(admins => {
+      const adminList = admins.map(admin => `${admin.user.username || admin.user.first_name}`).join('\n');
+      bot.sendMessage(chatId, `Admins:\n${adminList}`);
+    })
+    .catch(error => bot.sendMessage(chatId, `Failed to list admins: ${error}`));
+});
+
 
 // Event listener for /getprofilepics command with username argument
 bot.onText(/\/getprofilepics/, async (msg) => {
