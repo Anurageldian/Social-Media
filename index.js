@@ -727,7 +727,7 @@ bot.onText(/\/listadmins/, (msg) => {
 
       let ownerDisplay = '';
       if (owner) {
-        ownerDisplay = `火 <b>${owner.username ? `@${owner.username.replace(/_/g, '&#95;')}` : `<a href="tg://user?id=${owner.id}">${owner.first_name}</a>`} (Owner)</b>\n\n`;
+        ownerDisplay = `火 <b>${owner.username ? `@${owner.username.replace(/_/g, '&#95;')}` : `<a href="tg://user?id=${owner.id}">${owner.first_name}</a>`} (Alpha)</b>\n`;
       }
 
       const adminList = otherAdmins.map(admin => {
