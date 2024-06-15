@@ -85,7 +85,7 @@ let bot = new TelegramBot(token, {
   polling: true
 })
 // Bot Settings
-let botName = 'Nezuko Social Bot';
+let botName = 'ɴᴇᴢᴜᴋᴏ ꜱᴏᴄɪᴀʟ ʙᴏᴛ';
 app.get('/', async (req, res) => {
   res.send({
     Status: "Active"
@@ -145,20 +145,21 @@ bot.onText(/\/start/, async (msg) => {
   
   let response = await bot.sendPhoto(msg.chat.id, 'https://telegra.ph/file/57fabcc59ac97735de40b.jpg', {
     caption:
-`Hello I am ${botName}
+`*ʜᴇʟʟᴏ ɪ ᴀᴍ ${botName}*
 
-Please send a link to the video or post you want to download, the bot only supports social media on the list
+ᴘʟᴇᴀꜱᴇ ꜱᴇɴᴅ ᴀ ʟɪɴᴋ ᴛᴏ ᴛʜᴇ ᴠɪᴅᴇᴏ ᴏʀ ᴘᴏꜱᴛ ʏᴏᴜ ᴡᴀɴᴛ ᴛᴏ ᴅᴏᴡɴʟᴏᴀᴅ, ᴛʜᴇ ʙᴏᴛ ᴏɴʟʏ ꜱᴜᴘᴘᴏʀᴛꜱ ꜱᴏᴄɪᴀʟ ᴍᴇᴅɪᴀ ᴏɴ ᴛʜᴇ ʟɪꜱᴛ
 
-LIST :
-• Threads
-• Tiktok  
-• Instagram
-• Twitter  
-• Facebook
-• Pinterest
-• Spotify
-• Github`,
+ʟɪꜱᴛ :
+• _ᴛʜʀᴇᴀᴅꜱ_
+• _ᴛɪᴋᴛᴏᴋ_
+• _ɪɴꜱᴛᴀɢʀᴀᴍ_
+• _ᴛᴡɪᴛᴛᴇʀ_
+• _ꜰᴀᴄᴇʙᴏᴏᴋ_
+• _ᴘɪɴᴛᴇʀᴇꜱᴛ_
+• _ꜱᴘᴏᴛɪꜰʏ_
+• _ɢɪᴛʜᴜʙ_`,
     reply_markup: { inline_keyboard: inlineKeyboard },
+    parse_mode: 'Markdown', // Ensure Markdown mode is enabled
   });
 
   // Handle button callback
@@ -170,13 +171,13 @@ LIST :
     if (data === 'more_info') {
       // Send additional information when the button is pressed
       await bot.editMessageCaption(
-        `OTHER FEATURES
-        /ai (Question/Pertanyaan)
-        /brainly (Pertanyaan/Soal)
-        /pin (Searching Pinterest)
-        /google (Searching Google)
-        
-Send images, if you want to use ocr (extract text on image), telegraph (upload to telegraph), and pomf2 (upload to pomf2)`,
+        `ᴏᴛʜᴇʀ ꜰᴇᴀᴛᴜʀᴇꜱ
+/ᴀɪ (Qᴜᴇꜱᴛɪᴏɴ)
+/ʙʀᴀɪɴʟʏ (ꜱᴏʟᴜᴛɪᴏɴ)
+/ᴘɪɴ (ꜱᴇᴀʀᴄʜɪɴɢ ᴘɪɴᴛᴇʀᴇꜱᴛ)
+/ɢᴏᴏɢʟᴇ (ꜱᴇᴀʀᴄʜɪɴɢ ɢᴏᴏɢʟᴇ)
+
+ꜱᴇɴᴅ ɪᴍᴀɢᴇꜱ, ɪꜰ ʏᴏᴜ ᴡᴀɴᴛ ᴛᴏ ᴜꜱᴇ ᴏᴄʀ (ᴇxᴛʀᴀᴄᴛ ᴛᴇxᴛ ᴏɴ ɪᴍᴀɢᴇ), ᴛᴇʟᴇɢʀᴀᴘʜ (ᴜᴘʟᴏᴀᴅ ᴛᴏ ᴛᴇʟᴇɢʀᴀᴘʜ), ᴀɴᴅ ᴘᴏᴍꜰ2 (ᴜᴘʟᴏᴀᴅ ᴛᴏ ᴘᴏᴍꜰ-2)`,
         {
           chat_id: chatId,
           message_id: messageId,
@@ -189,28 +190,30 @@ Send images, if you want to use ocr (extract text on image), telegraph (upload t
               [{ text: '< Back', callback_data: 'back_to_first_caption' }],
             ],
           },
+          parse_mode: 'Markdown', // Ensure Markdown mode is enabled
         }
       );
     } else if (data === 'back_to_first_caption') {
       // Handle the callback for the "Back to first caption" button
       await bot.editMessageCaption(
-`Hello I am ${botName}
+`*ʜᴇʟʟᴏ ɪ ᴀᴍ ${botName}*
 
-Please send a link to the video or post you want to download, the bot only supports social media on the list
+ᴘʟᴇᴀꜱᴇ ꜱᴇɴᴅ ᴀ ʟɪɴᴋ ᴛᴏ ᴛʜᴇ ᴠɪᴅᴇᴏ ᴏʀ ᴘᴏꜱᴛ ʏᴏᴜ ᴡᴀɴᴛ ᴛᴏ ᴅᴏᴡɴʟᴏᴀᴅ, ᴛʜᴇ ʙᴏᴛ ᴏɴʟʏ ꜱᴜᴘᴘᴏʀᴛꜱ ꜱᴏᴄɪᴀʟ ᴍᴇᴅɪᴀ ᴏɴ ᴛʜᴇ ʟɪꜱᴛ
 
-LIST :
-• Threads
-• Tiktok  
-• Instagram
-• Twitter  
-• Facebook
-• Pinterest
-• Spotify
-• Github`,
+ʟɪꜱᴛ :
+• _ᴛʜʀᴇᴀᴅꜱ_
+• _ᴛɪᴋᴛᴏᴋ_
+• _ɪɴꜱᴛᴀɢʀᴀᴍ_
+• _ᴛᴡɪᴛᴛᴇʀ_
+• _ꜰᴀᴄᴇʙᴏᴏᴋ_
+• _ᴘɪɴᴛᴇʀᴇꜱᴛ_
+• _ꜱᴘᴏᴛɪꜰʏ_
+• _ɢɪᴛʜᴜʙ_`,
         {
           chat_id: chatId,
           message_id: messageId,
           reply_markup: { inline_keyboard: inlineKeyboard },
+          parse_mode: 'Markdown', // Ensure Markdown mode is enabled
         }
       );
     }
