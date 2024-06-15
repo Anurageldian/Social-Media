@@ -873,22 +873,21 @@ bot.on('photo', async (msg) => {
     return;
   }
 
-  // Get the photo file ID
-  const photoId = msg.photo[msg.photo.length - 1].file_id;
-
   try {
+    // Get the largest photo size (most suitable for chat photo)
+    const largestPhoto = msg.photo[msg.photo.length - 1];
+
     // Download the photo file
-    const file = await bot.getFile(photoId);
+    const photoFile = await bot.downloadFile(largestPhoto.file_id, 'photos');
 
     // Set the group chat photo
-    await bot.setChatPhoto(chatId, file.file_id);
+    await bot.setChatPhoto(chatId, photoFile.fileData);
     await bot.sendMessage(chatId, 'Group chat photo has been updated successfully!');
   } catch (error) {
     console.error('Error setting group chat photo:', error.message);
     await bot.sendMessage(chatId, 'Failed to update group chat photo.');
   }
 });
-
 
 
 // bot.onText(/\/info/, async (msg) => {
