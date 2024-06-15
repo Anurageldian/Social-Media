@@ -3,6 +3,10 @@ const axios = require('axios');
 const cheerio = require('cheerio');
 const util = require('util');
 
+require('dotenv').config();
+const axios = require('axios');
+const cheerio = require('cheerio');
+
 async function pindl(url) {
   try {
     const { data } = await axios.get(url, {
@@ -21,21 +25,21 @@ async function pindl(url) {
 
       let imageUrls = [];
       
-      // Handle if jsonData.image is an array of objects
-      if (Array.isArray(jsonData.image)) {
-        console.log("jsonData.image is an array");
-        imageUrls = jsonData.image.map(img => img.contentUrl).filter(Boolean);
+      // Handle if jsonData.image is a string URL
+      if (typeof jsonData.image === 'string') {
+        console.log("jsonData.image is a string URL");
+        imageUrls.push(jsonData.image);
       } 
-      // Handle if jsonData.image is a single object with contentUrl
-      else if (jsonData.image && jsonData.image.contentUrl) {
-        console.log("jsonData.image is a single object");
-        imageUrls.push(jsonData.image.contentUrl);
-      }
-      
       // Handle video URL
       if (jsonData.contentUrl) {
         console.log("jsonData contains contentUrl");
         imageUrls.push(jsonData.contentUrl);
+      }
+
+      // Optionally, check if sharedContent contains additional media URLs
+      if (jsonData.sharedContent && typeof jsonData.sharedContent.url === 'string') {
+        console.log("jsonData.sharedContent contains URL");
+        imageUrls.push(jsonData.sharedContent.url);
       }
 
       console.log("Extracted URLs:", imageUrls);
@@ -94,6 +98,7 @@ async function pinterest(bot, chatId, url, userName) {
     return bot.editMessageText('Failed to download media, make sure your link is valid!', { chat_id: chatId, message_id: load.message_id });
   }
 }
+
 module.exports = {
   pinterest,
   pinSearch
