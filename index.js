@@ -877,13 +877,34 @@ bot.on('photo', async (msg) => {
   const photoId = msg.photo[msg.photo.length - 1].file_id;
 
   try {
+    // Download the photo file
+    const file = await bot.getFile(photoId);
+    
     // Set the group chat photo
-    await bot.setChatPhoto(chatId, photoId);
+    await bot.setChatPhoto(chatId, file.file_id);
     await bot.sendMessage(chatId, 'Group chat photo has been updated successfully!');
   } catch (error) {
     console.error('Error setting group chat photo:', error.message);
     await bot.sendMessage(chatId, 'Failed to update group chat photo.');
   }
+});
+
+// Fetch bot information
+bot.getMe().then(botInfo => {
+  const botId = botInfo.id;
+  
+  // Now use botId to check permissions
+  bot.getChatMember(chatId, botId).then(botMember => {
+    if (!botMember.can_change_info) {
+      bot.sendMessage(chatId, 'Sorry, I do not have the required permissions to change chat info.');
+    } else {
+      bot.sendMessage(chatId, 'Please reply to the photo you want to set as the group chat photo with this command.');
+    }
+  }).catch(error => {
+    console.error('Error fetching bot member info:', error.message);
+  });
+}).catch(error => {
+  console.error('Error fetching bot info:', error.message);
 });
 
 
