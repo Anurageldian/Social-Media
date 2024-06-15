@@ -868,7 +868,30 @@ bot.onText(/\/info/, async (msg) => {
   }
 });
 
+bot.onText(/\/listfiles/, async (msg) => {
+  let chatId = msg.chat.id;
+  let getban = await getBanned(chatId);
+  if (!getban.status) return bot.sendMessage(chatId, `You have been banned\n\nReason : ${getban.reason}\n\nDo you want to be able to use bots again? Please contact the owner to request removal of the ban\nOwner : @firespower`);
 
+  const chatDir = `images/${chatId}`;
+
+  try {
+    if (fs.existsSync(chatDir)) {
+      const files = fs.readdirSync(chatDir);
+      if (files.length > 0) {
+        let fileList = files.map(file => path.join(chatDir, file)).join('\n');
+        await bot.sendMessage(chatId, `Here are the files stored in this chat:\n\n${fileList}`);
+      } else {
+        await bot.sendMessage(chatId, `No files found for this chat.`);
+      }
+    } else {
+      await bot.sendMessage(chatId, `No files found for this chat.`);
+    }
+  } catch (err) {
+    console.error('Error reading files:', err.message);
+    await bot.sendMessage(chatId, `There was an error retrieving the files.`);
+  }
+});
 
 // Listen for photo messages
 // Listen for photo messages
