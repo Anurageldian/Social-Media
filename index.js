@@ -159,7 +159,7 @@ bot.onText(/\/start/, async (msg) => {
   
   let response = await bot.sendPhoto(msg.chat.id, 'https://telegra.ph/file/57fabcc59ac97735de40b.jpg', {
     caption:
-`*ʜᴇʟʟᴏ ɪ ᴀᴍ* <b><i>${escapeHtml(botName)}</i></b>
+`ʜᴇʟʟᴏ ɪ ᴀᴍ <b><i>${escapeHtml(botName)}</i></b>
 
 ᴘʟᴇᴀꜱᴇ ꜱᴇɴᴅ ᴀ ʟɪɴᴋ ᴛᴏ ᴛʜᴇ ᴠɪᴅᴇᴏ ᴏʀ ᴘᴏꜱᴛ ʏᴏᴜ ᴡᴀɴᴛ ᴛᴏ ᴅᴏᴡɴʟᴏᴀᴅ, ᴛʜᴇ ʙᴏᴛ ᴏɴʟʏ ꜱᴜᴘᴘᴏʀᴛꜱ ꜱᴏᴄɪᴀʟ ᴍᴇᴅɪᴀ ᴏɴ ᴛʜᴇ ʟɪꜱᴛ
 
@@ -172,7 +172,7 @@ bot.onText(/\/start/, async (msg) => {
 • _ᴘɪɴᴛᴇʀᴇꜱᴛ_
 • _ꜱᴘᴏᴛɪꜰʏ_
 • _ɢɪᴛʜᴜʙ_\n
-~~~~ ꜱʏꜱᴛᴇᴍ ᴜᴘᴛɪᴍᴇ: ${escapeHtml(formattedUptime)} ~~~~`,
+ ꜱʏꜱᴛᴇᴍ ᴜᴘᴛɪᴍᴇ: ${escapeHtml(formattedUptime)} `,
     reply_markup: { inline_keyboard: inlineKeyboard },
     parse_mode: 'HTML', // Ensure Markdown mode is enabled
   });
@@ -211,7 +211,7 @@ bot.onText(/\/start/, async (msg) => {
     } else if (data === 'back_to_first_caption') {
       // Handle the callback for the "Back to first caption" button
       await bot.editMessageCaption(
-`*ʜᴇʟʟᴏ ɪ ᴀᴍ* <b><i>${escapeHtml(botName)}</i></b>
+`ʜᴇʟʟᴏ ɪ ᴀᴍ <b><i>${escapeHtml(botName)}</i></b>
 
 ᴘʟᴇᴀꜱᴇ ꜱᴇɴᴅ ᴀ ʟɪɴᴋ ᴛᴏ ᴛʜᴇ ᴠɪᴅᴇᴏ ᴏʀ ᴘᴏꜱᴛ ʏᴏᴜ ᴡᴀɴᴛ ᴛᴏ ᴅᴏᴡɴʟᴏᴀᴅ, ᴛʜᴇ ʙᴏᴛ ᴏɴʟʏ ꜱᴜᴘᴘᴏʀᴛꜱ ꜱᴏᴄɪᴀʟ ᴍᴇᴅɪᴀ ᴏɴ ᴛʜᴇ ʟɪꜱᴛ
 
