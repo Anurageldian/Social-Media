@@ -131,6 +131,13 @@ bot.on('photo', async (msg) => {
 })
 
 
+function escapeHtml(text) {
+  return text.replace(/&/g, '&amp;')
+             .replace(/</g, '&lt;')
+             .replace(/>/g, '&gt;')
+             .replace(/"/g, '&quot;')
+             .replace(/'/g, '&#039;');
+
 // start
 bot.onText(/\/start/, async (msg) => {
   let getban = await getBanned(msg.chat.id);
@@ -152,7 +159,7 @@ bot.onText(/\/start/, async (msg) => {
   
   let response = await bot.sendPhoto(msg.chat.id, 'https://telegra.ph/file/57fabcc59ac97735de40b.jpg', {
     caption:
-`*ʜᴇʟʟᴏ ɪ ᴀᴍ* ***${botName}***
+`*ʜᴇʟʟᴏ ɪ ᴀᴍ* <b><i>${escapeHtml(botName)}</i></b>
 
 ᴘʟᴇᴀꜱᴇ ꜱᴇɴᴅ ᴀ ʟɪɴᴋ ᴛᴏ ᴛʜᴇ ᴠɪᴅᴇᴏ ᴏʀ ᴘᴏꜱᴛ ʏᴏᴜ ᴡᴀɴᴛ ᴛᴏ ᴅᴏᴡɴʟᴏᴀᴅ, ᴛʜᴇ ʙᴏᴛ ᴏɴʟʏ ꜱᴜᴘᴘᴏʀᴛꜱ ꜱᴏᴄɪᴀʟ ᴍᴇᴅɪᴀ ᴏɴ ᴛʜᴇ ʟɪꜱᴛ
 
@@ -165,9 +172,9 @@ bot.onText(/\/start/, async (msg) => {
 • _ᴘɪɴᴛᴇʀᴇꜱᴛ_
 • _ꜱᴘᴏᴛɪꜰʏ_
 • _ɢɪᴛʜᴜʙ_\n
-~~~~~~~~~~ ꜱʏꜱᴛᴇᴍ ᴜᴘᴛɪᴍᴇ: *${formattedUptime}*~~~~~~~~~~`,
+~~~~ ꜱʏꜱᴛᴇᴍ ᴜᴘᴛɪᴍᴇ: ${escapeHtml(formattedUptime)} ~~~~`,
     reply_markup: { inline_keyboard: inlineKeyboard },
-    parse_mode: 'Markdown', // Ensure Markdown mode is enabled
+    parse_mode: 'HTML', // Ensure Markdown mode is enabled
   });
 
   // Handle button callback
@@ -198,13 +205,13 @@ bot.onText(/\/start/, async (msg) => {
               [{ text: '< Back', callback_data: 'back_to_first_caption' }],
             ],
           },
-          parse_mode: 'Markdown', // Ensure Markdown mode is enabled
+          parse_mode: 'HTML', // Ensure Markdown mode is enabled
         }
       );
     } else if (data === 'back_to_first_caption') {
       // Handle the callback for the "Back to first caption" button
       await bot.editMessageCaption(
-`*ʜᴇʟʟᴏ ɪ ᴀᴍ* ***${botName}***
+`*ʜᴇʟʟᴏ ɪ ᴀᴍ* <b><i>${escapeHtml(botName)}</i></b>
 
 ᴘʟᴇᴀꜱᴇ ꜱᴇɴᴅ ᴀ ʟɪɴᴋ ᴛᴏ ᴛʜᴇ ᴠɪᴅᴇᴏ ᴏʀ ᴘᴏꜱᴛ ʏᴏᴜ ᴡᴀɴᴛ ᴛᴏ ᴅᴏᴡɴʟᴏᴀᴅ, ᴛʜᴇ ʙᴏᴛ ᴏɴʟʏ ꜱᴜᴘᴘᴏʀᴛꜱ ꜱᴏᴄɪᴀʟ ᴍᴇᴅɪᴀ ᴏɴ ᴛʜᴇ ʟɪꜱᴛ
 
@@ -217,12 +224,12 @@ bot.onText(/\/start/, async (msg) => {
 • _ᴘɪɴᴛᴇʀᴇꜱᴛ_
 • _ꜱᴘᴏᴛɪꜰʏ_
 • _ɢɪᴛʜᴜʙ_\n
-~~~~~~~~~~ ꜱʏꜱᴛᴇᴍ ᴜᴘᴛɪᴍᴇ: *${formattedUptime}*~~~~~~~~~~`,
+~~~~ ꜱʏꜱᴛᴇᴍ ᴜᴘᴛɪᴍᴇ: ${escapeHtml(formattedUptime)} ~~~~`,
         {
           chat_id: chatId,
           message_id: messageId,
           reply_markup: { inline_keyboard: inlineKeyboard },
-          parse_mode: 'Markdown', // Ensure Markdown mode is enabled
+          parse_mode: 'HTML', // Ensure Markdown mode is enabled
         }
       );
     }
