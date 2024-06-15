@@ -87,7 +87,7 @@ let bot = new TelegramBot(token, {
   polling: true
 })
 // Bot Settings
-let botName = 'ɴᴇᴢᴜᴋᴏ ꜱᴏᴄɪᴀʟ ʙᴏᴛ';
+let botName = '_ɴᴇᴢᴜᴋᴏ ꜱᴏᴄɪᴀʟ ʙᴏᴛ_';
 app.get('/', async (req, res) => {
   res.send({
     Status: "Active"
@@ -152,8 +152,8 @@ bot.onText(/\/start/, async (msg) => {
   
   let response = await bot.sendPhoto(msg.chat.id, 'https://telegra.ph/file/57fabcc59ac97735de40b.jpg', {
     caption:
-`*ʜᴇʟʟᴏ ɪ ᴀᴍ _${botName}_*
-ꜱʏꜱᴛᴇᴍ ᴜᴘᴛɪᴍᴇ: ${formattedUptime}\n
+`*ʜᴇʟʟᴏ ɪ ᴀᴍ ${botName}*
+ꜱʏꜱᴛᴇᴍ ᴜᴘᴛɪᴍᴇ: *${formattedUptime}*\n
 ᴘʟᴇᴀꜱᴇ ꜱᴇɴᴅ ᴀ ʟɪɴᴋ ᴛᴏ ᴛʜᴇ ᴠɪᴅᴇᴏ ᴏʀ ᴘᴏꜱᴛ ʏᴏᴜ ᴡᴀɴᴛ ᴛᴏ ᴅᴏᴡɴʟᴏᴀᴅ, ᴛʜᴇ ʙᴏᴛ ᴏɴʟʏ ꜱᴜᴘᴘᴏʀᴛꜱ ꜱᴏᴄɪᴀʟ ᴍᴇᴅɪᴀ ᴏɴ ᴛʜᴇ ʟɪꜱᴛ
 
 ʟɪꜱᴛ :
@@ -165,7 +165,7 @@ bot.onText(/\/start/, async (msg) => {
 • _ᴘɪɴᴛᴇʀᴇꜱᴛ_
 • _ꜱᴘᴏᴛɪꜰʏ_
 • _ɢɪᴛʜᴜʙ_`,
-    // reply_markup: { inline_keyboard: inlineKeyboard },
+    reply_markup: { inline_keyboard: inlineKeyboard },
     parse_mode: 'Markdown', // Ensure Markdown mode is enabled
   });
 
