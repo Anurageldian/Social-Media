@@ -165,6 +165,10 @@ bot.onText(/\/start/, async (msg) => {
 • <i>ᴘɪɴᴛᴇʀᴇꜱᴛ</i>
 • <i>ꜱᴘᴏᴛɪꜰʏ</i>
 • <i>ɢɪᴛʜᴜʙ</i>\n
+<ul>
+  <li>Item 1</li>
+  <li>Item 2</li>
+</ul>
  ~~~~ ꜱʏꜱᴛᴇᴍ ᴜᴘᴛɪᴍᴇ: <b>${formattedUptime}</b> ~~~~ `,
     reply_markup: { inline_keyboard: inlineKeyboard },
     parse_mode: 'HTML', // Ensure Markdown mode is enabled
