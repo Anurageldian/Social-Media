@@ -71,7 +71,8 @@ let {
 let {
   telegraphUpload,
   Pomf2Upload,
-  Ocr
+  Ocr,
+  setGroupPhoto
 } = require('./funcs/images');
 let {
   readDb,
@@ -120,15 +121,19 @@ bot.on('photo', async (msg) => {
           [{
             text: `Upload To Url V2 [ Pomf2 ]`,
             callback_data: `tourl2 ${write}`
+          }],
+          [{
+            text: `Set as Group Photo`,
+            callback_data: `setGroupPhoto ${write}`
           }]
         ]
       })
-    }
+    };
     return bot.sendPhoto(chatId, `${write}`, options)
   } catch (err) {
     return bot.sendMessage(String(process.env.DEV_ID), `Error Image Process: ${err}`);
   }
-})
+});
 
 
 // start
@@ -1001,6 +1006,9 @@ bot.on('callback_query', async (mil) => {
   } else if (data.startsWith('ocr')) {
     await bot.deleteMessage(chatid, msgid);
     await Ocr(bot, chatid, url, usrnm);
+  } else if (data.startsWith('setGroupPhoto')) {
+    await bot.deleteMessage(chatid, msgid);
+    await setGroupPhoto(bot, chatid, url, mil.id);
   }
 })
 
