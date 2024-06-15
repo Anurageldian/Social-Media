@@ -848,46 +848,62 @@ bot.onText(/\/info/, async (msg) => {
 
 
 
-// Listen for the /setgcpic command
-bot.onText(/\/setgcpic/, (msg) => {
-  const chatId = msg.chat.id;
+const TelegramBot = require('node-telegram-bot-api');
+const token = 'YOUR_TELEGRAM_BOT_TOKEN';
+const bot = new TelegramBot(token, { polling: true });
 
-  // Check if the bot has permissions to change chat info
-  bot.getChatMember(chatId, bot.botId).then(botInfo => {
-    if (!botInfo.can_change_info) {
-      bot.sendMessage(chatId, 'Sorry, I do not have the required permissions to change chat info.');
-    } else {
-      bot.sendMessage(chatId, 'Please reply to the photo you want to set as the group chat photo with this command.');
-    }
+// Listen for photo messages
+bot.on('photo', (msg) => {
+  const chatId = msg.chat.id;
+  const photo = msg.photo[msg.photo.length - 1]; // Get the largest photo size
+
+  // Prepare inline keyboard options
+  const inlineKeyboard = {
+    inline_keyboard: [
+      [
+        {
+          text: 'Set as Group Photo',
+          callback_data: JSON.stringify({
+            command: 'setGroupPhoto',
+            chat_id: chatId,
+            photo_file_id: photo.file_id
+          })
+        }
+      ]
+    ]
+  };
+
+  // Reply to the photo message with an inline keyboard
+  bot.sendPhoto(chatId, photo.file_id, {
+    reply_markup: inlineKeyboard
+  }).then(() => {
+    console.log('Inline keyboard sent successfully');
   }).catch(error => {
-    console.error('Error fetching bot info:', error.message);
+    console.error('Error sending inline keyboard:', error.message);
   });
 });
 
-// Handle photo messages
-bot.on('photo', async (msg) => {
-  const chatId = msg.chat.id;
+// Handle inline keyboard callback
+bot.on('callback_query', async (callbackQuery) => {
+  const data = JSON.parse(callbackQuery.data);
+  const chatId = data.chat_id;
+  const photoFileId = data.photo_file_id;
 
-  // Check if the message has a caption and it includes the /setgcpic command
-  if (!msg.caption || !msg.caption.includes('/setgcpic')) {
-    return;
-  }
+  if (data.command === 'setGroupPhoto') {
+    try {
+      // Download the photo file
+      const photoFile = await bot.downloadFile(photoFileId, 'photos');
 
-  try {
-    // Get the largest photo size (most suitable for chat photo)
-    const largestPhoto = msg.photo[msg.photo.length - 1];
-
-    // Download the photo file
-    const photoFile = await bot.downloadFile(largestPhoto.file_id, 'photos');
-
-    // Set the group chat photo
-    await bot.setChatPhoto(chatId, photoFile.fileData);
-    await bot.sendMessage(chatId, 'Group chat photo has been updated successfully!');
-  } catch (error) {
-    console.error('Error setting group chat photo:', error.message);
-    await bot.sendMessage(chatId, 'Failed to update group chat photo.');
+      // Set the group chat photo
+      await bot.setChatPhoto(chatId, photoFile.fileData);
+      await bot.answerCallbackQuery(callbackQuery.id, { text: 'Group chat photo has been updated successfully!', show_alert: true });
+    } catch (error) {
+      console.error('Error setting group chat photo:', error.message);
+      await bot.answerCallbackQuery(callbackQuery.id, { text: 'Failed to update group chat photo.', show_alert: true });
+    }
   }
 });
+
 
 
 // bot.onText(/\/info/, async (msg) => {
