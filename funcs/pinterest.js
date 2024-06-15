@@ -24,7 +24,7 @@ async function pindl(url) {
 
       if (Array.isArray(jsonData.image)) {
         console.log("jsonData.image is an array");
-        imageUrls = jsonData.image;
+        imageUrls = jsonData.image.map(img => img.url);
       } else if (typeof jsonData.image === 'string') {
         console.log("jsonData.image is a string URL");
         imageUrls.push(jsonData.image);
@@ -33,11 +33,6 @@ async function pindl(url) {
       if (jsonData.contentUrl) {
         console.log("jsonData contains contentUrl");
         imageUrls.push(jsonData.contentUrl);
-      }
-
-      if (jsonData.sharedContent && typeof jsonData.sharedContent.url === 'string') {
-        console.log("jsonData.sharedContent contains URL");
-        imageUrls.push(jsonData.sharedContent.url);
       }
 
       console.log("Extracted URLs:", imageUrls);
@@ -51,6 +46,7 @@ async function pindl(url) {
     return ["Error: Invalid URL!"];
   }
 }
+
 
 
 async function pinSearch(bot, chatId, query, userName) {
@@ -101,7 +97,6 @@ async function pinterest(bot, chatId, url, userName) {
     return bot.editMessageText('Failed to download media, make sure your link is valid!', { chat_id: chatId, message_id: load.message_id });
   }
 }
-
 module.exports = {
   pinterest,
   pinSearch
