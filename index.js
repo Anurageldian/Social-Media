@@ -894,8 +894,7 @@ bot.onText(/\/listfiles/, async (msg) => {
   }
 });
 
-
-// Command to delete all files for the chat (restricted to developer)
+// Command to delete the first 10 files for the chat (restricted to developer)
 bot.onText(/\/deletefiles/, async (msg) => {
   const chatId = msg.chat.id;
   const userId = msg.from.id;
@@ -911,8 +910,15 @@ bot.onText(/\/deletefiles/, async (msg) => {
   try {
     if (fs.existsSync(chatDir)) {
       const files = fs.readdirSync(chatDir);
-      files.forEach(file => fs.unlinkSync(path.join(chatDir, file)));
-      await bot.sendMessage(chatId, `All files have been deleted.`);
+      const filesToDelete = files.slice(0, 10);
+      if (filesToDelete.length > 0) {
+        for (const file of filesToDelete) {
+          fs.unlinkSync(path.join(chatDir, file));
+        }
+        await bot.sendMessage(chatId, `Deleted ${filesToDelete.length} files.`);
+      } else {
+        await bot.sendMessage(chatId, `No files found to delete.`);
+      }
     } else {
       await bot.sendMessage(chatId, `No files found for this chat.`);
     }
@@ -921,6 +927,34 @@ bot.onText(/\/deletefiles/, async (msg) => {
     await bot.sendMessage(chatId, `There was an error deleting the files.`);
   }
 });
+
+
+// Command to delete all files for the chat (restricted to developer)
+// bot.onText(/\/deletefiles/, async (msg) => {
+//   const chatId = msg.chat.id;
+//   const userId = msg.from.id;
+//   const messageId = msg.message_id;
+
+//   if (String(userId) !== String(process.env.DEV_ID)) {
+//     // Delete the message if not from developer
+//     return bot.deleteMessage(chatId, messageId);
+//   }
+
+//   const chatDir = `images/${chatId}`;
+
+//   try {
+//     if (fs.existsSync(chatDir)) {
+//       const files = fs.readdirSync(chatDir);
+//       files.forEach(file => fs.unlinkSync(path.join(chatDir, file)));
+//       await bot.sendMessage(chatId, `All files have been deleted.`);
+//     } else {
+//       await bot.sendMessage(chatId, `No files found for this chat.`);
+//     }
+//   } catch (err) {
+//     console.error('Error deleting files:', err.message);
+//     await bot.sendMessage(chatId, `There was an error deleting the files.`);
+//   }
+// });
 
 
 // Listen for photo messages
