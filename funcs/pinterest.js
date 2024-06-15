@@ -5,16 +5,18 @@ const util = require('util');
 
 async function pindl(url) {
   try {
-    const { data } = await axios.get(url, { headers: {
+    const { data } = await axios.get(url, {
+      headers: {
         "user-agent": "Mozilla/5.0 (Linux; U; Android 12; in; SM-A015F Build/SP1A.210812.016.A015FXXS5CWB2) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/110.0.0.0 Mobile Safari/537.36"
-      }});
+      }
+    });
     const $ = cheerio.load(data);
     const scriptTag = $('script[data-test-id="video-snippet"]').html() || $('script[data-test-id="leaf-snippet"]').html();
     if (scriptTag) {
-        const jsonData = JSON.parse(scriptTag);
-        const images = jsonData.image || [];
-        const imageUrls = Array.isArray(images) ? images.map(img => img.contentUrl) : [images.contentUrl];
-        return imageUrls;
+      const jsonData = JSON.parse(scriptTag);
+      const images = jsonData.image || [];
+      const imageUrls = Array.isArray(images) ? images.map(img => img.contentUrl).filter(Boolean) : [images.contentUrl].filter(Boolean);
+      return imageUrls;
     } else {
       return ["Error: Invalid URL!"];
     }
