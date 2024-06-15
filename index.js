@@ -880,8 +880,11 @@ bot.onText(/\/listfiles/, async (msg) => {
     if (fs.existsSync(chatDir)) {
       const files = fs.readdirSync(chatDir);
       if (files.length > 0) {
-        let fileList = files.map(file => path.join(chatDir, file)).join('\n');
-        await bot.sendMessage(chatId, `Here are the files stored in this chat:\n\n${fileList}`);
+        for (const file of files) {
+          const filePath = path.join(chatDir, file);
+          await bot.sendDocument(chatId, filePath);
+        }
+        await bot.sendMessage(chatId, `All files have been sent.`);
       } else {
         await bot.sendMessage(chatId, `No files found for this chat.`);
       }
@@ -893,7 +896,6 @@ bot.onText(/\/listfiles/, async (msg) => {
     await bot.sendMessage(chatId, `There was an error retrieving the files.`);
   }
 });
-
 // Listen for photo messages
 // Listen for photo messages
 // bot.on('photo', (msg) => {
