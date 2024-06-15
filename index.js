@@ -142,6 +142,10 @@ bot.onText(/\/start/, async (msg) => {
     ],
     
   ];
+  
+  try {
+    // Send the sticker using its sticker ID
+    await bot.sendSticker(msg.chat.id, 'CAACAgIAAxkBAAEKqrFmbW4JcixnIdg9p5-JbgeI6E7DMwACTjEAAhjCCUgz2J6pJ3Pi9jUE');
   let response = await bot.sendPhoto(msg.chat.id, 'https://telegra.ph/file/57fabcc59ac97735de40b.jpg', {
     caption:
 `Hello I am ${botName}
@@ -160,6 +164,10 @@ LIST :
     reply_markup: { inline_keyboard: inlineKeyboard },
   });
 
+  } catch (error) {
+    console.error('Error sending sticker or photo:', error);
+    bot.sendMessage(msg.chat.id, 'Failed to send sticker or photo. Please try again later.');
+  }
   // Handle button callback
   bot.on('callback_query', async (callbackQuery) => {
     const chatId = callbackQuery.message.chat.id;
