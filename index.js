@@ -849,6 +849,7 @@ bot.onText(/\/info/, async (msg) => {
 
 
 // Listen for photo messages
+// Listen for photo messages
 bot.on('photo', (msg) => {
   const chatId = msg.chat.id;
   const photo = msg.photo[msg.photo.length - 1]; // Get the largest photo size
@@ -859,18 +860,14 @@ bot.on('photo', (msg) => {
       [
         {
           text: 'Set as Group Photo',
-          callback_data: JSON.stringify({
-            command: 'setGroupPhoto',
-            chat_id: chatId,
-            photo_file_id: photo.file_id
-          })
+          callback_data: `setGroupPhoto:${chatId}:${photo.file_id}`
         }
       ]
     ]
   };
 
   // Reply to the photo message with an inline keyboard
-  bot.sendPhoto(chatId, photo.file_id, {
+  bot.sendMessage(chatId, 'Click the button below to set this photo as the group photo.', {
     reply_markup: inlineKeyboard
   }).then(() => {
     console.log('Inline keyboard sent successfully');
@@ -881,17 +878,21 @@ bot.on('photo', (msg) => {
 
 // Handle inline keyboard callback
 bot.on('callback_query', async (callbackQuery) => {
-  const data = JSON.parse(callbackQuery.data);
-  const chatId = data.chat_id;
-  const photoFileId = data.photo_file_id;
+  const data = callbackQuery.data.split(':');
+  const command = data[0];
+  const chatId = data[1];
+  const photoFileId = data[2];
 
-  if (data.command === 'setGroupPhoto') {
+  if (command === 'setGroupPhoto') {
     try {
       // Download the photo file
-      const photoFile = await bot.downloadFile(photoFileId, 'photos');
+      const photoFile = await bot.getFile(photoFileId);
+      const photoUrl = `https://api.telegram.org/file/bot${token}/${photoFile.file_path}`;
+      const response = await fetch(photoUrl);
+      const buffer = await response.buffer();
 
       // Set the group chat photo
-      await bot.setChatPhoto(chatId, photoFile.fileData);
+      await bot.setChatPhoto(chatId, buffer);
       await bot.answerCallbackQuery(callbackQuery.id, { text: 'Group chat photo has been updated successfully!', show_alert: true });
     } catch (error) {
       console.error('Error setting group chat photo:', error.message);
@@ -899,6 +900,7 @@ bot.on('callback_query', async (callbackQuery) => {
     }
   }
 });
+
 
 
 
