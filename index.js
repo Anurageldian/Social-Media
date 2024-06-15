@@ -152,7 +152,7 @@ bot.onText(/\/start/, async (msg) => {
   
   let response = await bot.sendPhoto(msg.chat.id, 'https://telegra.ph/file/57fabcc59ac97735de40b.jpg', {
     caption:
-`*ʜᴇʟʟᴏ ɪ ᴀᴍ* ***${escapeMarkdown(botName)}***
+`*ʜᴇʟʟᴏ ɪ ᴀᴍ* ***${botName}***
 
 ᴘʟᴇᴀꜱᴇ ꜱᴇɴᴅ ᴀ ʟɪɴᴋ ᴛᴏ ᴛʜᴇ ᴠɪᴅᴇᴏ ᴏʀ ᴘᴏꜱᴛ ʏᴏᴜ ᴡᴀɴᴛ ᴛᴏ ᴅᴏᴡɴʟᴏᴀᴅ, ᴛʜᴇ ʙᴏᴛ ᴏɴʟʏ ꜱᴜᴘᴘᴏʀᴛꜱ ꜱᴏᴄɪᴀʟ ᴍᴇᴅɪᴀ ᴏɴ ᴛʜᴇ ʟɪꜱᴛ
 
@@ -167,7 +167,7 @@ bot.onText(/\/start/, async (msg) => {
 • _ɢɪᴛʜᴜʙ_\n
 ~~~~~~~~~~ ꜱʏꜱᴛᴇᴍ ᴜᴘᴛɪᴍᴇ: *${formattedUptime}*~~~~~~~~~~`,
     reply_markup: { inline_keyboard: inlineKeyboard },
-    parse_mode: 'MarkdownV2', // Ensure Markdown mode is enabled
+    parse_mode: 'Markdown', // Ensure Markdown mode is enabled
   });
 
   // Handle button callback
@@ -198,13 +198,13 @@ bot.onText(/\/start/, async (msg) => {
               [{ text: '< Back', callback_data: 'back_to_first_caption' }],
             ],
           },
-          parse_mode: 'MarkdownV2', // Ensure Markdown mode is enabled
+          parse_mode: 'Markdown', // Ensure Markdown mode is enabled
         }
       );
     } else if (data === 'back_to_first_caption') {
       // Handle the callback for the "Back to first caption" button
       await bot.editMessageCaption(
-`*ʜᴇʟʟᴏ ɪ ᴀᴍ* ***${escapeMarkdown(botName)}***
+`*ʜᴇʟʟᴏ ɪ ᴀᴍ* ***${botName}***
 
 ᴘʟᴇᴀꜱᴇ ꜱᴇɴᴅ ᴀ ʟɪɴᴋ ᴛᴏ ᴛʜᴇ ᴠɪᴅᴇᴏ ᴏʀ ᴘᴏꜱᴛ ʏᴏᴜ ᴡᴀɴᴛ ᴛᴏ ᴅᴏᴡɴʟᴏᴀᴅ, ᴛʜᴇ ʙᴏᴛ ᴏɴʟʏ ꜱᴜᴘᴘᴏʀᴛꜱ ꜱᴏᴄɪᴀʟ ᴍᴇᴅɪᴀ ᴏɴ ᴛʜᴇ ʟɪꜱᴛ
 
@@ -222,14 +222,11 @@ bot.onText(/\/start/, async (msg) => {
           chat_id: chatId,
           message_id: messageId,
           reply_markup: { inline_keyboard: inlineKeyboard },
-          parse_mode: 'MarkdownV2', // Ensure Markdown mode is enabled
+          parse_mode: 'Markdown', // Ensure Markdown mode is enabled
         }
       );
     }
   });
-  function escapeMarkdown(text) {
-  return text.replace(/([*_[\]()~`>#+-=|{}.!\\])/g, '\\$1');
-}
 
 
 
