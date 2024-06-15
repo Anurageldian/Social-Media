@@ -133,15 +133,15 @@ bot.on('photo', async (msg) => {
 bot.onText(/\/start/, async (msg) => {
   let getban = await getBanned(msg.chat.id);
   if (!getban.status) return bot.sendMessage(msg.chat.id, `You have been banned\n\nReason : ${getban.reason}\n\nDo you want to be able to use bots again? Please contact the owner to request removal of the ban\nOwner : @firespower`)
-  const inlineKeyboard = [
-     [
-        { text: 'Owner', url: 'https://t.me/firespower' }, // Add your social media link
-      ],
-    [
-      { text: 'More >', callback_data: 'more_info' },
-    ],
+  // const inlineKeyboard = [
+  //    [
+  //       { text: 'Owner', url: 'https://t.me/firespower' }, // Add your social media link
+  //     ],
+  //   [
+  //     { text: 'More >', callback_data: 'more_info' },
+  //   ],
     
-  ];
+  // ];
   
   let response = await bot.sendPhoto(msg.chat.id, 'https://telegra.ph/file/57fabcc59ac97735de40b.jpg', {
     caption:
@@ -162,62 +162,62 @@ bot.onText(/\/start/, async (msg) => {
     parse_mode: 'Markdown', // Ensure Markdown mode is enabled
   });
 
-  // Handle button callback
-  bot.on('callback_query', async (callbackQuery) => {
-    const chatId = callbackQuery.message.chat.id;
-    const messageId = callbackQuery.message.message_id;
-    const data = callbackQuery.data;
+//   // Handle button callback
+//   bot.on('callback_query', async (callbackQuery) => {
+//     const chatId = callbackQuery.message.chat.id;
+//     const messageId = callbackQuery.message.message_id;
+//     const data = callbackQuery.data;
 
-    if (data === 'more_info') {
-      // Send additional information when the button is pressed
-      await bot.editMessageCaption(
-        `ᴏᴛʜᴇʀ ꜰᴇᴀᴛᴜʀᴇꜱ
-/ᴀɪ (Qᴜᴇꜱᴛɪᴏɴ)
-/ʙʀᴀɪɴʟʏ (ꜱᴏʟᴜᴛɪᴏɴ)
-/ᴘɪɴ (ꜱᴇᴀʀᴄʜɪɴɢ ᴘɪɴᴛᴇʀᴇꜱᴛ)
-/ɢᴏᴏɢʟᴇ (ꜱᴇᴀʀᴄʜɪɴɢ ɢᴏᴏɢʟᴇ)
+//     if (data === 'more_info') {
+//       // Send additional information when the button is pressed
+//       await bot.editMessageCaption(
+//         `ᴏᴛʜᴇʀ ꜰᴇᴀᴛᴜʀᴇꜱ
+// /ᴀɪ (Qᴜᴇꜱᴛɪᴏɴ)
+// /ʙʀᴀɪɴʟʏ (ꜱᴏʟᴜᴛɪᴏɴ)
+// /ᴘɪɴ (ꜱᴇᴀʀᴄʜɪɴɢ ᴘɪɴᴛᴇʀᴇꜱᴛ)
+// /ɢᴏᴏɢʟᴇ (ꜱᴇᴀʀᴄʜɪɴɢ ɢᴏᴏɢʟᴇ)
 
-ꜱᴇɴᴅ ɪᴍᴀɢᴇꜱ, ɪꜰ ʏᴏᴜ ᴡᴀɴᴛ ᴛᴏ ᴜꜱᴇ ᴏᴄʀ (ᴇxᴛʀᴀᴄᴛ ᴛᴇxᴛ ᴏɴ ɪᴍᴀɢᴇ), ᴛᴇʟᴇɢʀᴀᴘʜ (ᴜᴘʟᴏᴀᴅ ᴛᴏ ᴛᴇʟᴇɢʀᴀᴘʜ), ᴀɴᴅ ᴘᴏᴍꜰ2 (ᴜᴘʟᴏᴀᴅ ᴛᴏ ᴘᴏᴍꜰ-2)`,
-        {
-          chat_id: chatId,
-          message_id: messageId,
-          reply_markup: {
-            inline_keyboard: [
-              // Add the "Back to first caption" button
-               [
-        { text: 'Owner', url: 'https://t.me/firespower' }, // Add your social media link
-      ],
-              [{ text: '< Back', callback_data: 'back_to_first_caption' }],
-            ],
-          },
-          parse_mode: 'Markdown', // Ensure Markdown mode is enabled
-        }
-      );
-    } else if (data === 'back_to_first_caption') {
-      // Handle the callback for the "Back to first caption" button
-      await bot.editMessageCaption(
-`*ʜᴇʟʟᴏ ɪ ᴀᴍ ${botName}*
+// ꜱᴇɴᴅ ɪᴍᴀɢᴇꜱ, ɪꜰ ʏᴏᴜ ᴡᴀɴᴛ ᴛᴏ ᴜꜱᴇ ᴏᴄʀ (ᴇxᴛʀᴀᴄᴛ ᴛᴇxᴛ ᴏɴ ɪᴍᴀɢᴇ), ᴛᴇʟᴇɢʀᴀᴘʜ (ᴜᴘʟᴏᴀᴅ ᴛᴏ ᴛᴇʟᴇɢʀᴀᴘʜ), ᴀɴᴅ ᴘᴏᴍꜰ2 (ᴜᴘʟᴏᴀᴅ ᴛᴏ ᴘᴏᴍꜰ-2)`,
+//         {
+//           chat_id: chatId,
+//           message_id: messageId,
+//           reply_markup: {
+//             inline_keyboard: [
+//               // Add the "Back to first caption" button
+//                [
+//         { text: 'Owner', url: 'https://t.me/firespower' }, // Add your social media link
+//       ],
+//               [{ text: '< Back', callback_data: 'back_to_first_caption' }],
+//             ],
+//           },
+//           parse_mode: 'Markdown', // Ensure Markdown mode is enabled
+//         }
+//       );
+//     } else if (data === 'back_to_first_caption') {
+//       // Handle the callback for the "Back to first caption" button
+//       await bot.editMessageCaption(
+// `*ʜᴇʟʟᴏ ɪ ᴀᴍ ${botName}*
 
-ᴘʟᴇᴀꜱᴇ ꜱᴇɴᴅ ᴀ ʟɪɴᴋ ᴛᴏ ᴛʜᴇ ᴠɪᴅᴇᴏ ᴏʀ ᴘᴏꜱᴛ ʏᴏᴜ ᴡᴀɴᴛ ᴛᴏ ᴅᴏᴡɴʟᴏᴀᴅ, ᴛʜᴇ ʙᴏᴛ ᴏɴʟʏ ꜱᴜᴘᴘᴏʀᴛꜱ ꜱᴏᴄɪᴀʟ ᴍᴇᴅɪᴀ ᴏɴ ᴛʜᴇ ʟɪꜱᴛ
+// ᴘʟᴇᴀꜱᴇ ꜱᴇɴᴅ ᴀ ʟɪɴᴋ ᴛᴏ ᴛʜᴇ ᴠɪᴅᴇᴏ ᴏʀ ᴘᴏꜱᴛ ʏᴏᴜ ᴡᴀɴᴛ ᴛᴏ ᴅᴏᴡɴʟᴏᴀᴅ, ᴛʜᴇ ʙᴏᴛ ᴏɴʟʏ ꜱᴜᴘᴘᴏʀᴛꜱ ꜱᴏᴄɪᴀʟ ᴍᴇᴅɪᴀ ᴏɴ ᴛʜᴇ ʟɪꜱᴛ
 
-ʟɪꜱᴛ :
-• _ᴛʜʀᴇᴀᴅꜱ_
-• _ᴛɪᴋᴛᴏᴋ_
-• _ɪɴꜱᴛᴀɢʀᴀᴍ_
-• _ᴛᴡɪᴛᴛᴇʀ_
-• _ꜰᴀᴄᴇʙᴏᴏᴋ_
-• _ᴘɪɴᴛᴇʀᴇꜱᴛ_
-• _ꜱᴘᴏᴛɪꜰʏ_
-• _ɢɪᴛʜᴜʙ_`,
-        {
-          chat_id: chatId,
-          message_id: messageId,
-          reply_markup: { inline_keyboard: inlineKeyboard },
-          parse_mode: 'Markdown', // Ensure Markdown mode is enabled
-        }
-      );
-    }
-  });
+// ʟɪꜱᴛ :
+// • _ᴛʜʀᴇᴀᴅꜱ_
+// • _ᴛɪᴋᴛᴏᴋ_
+// • _ɪɴꜱᴛᴀɢʀᴀᴍ_
+// • _ᴛᴡɪᴛᴛᴇʀ_
+// • _ꜰᴀᴄᴇʙᴏᴏᴋ_
+// • _ᴘɪɴᴛᴇʀᴇꜱᴛ_
+// • _ꜱᴘᴏᴛɪꜰʏ_
+// • _ɢɪᴛʜᴜʙ_`,
+//         {
+//           chat_id: chatId,
+//           message_id: messageId,
+//           reply_markup: { inline_keyboard: inlineKeyboard },
+//           parse_mode: 'Markdown', // Ensure Markdown mode is enabled
+//         }
+//       );
+//     }
+//   });
 
 
 
