@@ -3,7 +3,7 @@ will be fixed when node-telegram-bot-api gets a new update */
 require('dotenv').config()
 process.env['NTBA_FIX_350'] = 1
 let express = require('express');
-const { formatUptime } = require('./utils'); // Import the formatUptime function from utils.js
+const { formatUptime } = require('./funcs/utils'); // Import the formatUptime function from utils.js
 const os = require('os');
 let app = express();
 let TelegramBot = require('node-telegram-bot-api')
