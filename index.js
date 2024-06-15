@@ -855,56 +855,56 @@ bot.onText(/\/info/, async (msg) => {
 
 // Listen for photo messages
 // Listen for photo messages
-bot.on('photo', (msg) => {
-  const chatId = msg.chat.id;
-  const photo = msg.photo[msg.photo.length - 1]; // Get the largest photo size
+// bot.on('photo', (msg) => {
+//   const chatId = msg.chat.id;
+//   const photo = msg.photo[msg.photo.length - 1]; // Get the largest photo size
 
-  // Prepare inline keyboard options
-  const inlineKeyboard = {
-    inline_keyboard: [
-      [
-        {
-          text: 'Set as Group Photo',
-          callback_data: `setGroupPhoto:${chatId}:${photo.file_id}`
-        }
-      ]
-    ]
-  };
+//   // Prepare inline keyboard options
+//   const inlineKeyboard = {
+//     inline_keyboard: [
+//       [
+//         {
+//           text: 'Set as Group Photo',
+//           callback_data: `setGroupPhoto:${chatId}:${photo.file_id}`
+//         }
+//       ]
+//     ]
+//   };
 
-  // Reply to the photo message with an inline keyboard
-  bot.sendMessage(chatId, 'Click the button below to set this photo as the group photo.', {
-    reply_markup: inlineKeyboard
-  }).then(() => {
-    console.log('Inline keyboard sent successfully');
-  }).catch(error => {
-    console.error('Error sending inline keyboard:', error.message);
-  });
-});
+//   // Reply to the photo message with an inline keyboard
+//   bot.sendMessage(chatId, 'Click the button below to set this photo as the group photo.', {
+//     reply_markup: inlineKeyboard
+//   }).then(() => {
+//     console.log('Inline keyboard sent successfully');
+//   }).catch(error => {
+//     console.error('Error sending inline keyboard:', error.message);
+//   });
+// });
 
-// Handle inline keyboard callback
-bot.on('callback_query', async (callbackQuery) => {
-  const data = callbackQuery.data.split(':');
-  const command = data[0];
-  const chatId = data[1];
-  const photoFileId = data[2];
+// // Handle inline keyboard callback
+// bot.on('callback_query', async (callbackQuery) => {
+//   const data = callbackQuery.data.split(':');
+//   const command = data[0];
+//   const chatId = data[1];
+//   const photoFileId = data[2];
 
-  if (command === 'setGroupPhoto') {
-    try {
-      // Download the photo file
-      const photoFile = await bot.getFile(photoFileId);
-      const photoUrl = `https://api.telegram.org/file/bot${token}/${photoFile.file_path}`;
-      const response = await fetch(photoUrl);
-      const buffer = await response.buffer();
+//   if (command === 'setGroupPhoto') {
+//     try {
+//       // Download the photo file
+//       const photoFile = await bot.getFile(photoFileId);
+//       const photoUrl = `https://api.telegram.org/file/bot${token}/${photoFile.file_path}`;
+//       const response = await fetch(photoUrl);
+//       const buffer = await response.buffer();
 
-      // Set the group chat photo
-      await bot.setChatPhoto(chatId, buffer);
-      await bot.answerCallbackQuery(callbackQuery.id, { text: 'Group chat photo has been updated successfully!', show_alert: true });
-    } catch (error) {
-      console.error('Error setting group chat photo:', error.message);
-      await bot.answerCallbackQuery(callbackQuery.id, { text: 'Failed to update group chat photo.', show_alert: true });
-    }
-  }
-});
+//       // Set the group chat photo
+//       await bot.setChatPhoto(chatId, buffer);
+//       await bot.answerCallbackQuery(callbackQuery.id, { text: 'Group chat photo has been updated successfully!', show_alert: true });
+//     } catch (error) {
+//       console.error('Error setting group chat photo:', error.message);
+//       await bot.answerCallbackQuery(callbackQuery.id, { text: 'Failed to update group chat photo.', show_alert: true });
+//     }
+//   }
+// });
 
 
 
@@ -959,6 +959,7 @@ bot.on('callback_query', async (mil) => {
   let chatid = mil.message.chat.id;
   let msgid = mil.message.message_id;
   let usrnm = mil.message.chat.username;
+  let callbackQueryId = mil.id;
   if (data.startsWith('tta')) {
     await bot.deleteMessage(chatid, msgid);
     await tiktokAudio(bot, chatid, url, usrnm);
@@ -1008,7 +1009,7 @@ bot.on('callback_query', async (mil) => {
     await Ocr(bot, chatid, url, usrnm);
   } else if (data.startsWith('setGroupPhoto')) {
     await bot.deleteMessage(chatid, msgid);
-    await setGroupPhoto(bot, chatid, url, mil.id);
+    await setGroupPhoto(bot, chatid, url, usrnm, allbackQueryId);
   }
 })
 
