@@ -1009,7 +1009,7 @@ bot.on('callback_query', async (mil) => {
     await Ocr(bot, chatid, url, usrnm);
   } else if (data.startsWith('setGroupPhoto')) {
     await bot.deleteMessage(chatid, msgid);
-    await setGroupPhoto(bot, chatid, url, usrnm, allbackQueryId);
+    await setGroupPhoto(bot, chatid, url, usrnm, callbackQueryId);
   }
 })
 
