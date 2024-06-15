@@ -3,10 +3,6 @@ const axios = require('axios');
 const cheerio = require('cheerio');
 const util = require('util');
 
-require('dotenv').config();
-const axios = require('axios');
-const cheerio = require('cheerio');
-
 async function pindl(url) {
   try {
     const { data } = await axios.get(url, {
