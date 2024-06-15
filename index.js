@@ -847,6 +847,49 @@ bot.onText(/\/info/, async (msg) => {
 });
 
 
+const TelegramBot = require('node-telegram-bot-api');
+const token = 'YOUR_TELEGRAM_BOT_TOKEN';
+const bot = new TelegramBot(token, { polling: true });
+
+// Listen for the /setgcpic command
+bot.onText(/\/setgcpic/, (msg) => {
+  const chatId = msg.chat.id;
+  
+  // Check if the bot has permissions to change chat info
+  bot.getChatMember(chatId, bot.botId).then(botInfo => {
+    if (!botInfo.can_change_info) {
+      bot.sendMessage(chatId, 'Sorry, I do not have the required permissions to change chat info.');
+    } else {
+      bot.sendMessage(chatId, 'Please reply to the photo you want to set as the group chat photo with this command.');
+    }
+  }).catch(error => {
+    console.error('Error fetching bot info:', error.message);
+  });
+});
+
+// Handle photo messages
+bot.on('photo', async (msg) => {
+  const chatId = msg.chat.id;
+
+  // Check if the message has a caption and it includes the /setgcpic command
+  if (!msg.caption || !msg.caption.includes('/setgcpic')) {
+    return;
+  }
+
+  // Get the photo file ID
+  const photoId = msg.photo[msg.photo.length - 1].file_id;
+
+  try {
+    // Set the group chat photo
+    await bot.setChatPhoto(chatId, photoId);
+    await bot.sendMessage(chatId, 'Group chat photo has been updated successfully!');
+  } catch (error) {
+    console.error('Error setting group chat photo:', error.message);
+    await bot.sendMessage(chatId, 'Failed to update group chat photo.');
+  }
+});
+
+
 
 // bot.onText(/\/info/, async (msg) => {
 //   const chatId = msg.chat.id;
