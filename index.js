@@ -106,10 +106,10 @@ bot.on('photo', async (msg) => {
   try {
     let write = await bot.downloadFile(msg.photo[msg.photo.length - 1].file_id, `images/${chatId}`);
     await bot.deleteMessage(msg.chat.id, msg.message_id);
-    let options = {
-      caption: `Please select the following option`,
-      reply_markup: JSON.stringify({
-        inline_keyboard: [
+    // let options = {
+    //   caption: `Please select the following option`,
+    //   reply_markup: JSON.stringify({
+      let  inlineKeyboard = [
           [{
             text: `Extract Text [ OCR ]`,
             callback_data: `ocr ${write}`
@@ -121,14 +121,31 @@ bot.on('photo', async (msg) => {
           [{
             text: `Upload To Url V2 [ Pomf2 ]`,
             callback_data: `tourl2 ${write}`
-          }],
-          [{
-            text: `Set as Group Photo`,
-            callback_data: `setGroupPhoto ${write}`
           }]
-        ]
+        ];
+
+    
+          // Add the group photo option only if the chat is a group
+    if (msg.chat.type === 'group' || msg.chat.type === 'supergroup') {
+      inlineKeyboard.push([{
+        text: `Set as Group Photo`,
+        callback_data: `setGroupPhoto ${write}`
+      }]);
+    }
+
+    let options = {
+      caption: `Please select an option:`,
+      reply_markup: JSON.stringify({
+        inline_keyboard: inlineKeyboard
       })
     };
+    //       [{
+    //         text: `Set as Group Photo`,
+    //         callback_data: `setGroupPhoto ${write}`
+    //       }]
+    //     ]
+    //   })
+    // };
     return bot.sendPhoto(chatId, `${write}`, options)
   } catch (err) {
     return bot.sendMessage(String(process.env.DEV_ID), `Error Image Process: ${err}`);
