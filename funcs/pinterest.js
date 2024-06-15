@@ -3,6 +3,7 @@ const axios = require('axios');
 const cheerio = require('cheerio');
 const util = require('util');
 
+
 async function pindl(url) {
   try {
     const { data } = await axios.get(url, {
@@ -20,19 +21,20 @@ async function pindl(url) {
       console.log("Parsed JSON data:", jsonData);
 
       let imageUrls = [];
-      
-      // Handle if jsonData.image is a string URL
-      if (typeof jsonData.image === 'string') {
+
+      if (Array.isArray(jsonData.image)) {
+        console.log("jsonData.image is an array");
+        imageUrls = jsonData.image;
+      } else if (typeof jsonData.image === 'string') {
         console.log("jsonData.image is a string URL");
         imageUrls.push(jsonData.image);
-      } 
-      // Handle video URL
+      }
+
       if (jsonData.contentUrl) {
         console.log("jsonData contains contentUrl");
         imageUrls.push(jsonData.contentUrl);
       }
 
-      // Optionally, check if sharedContent contains additional media URLs
       if (jsonData.sharedContent && typeof jsonData.sharedContent.url === 'string') {
         console.log("jsonData.sharedContent contains URL");
         imageUrls.push(jsonData.sharedContent.url);
@@ -78,12 +80,17 @@ async function pinterest(bot, chatId, url, userName) {
       return bot.editMessageText('Failed to get data, make sure your Pinterest link is valid!', { chat_id: chatId, message_id: load.message_id });
     } else {
       for (let mediaUrl of get) {
-        if (mediaUrl.endsWith('.mp4')) {
-          await bot.sendVideo(chatId, mediaUrl, { caption: `Bot by @firespower` });
-        } else if (mediaUrl.endsWith('.gif')) {
-          await bot.sendAnimation(chatId, mediaUrl, { caption: `Bot by @firespower` });
-        } else {
-          await bot.sendPhoto(chatId, mediaUrl, { caption: `Bot by @firespower` });
+        try {
+          if (mediaUrl.endsWith('.mp4')) {
+            await bot.sendVideo(chatId, mediaUrl, { caption: `Bot by @firespower` });
+          } else if (mediaUrl.endsWith('.gif')) {
+            await bot.sendAnimation(chatId, mediaUrl, { caption: `Bot by @firespower` });
+          } else {
+            await bot.sendPhoto(chatId, mediaUrl, { caption: `Bot by @firespower` });
+          }
+        } catch (err) {
+          console.log(`Error sending media URL ${mediaUrl}:`, err);
+          await bot.sendMessage(chatId, `Error sending media: ${mediaUrl}`);
         }
       }
       return bot.deleteMessage(chatId, load.message_id);
