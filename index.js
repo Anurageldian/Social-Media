@@ -851,7 +851,7 @@ bot.onText(/\/info/, async (msg) => {
 // Listen for the /setgcpic command
 bot.onText(/\/setgcpic/, (msg) => {
   const chatId = msg.chat.id;
-  
+
   // Check if the bot has permissions to change chat info
   bot.getChatMember(chatId, bot.botId).then(botInfo => {
     if (!botInfo.can_change_info) {
@@ -879,7 +879,7 @@ bot.on('photo', async (msg) => {
   try {
     // Download the photo file
     const file = await bot.getFile(photoId);
-    
+
     // Set the group chat photo
     await bot.setChatPhoto(chatId, file.file_id);
     await bot.sendMessage(chatId, 'Group chat photo has been updated successfully!');
@@ -887,24 +887,6 @@ bot.on('photo', async (msg) => {
     console.error('Error setting group chat photo:', error.message);
     await bot.sendMessage(chatId, 'Failed to update group chat photo.');
   }
-});
-
-// Fetch bot information
-bot.getMe().then(botInfo => {
-  const botId = botInfo.id;
-  
-  // Now use botId to check permissions
-  bot.getChatMember(chatId, botId).then(botMember => {
-    if (!botMember.can_change_info) {
-      bot.sendMessage(chatId, 'Sorry, I do not have the required permissions to change chat info.');
-    } else {
-      bot.sendMessage(chatId, 'Please reply to the photo you want to set as the group chat photo with this command.');
-    }
-  }).catch(error => {
-    console.error('Error fetching bot member info:', error.message);
-  });
-}).catch(error => {
-  console.error('Error fetching bot info:', error.message);
 });
 
 
