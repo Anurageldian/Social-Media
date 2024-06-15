@@ -227,6 +227,10 @@ bot.onText(/\/start/, async (msg) => {
       );
     }
   });
+  function escapeMarkdown(text) {
+  return text.replace(/([*_[\]()~`>#+-=|{}.!\\])/g, '\\$1');
+}
+
 
 
 
