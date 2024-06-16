@@ -929,7 +929,6 @@ bot.onText(/\/deletefiles/, async (msg) => {
   
 // dev commands message
 bot.onText(/\/dev/, async (msg) => {
-  let chatId = msg.chat.id
   if (String(msg.from.id) !== String(process.env.DEV_ID)) {
     return
   }
