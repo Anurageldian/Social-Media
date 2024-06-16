@@ -931,8 +931,10 @@ bot.onText(/\/deletefiles/, async (msg) => {
 bot.onText(/\/dev/, async (msg) => {
   let chatId = msg.chat.id;
   if (String(msg.from.id) !== String(process.env.DEV_ID)) {
-    return;
+    return bot.deleteMessage(msg.chat.id, msg.message_id);
   }
+  const uptimeSeconds = os.uptime();
+  const formattedUptime = formatUptime(uptimeSeconds); // Use the formatUptime function from utils.js
   
   const inlineKeyboard = [
     [
