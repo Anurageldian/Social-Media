@@ -1088,7 +1088,7 @@ bot.onText(/\/dev/, async (msg) => {
           reply_markup: {
             inline_keyboard: [
               [
-            { text: '< Back', callback_data: 'back_to_first_caption' }.
+            { text: '< Back', callback_data: 'back_to_first_caption' },
           ],
               [{ text: 'Close', callback_data: 'close_message' }],
             ],
