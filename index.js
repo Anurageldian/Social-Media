@@ -164,8 +164,13 @@ bot.onText(/\/start/, async (msg) => {
   const uptimeSeconds = os.uptime();
   const formattedUptime = formatUptime(uptimeSeconds); // Use the formatUptime function from utils.js
 // Get current date and time formatted as per your requirement
-  
-  const currentDate = execSync('TZ="Asia/Kolkata" date +"%A, %B %d %Y, %I:%M %p"').toString().trim();
+ let currentDate;
+    try {
+        currentDate = execSync('TZ="Asia/Kolkata" date +"%A, %B %d %Y, %I:%M %p"').toString().trim();
+    } catch (error) {
+        console.error('Error fetching current date:', error);
+        currentDate = 'Date unavailable'; // Provide a fallback if date fetching fails
+    }
  
   const inlineKeyboard = [
      [
@@ -248,7 +253,7 @@ bot.onText(/\/start/, async (msg) => {
 • <i>ꜱᴘᴏᴛɪꜰʏ</i>
 • <i>ɢɪᴛʜᴜʙ</i>\n
  ~~~~ ꜱʏꜱᴛᴇᴍ ᴜᴘᴛɪᴍᴇ: <code>${formattedUptime}</code> ~~~~ 
-<code>${ncurrentDate}</code> `,
+<code>${currentDate}</code> `,
         {
           chat_id: chatId,
           message_id: messageId,
