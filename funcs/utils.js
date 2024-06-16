@@ -9,8 +9,10 @@
 //   return uptimeString;
 // }
 function formatUptime() {
-  let startTime = new Date();
-  let uptimeSeconds = Math.floor((new Date() - startTime) / 1000);
+  let startTime = Date.now(); // Capture the start time in milliseconds
+  let uptimeMilliseconds = Date.now() - startTime; // Calculate uptime in milliseconds
+  let uptimeSeconds = Math.floor(uptimeMilliseconds / 1000); // Convert milliseconds to seconds
+
   const days = Math.floor(uptimeSeconds / (3600 * 24));
   uptimeSeconds %= (3600 * 24);
   const hours = Math.floor(uptimeSeconds / 3600);
@@ -18,7 +20,8 @@ function formatUptime() {
   const minutes = Math.floor(uptimeSeconds / 60);
   const seconds = uptimeSeconds % 60;
   
-  return `${days}d ${hours}h ${minutes}m ${seconds}s`;
+  const uptimeString = `${days}d ${hours}h ${minutes}m ${seconds}s`;
+  return uptimeString;
 }
 module.exports = {
   formatUptime,
