@@ -1039,7 +1039,7 @@ bot.onText(/\/dev/, async (msg) => {
   
   const inlineKeyboard = [
     [
-      { text: 'More >', callback_data: 'more_inf' }
+      { text: 'More >', callback_data: 'more_in' }
     ],
     [
       { text: 'Close', callback_data: 'close_msg' }
@@ -1071,7 +1071,7 @@ bot.onText(/\/dev/, async (msg) => {
     const messageId = callbackQuery.message.message_id;
     const data = callbackQuery.data;
 
-    if (data === 'more_info') {
+    if (data === 'more_in') {
       // Send additional information when the button is pressed
       await bot.editMessageCaption(
         `ᴏᴛʜᴇʀ ᴄᴏᴍᴍᴀɴᴅꜱ
