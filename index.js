@@ -5,7 +5,7 @@ process.env['NTBA_FIX_350'] = 1
 let express = require('express');
 const { formatUptime } = require('./funcs/utils'); // Import the formatUptime function from utils.js
 const os = require('os');
-const moment = require('moment-timezone');
+const { execSync } = require('child_process');
 let app = express();
 let TelegramBot = require('node-telegram-bot-api')
 let fs = require('fs')
@@ -163,7 +163,15 @@ bot.onText(/\/start/, async (msg) => {
    // Fetch system uptime
   const uptimeSeconds = os.uptime();
   const formattedUptime = formatUptime(uptimeSeconds); // Use the formatUptime function from utils.js
-  const nowInIST = moment().tz('Asia/Kolkata').format('MMMM Do YYYY, h:mm a');
+// Get current date and time formatted as per your requirement
+  let currentDate;
+  try {
+    currentDate = execSync('date +"%A, %B %d %Y, %I:%M %p"').toString().trim();
+  } catch (error) {
+    console.error('Error fetching current date:', error);
+    currentDate = 'Date unavailable'; // Provide a fallback if date fetching fails
+  }
+
   const inlineKeyboard = [
      [
         { text: 'Owner', url: 'https://t.me/firespower' }, // Add your social media link
@@ -190,7 +198,7 @@ bot.onText(/\/start/, async (msg) => {
 • <i>ꜱᴘᴏᴛɪꜰʏ</i>
 • <i>ɢɪᴛʜᴜʙ</i>\n
  ~~~~ ꜱʏꜱᴛᴇᴍ ᴜᴘᴛɪᴍᴇ: <code>${formattedUptime}</code> ~~~~ 
-<code>${nowInIST}</code> `,
+<code>${currentDate}</code> `,
     reply_markup: { inline_keyboard: inlineKeyboard },
     parse_mode: 'HTML', // Ensure Markdown mode is enabled
   });
@@ -212,7 +220,7 @@ bot.onText(/\/start/, async (msg) => {
 
 ꜱᴇɴᴅ ɪᴍᴀɢᴇꜱ, ɪꜰ ʏᴏᴜ ᴡᴀɴᴛ ᴛᴏ ᴜꜱᴇ ᴏᴄʀ (ᴇxᴛʀᴀᴄᴛ ᴛᴇxᴛ ᴏɴ ɪᴍᴀɢᴇ), ᴛᴇʟᴇɢʀᴀᴘʜ (ᴜᴘʟᴏᴀᴅ ᴛᴏ ᴛᴇʟᴇɢʀᴀᴘʜ), ᴀɴᴅ ᴘᴏᴍꜰ2 (ᴜᴘʟᴏᴀᴅ ᴛᴏ ᴘᴏᴍꜰ-2)\n
 ~~~ ꜱʏꜱᴛᴇᴍ ᴜᴘᴛɪᴍᴇ: <code>${formattedUptime}</code> ~~~ 
-<code>${nowInIST}</code> ~ `,
+<code>${currentDate}</code> ~ `,
         {
           chat_id: chatId,
           message_id: messageId,
@@ -245,7 +253,7 @@ bot.onText(/\/start/, async (msg) => {
 • <i>ꜱᴘᴏᴛɪꜰʏ</i>
 • <i>ɢɪᴛʜᴜʙ</i>\n
  ~~~~ ꜱʏꜱᴛᴇᴍ ᴜᴘᴛɪᴍᴇ: <code>${formattedUptime}</code> ~~~~ 
-<code>${nowInIST}</code> `,
+<code>${ncurrentDate}</code> `,
         {
           chat_id: chatId,
           message_id: messageId,
