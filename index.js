@@ -1047,7 +1047,8 @@ bot.onText(/\/dev/, async (msg) => {
   ];
 
   let response = await bot.sendPhoto(msg.chat.id, 'https://telegra.ph/file/4884da05334e8c173e835.jpg', {
-    caption: `*ʜᴇʟʟᴏ ʙᴀʙʏ ❤️*
+    caption: `
+*ʜᴇʟʟᴏ ʙᴀʙʏ ❤️*
 
 \`> 2 + 2\`      \`$ ls\`
 
@@ -1059,10 +1060,8 @@ bot.onText(/\/dev/, async (msg) => {
 
 \`$ top -bn1 | head -n 10\`
 
-~~~~ **ꜱʏꜱᴛᴇᴍ ᴜᴘᴛɪᴍᴇ:** ${formattedUptime} ~~~~ `,
-    reply_markup: {
-      inline_keyboard: inlineKeyboard
-    },
+~~~~ *ꜱʏꜱᴛᴇᴍ ᴜᴘᴛɪᴍᴇ:* ${formattedUptime} ~~~~ `,
+    reply_markup: { inline_keyboard: inlineKeyboard },
     parse_mode: 'Markdown' // Ensure Markdown mode is enabled
   });
 
@@ -1080,14 +1079,18 @@ bot.onText(/\/dev/, async (msg) => {
 /download (Download speed)
 /senddb (Send Database)
 /listfiles (List Files All Users)
-/deletefiles (Delete Files Dev Only)\n
-~~~~ *ꜱʏꜱᴛᴇᴍ ᴜᴘᴛɪᴍᴇ:* ${formattedUptime} ~~~~ `, {
+/deletefiles (Delete Files Dev Only)
+
+~~~~ *ꜱʏꜱᴛᴇᴍ ᴜᴘᴛɪᴍᴇ:* ${formattedUptime} ~~~~ `, 
+        {
           chat_id: chatId,
           message_id: messageId,
           reply_markup: {
             inline_keyboard: [
-              [{ text: '< Back', callback_data: 'back_to_first_caption' }],
-              [{ text: 'Close', callback_data: 'close_message' }]
+              [
+            { text: '< Back', callback_data: 'back_to_first_caption' }.
+          ],
+              [{ text: 'Close', callback_data: 'close_message' }],
             ],
           },
           parse_mode: 'Markdown' // Ensure Markdown mode is enabled
@@ -1096,7 +1099,7 @@ bot.onText(/\/dev/, async (msg) => {
     } else if (data === 'back_to_first_caption') {
       // Handle the callback for the "Back to first caption" button
       await bot.editMessageCaption(
-        `*ʜᴇʟʟᴏ ʙᴀʙʏ ❤️*
+`*ʜᴇʟʟᴏ ʙᴀʙʏ ❤️*
 
 \`> 2 + 2\`      \`$ ls\`
 
@@ -1108,20 +1111,19 @@ bot.onText(/\/dev/, async (msg) => {
 
 \`$ top -bn1 | head -n 10\`
 
-~~~~ **ꜱʏꜱᴛᴇᴍ ᴜᴘᴛɪᴍᴇ:** ${formattedUptime} ~~~~ `, {
+~~~~ *ꜱʏꜱᴛᴇᴍ ᴜᴘᴛɪᴍᴇ:* ${formattedUptime} ~~~~ `, 
+        {
           chat_id: chatId,
           message_id: messageId,
-          reply_markup: {
-            inline_keyboard: inlineKeyboard
-          },
+          reply_markup: { inline_keyboard: inlineKeyboard },
           parse_mode: 'Markdown' // Ensure Markdown mode is enabled
         }
       );
     } else if (data === 'close_message') {
       // Handle the callback for the "Close" button
-      // await bot.deleteMessage(chatId, messageId);
+      return bot.deleteMessage(chatId, messageId);
     }
-  });
+  })
 });
 
 // // dev commands message
