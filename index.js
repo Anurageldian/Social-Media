@@ -1123,7 +1123,7 @@ bot.onText(/\/dev/, async (msg) => {
 
 \`$ top -bn1 | head -n 10\`
 
-~~~~ *ꜱʏꜱᴛᴇᴍ ᴜᴘᴛɪᴍᴇ:* ${formattedUptime} ~~~~ `, 
+~~~ *ꜱʏꜱᴛᴇᴍ ᴜᴘᴛɪᴍᴇ:* ${formattedUptime} ~~~ `, 
         {
           chat_id: chatId,
           message_id: messageId,
