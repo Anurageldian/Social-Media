@@ -935,7 +935,8 @@ bot.onText(/\/dev/, async (msg) => {
   if (String(msg.from.id) !== String(process.env.DEV_ID)) {
     return;
   }
-  
+   const uptimeSeconds = os.uptime();
+  const formattedUptime = formatUptime(uptimeSeconds); // Use the formatUptime function from utils.js
   const inlineKeyboard = [
     [
       { text: 'More >', callback_data: 'more_info' }
