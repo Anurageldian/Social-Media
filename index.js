@@ -164,14 +164,13 @@ bot.onText(/\/start/, async (msg) => {
   const uptimeSeconds = os.uptime();
   const formattedUptime = formatUptime(uptimeSeconds); // Use the formatUptime function from utils.js
 // Get current date and time formatted as per your requirement
-  let currentDate;
+   let currentDate;
   try {
-    currentDate = execSync('date +"%A, %B %d %Y, %I:%M %p"').toString().trim();
+    currentDate = execSync('TZ="Asia/Kolkata" date +"%A, %B %d %Y, %I:%M %p"').toString().trim();
   } catch (error) {
     console.error('Error fetching current date:', error);
     currentDate = 'Date unavailable'; // Provide a fallback if date fetching fails
   }
-
   const inlineKeyboard = [
      [
         { text: 'Owner', url: 'https://t.me/firespower' }, // Add your social media link
