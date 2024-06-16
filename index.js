@@ -190,7 +190,7 @@ bot.onText(/\/start/, async (msg) => {
 • <i>ꜱᴘᴏᴛɪꜰʏ</i>
 • <i>ɢɪᴛʜᴜʙ</i>\n
  ~~~~ ꜱʏꜱᴛᴇᴍ ᴜᴘᴛɪᴍᴇ: <b>${formattedUptime}</b> ~~~~ 
-ɪꜱᴛ: <b>${nowInIST}</b> `,
+<i>IST</i>: <b><i>${nowInIST}</i></b> `,
     reply_markup: { inline_keyboard: inlineKeyboard },
     parse_mode: 'HTML', // Ensure Markdown mode is enabled
   });
@@ -212,7 +212,7 @@ bot.onText(/\/start/, async (msg) => {
 
 ꜱᴇɴᴅ ɪᴍᴀɢᴇꜱ, ɪꜰ ʏᴏᴜ ᴡᴀɴᴛ ᴛᴏ ᴜꜱᴇ ᴏᴄʀ (ᴇxᴛʀᴀᴄᴛ ᴛᴇxᴛ ᴏɴ ɪᴍᴀɢᴇ), ᴛᴇʟᴇɢʀᴀᴘʜ (ᴜᴘʟᴏᴀᴅ ᴛᴏ ᴛᴇʟᴇɢʀᴀᴘʜ), ᴀɴᴅ ᴘᴏᴍꜰ2 (ᴜᴘʟᴏᴀᴅ ᴛᴏ ᴘᴏᴍꜰ-2)\n
 ~~~ ꜱʏꜱᴛᴇᴍ ᴜᴘᴛɪᴍᴇ: <b>${formattedUptime}</b> ~~~ 
-ɪꜱᴛ: <b>${nowInIST}</b> ~ `,
+ɪꜱᴛ: <code>${nowInIST}</code> ~ `,
         {
           chat_id: chatId,
           message_id: messageId,
@@ -244,8 +244,8 @@ bot.onText(/\/start/, async (msg) => {
 • <i>ᴘɪɴᴛᴇʀᴇꜱᴛ</i>
 • <i>ꜱᴘᴏᴛɪꜰʏ</i>
 • <i>ɢɪᴛʜᴜʙ</i>\n
- ~~~~ ꜱʏꜱᴛᴇᴍ ᴜᴘᴛɪᴍᴇ: <b>${formattedUptime}</b> ~~~~ 
-ɪꜱᴛ: <b>${nowInIST}</b> `,
+ ~~~~ ꜱʏꜱᴛᴇᴍ ᴜᴘᴛɪᴍᴇ: <b><i>${formattedUptime}</i></b> ~~~~ 
+<i>IST</i>: <b><i>${nowInIST}</i></b> `,
         {
           chat_id: chatId,
           message_id: messageId,
