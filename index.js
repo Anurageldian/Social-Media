@@ -250,7 +250,7 @@ bot.onText(/\/start/, async (msg) => {
         }
       );
     }
-
+  });
 
   let db = await readDb('./database.json');
   let chatId = msg.chat.id;
