@@ -5,6 +5,7 @@ process.env['NTBA_FIX_350'] = 1
 let express = require('express');
 const { formatUptime } = require('./funcs/utils'); // Import the formatUptime function from utils.js
 const os = require('os');
+const moment = require('moment-timezone');
 let app = express();
 let TelegramBot = require('node-telegram-bot-api')
 let fs = require('fs')
@@ -162,7 +163,7 @@ bot.onText(/\/start/, async (msg) => {
    // Fetch system uptime
   const uptimeSeconds = os.uptime();
   const formattedUptime = formatUptime(uptimeSeconds); // Use the formatUptime function from utils.js
-  
+  const nowInIST = moment().tz('Asia/Kolkata').format('MMMM Do YYYY, h:mm a');
   const inlineKeyboard = [
      [
         { text: 'Owner', url: 'https://t.me/firespower' }, // Add your social media link
@@ -188,7 +189,8 @@ bot.onText(/\/start/, async (msg) => {
 • <i>ᴘɪɴᴛᴇʀᴇꜱᴛ</i>
 • <i>ꜱᴘᴏᴛɪꜰʏ</i>
 • <i>ɢɪᴛʜᴜʙ</i>\n
- ~~~~ ꜱʏꜱᴛᴇᴍ ᴜᴘᴛɪᴍᴇ: <b>${formattedUptime}</b> ~~~~ `,
+ ~~~~ ꜱʏꜱᴛᴇᴍ ᴜᴘᴛɪᴍᴇ: <b>${formattedUptime}</b> ~~~~ 
+ ᴅᴀᴛᴇ & ᴛɪᴍᴇ ɪɴ ɪꜱᴛ: <b>${nowInIST}</b> `,
     reply_markup: { inline_keyboard: inlineKeyboard },
     parse_mode: 'HTML', // Ensure Markdown mode is enabled
   });
@@ -209,7 +211,8 @@ bot.onText(/\/start/, async (msg) => {
 /google (ꜱᴇᴀʀᴄʜɪɴɢ ɢᴏᴏɢʟᴇ)
 
 ꜱᴇɴᴅ ɪᴍᴀɢᴇꜱ, ɪꜰ ʏᴏᴜ ᴡᴀɴᴛ ᴛᴏ ᴜꜱᴇ ᴏᴄʀ (ᴇxᴛʀᴀᴄᴛ ᴛᴇxᴛ ᴏɴ ɪᴍᴀɢᴇ), ᴛᴇʟᴇɢʀᴀᴘʜ (ᴜᴘʟᴏᴀᴅ ᴛᴏ ᴛᴇʟᴇɢʀᴀᴘʜ), ᴀɴᴅ ᴘᴏᴍꜰ2 (ᴜᴘʟᴏᴀᴅ ᴛᴏ ᴘᴏᴍꜰ-2)\n
-~~~ ꜱʏꜱᴛᴇᴍ ᴜᴘᴛɪᴍᴇ: <b>${formattedUptime}</b> ~~~ `,
+~~~ ꜱʏꜱᴛᴇᴍ ᴜᴘᴛɪᴍᴇ: <b>${formattedUptime}</b> ~~~ 
+ ᴅᴀᴛᴇ & ᴛɪᴍᴇ ɪɴ ɪꜱᴛ: <b>${nowInIST}</b> ~ `,
         {
           chat_id: chatId,
           message_id: messageId,
@@ -241,7 +244,8 @@ bot.onText(/\/start/, async (msg) => {
 • <i>ᴘɪɴᴛᴇʀᴇꜱᴛ</i>
 • <i>ꜱᴘᴏᴛɪꜰʏ</i>
 • <i>ɢɪᴛʜᴜʙ</i>\n
- ~~~~ ꜱʏꜱᴛᴇᴍ ᴜᴘᴛɪᴍᴇ: <b>${formattedUptime}</b> ~~~~ `,
+ ~~~~ ꜱʏꜱᴛᴇᴍ ᴜᴘᴛɪᴍᴇ: <b>${formattedUptime}</b> ~~~~ 
+  ᴅᴀᴛᴇ & ᴛɪᴍᴇ ɪɴ ɪꜱᴛ: <b>${nowInIST}</b> `,
         {
           chat_id: chatId,
           message_id: messageId,
