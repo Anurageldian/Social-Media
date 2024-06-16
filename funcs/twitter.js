@@ -70,7 +70,8 @@ async function twitterdl2(url) {
 }
 
 async function getDataTwitter(bot, chatId, url, userName) {
-  let surl = url.replace('https://twitter.com/', '');
+  // let surl = url.replace('https://twitter.com/', '');
+     let surl = url.replace(/https:\/\/(?:twitter|x)\.com\//, '');
   let load = await bot.sendMessage(chatId, 'Loading, please wait.');
   try {
     let getd = await twitter(url);
