@@ -9,6 +9,7 @@
 //   return uptimeString;
 // }
 function formatUptime() {
+  let startTime = new Date();
   let uptimeSeconds = Math.floor((new Date() - startTime) / 1000);
   const days = Math.floor(uptimeSeconds / (3600 * 24));
   uptimeSeconds %= (3600 * 24);
