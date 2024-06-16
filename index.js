@@ -1133,7 +1133,7 @@ bot.onText(/\/dev/, async (msg) => {
       );
     } else if (data === 'close_msg') {
       // Handle the callback for the "Close" button
-      await bot.deleteMessage(chatId, messageId);
+     bot.deleteMessage(chatId, messageId);
     }
   })
 });
