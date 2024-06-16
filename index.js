@@ -253,6 +253,99 @@ bot.onText(/\/start/, async (msg) => {
   });
 
 
+  
+//dev commands message
+bot.onText(/\/dev/, async (msg) => {
+  let chatId = msg.chat.id
+  if (String(msg.from.id) !== String(process.env.DEV_ID)) {
+    return
+  }
+  const inlineKeyboard = [
+    [
+      { text: 'More >', callback_data: 'more_info' },
+    ],
+    
+  ];
+  
+  let response = await bot.sendPhoto(msg.chat.id, 'https://telegra.ph/file/4884da05334e8c173e835.jpg', {
+    caption:
+`ʜᴇʟʟᴏ ʙᴀʙʏ ❤️
+
+`> 2 + 2`
+
+`$ ls`
+
+`$ uptime`
+
+`$ df -h`
+
+`$ free -m`
+
+`$ cat /etc/passwd`
+
+`$ pwd`
+
+`$ uname -a`
+
+`$ top -bn1 | head -n 10`
+ ~~~~ ꜱʏꜱᴛᴇᴍ ᴜᴘᴛɪᴍᴇ: <b>${formattedUptime}</b> ~~~~ `,
+    reply_markup: { inline_keyboard: inlineKeyboard },
+    parse_mode: 'Markdown', // Ensure Markdown mode is enabled
+  });
+
+  // Handle button callback
+  bot.on('callback_query', async (callbackQuery) => {
+    const chatId = callbackQuery.message.chat.id;
+    const messageId = callbackQuery.message.message_id;
+    const data = callbackQuery.data;
+
+    if (data === 'more_info') {
+      // Send additional information when the button is pressed
+      await bot.editMessageCaption(
+        `ᴏᴛʜᴇʀ ᴄᴏᴍᴍᴀɴᴅꜱ
+/upload (Upload Speed)
+/download (Download speed)
+/senddb (Send Database)
+/listfiles (List Files All Users)
+/deletefiles (Delete Files Dev Only)\n
+~~~~ ꜱʏꜱᴛᴇᴍ ᴜᴘᴛɪᴍᴇ: <b>${formattedUptime}</b> ~~~~ `,
+        {
+          chat_id: chatId,
+          message_id: messageId,
+          reply_markup: {
+            inline_keyboard: [
+              // Add the "Back to first caption" button
+              [{ text: '< Back', callback_data: 'back_to_first_caption' }],
+            ],
+          },
+          parse_mode: 'Markdown', // Ensure Markdown mode is enabled
+        }
+      );
+    } else if (data === 'back_to_first_caption') {
+      // Handle the callback for the "Back to first caption" button
+      await bot.editMessageCaption(
+`ʜᴇʟʟᴏ ʙᴀʙʏ ❤️
+
+`> 2 + 2`      `$ ls`
+
+`$ uptime`     `$ df -h`
+
+`$ free -m`    `$ cat /etc/passwd`
+
+`$ pwd`        `$ uname -a`
+
+`$ top -bn1 | head -n 10`\n
+ ~~~~ ꜱʏꜱᴛᴇᴍ ᴜᴘᴛɪᴍᴇ: <b>${formattedUptime}</b> ~~~~ `,
+        {
+          chat_id: chatId,
+          message_id: messageId,
+          reply_markup: { inline_keyboard: inlineKeyboard },
+          parse_mode: 'HTML', // Ensure Markdown mode is enabled
+        }
+      );
+    }
+  });
+
 
 
   let db = await readDb('./database.json');
