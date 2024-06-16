@@ -402,7 +402,7 @@ bot.onText(/https?:\/\/(?:.*\.)?tiktok\.com/, async (msg) => {
 })
 
 // Twitter Regex
-bot.onText(/https?:\/\/(?:.*\.)?twitter\.com/, async (msg) => {
+bot.onText(/https?:\/\/(?:.*\.)?(twitter\.com|x\.com)/, async (msg) => {
   let getban = await getBanned(msg.chat.id);
   if (!getban.status) return bot.sendMessage(msg.chat.id, `You have been banned\n\nReason : ${getban.reason}\n\nDo you want to be able to use bots again? Please contact the owner to request removal of the ban\nOwner : @firespower`)
   let userId = msg.from.id.toString();
