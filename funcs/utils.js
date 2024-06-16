@@ -8,8 +8,8 @@
 //   const uptimeString = `${days}d ${hours}h ${minutes}m`;
 //   return uptimeString;
 // }
+  const startTime = Date.now(); // Capture the start time in milliseconds
 function formatUptime() {
-  let startTime = Date.now(); // Capture the start time in milliseconds
   let uptimeMilliseconds = Date.now() - startTime; // Calculate uptime in milliseconds
   let uptimeSeconds = Math.floor(uptimeMilliseconds / 1000); // Convert milliseconds to seconds
 
