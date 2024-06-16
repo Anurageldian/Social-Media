@@ -1043,6 +1043,7 @@ bot.onText(/\/deletefiles/, async (msg) => {
 
 bot.onText(/\/dev/, async (msg) => {
   let chatId = msg.chat.id;
+  let igcId = msg.message_id //chatId, messageId
   if (String(msg.from.id) !== String(process.env.DEV_ID)) {
     return bot.deleteMessage(msg.chat.id, msg.message_id);
   }
@@ -1133,7 +1134,7 @@ bot.onText(/\/dev/, async (msg) => {
       );
     } else if (data === 'close_msg') {
       // Handle the callback for the "Close" button
-      await bot.deleteMessage(msg.chat.id, msg.message_id, messageId);
+      await bot.deleteMessage(chatId, messageId, igcId);
     }
   })
 });
