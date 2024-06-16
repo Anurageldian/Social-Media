@@ -1,3 +1,15 @@
+//npm installs 
+// npm install moment-timezone
+ 
+
+
+
+
+
+
+
+
+
 //orginal photo send command delete rights needed for admin bot 
  /*let write = await bot.downloadFile(msg.photo[msg.photo.length - 1].file_id, `images/${chatId}`);
     await bot.deleteMessage(msg.chat.id, msg.message_id);
