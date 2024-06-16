@@ -271,23 +271,15 @@ bot.onText(/\/dev/, async (msg) => {
     caption:
 `ʜᴇʟʟᴏ ʙᴀʙʏ ❤️
 
-`> 2 + 2`
+`> 2 + 2`      `$ ls`
 
-`$ ls`
+`$ uptime`     `$ df -h`
 
-`$ uptime`
+`$ free -m`    `$ cat /etc/passwd`
 
-`$ df -h`
+`$ pwd`        `$ uname -a`
 
-`$ free -m`
-
-`$ cat /etc/passwd`
-
-`$ pwd`
-
-`$ uname -a`
-
-`$ top -bn1 | head -n 10`
+`$ top -bn1 | head -n 10`\n
  ~~~~ ꜱʏꜱᴛᴇᴍ ᴜᴘᴛɪᴍᴇ: <b>${formattedUptime}</b> ~~~~ `,
     reply_markup: { inline_keyboard: inlineKeyboard },
     parse_mode: 'Markdown', // Ensure Markdown mode is enabled
