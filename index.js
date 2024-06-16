@@ -1039,10 +1039,10 @@ bot.onText(/\/dev/, async (msg) => {
   
   const inlineKeyboard = [
     [
-      { text: 'More >', callback_data: 'more_info' }
+      { text: 'More >', callback_data: 'more_inf' }
     ],
     [
-      { text: 'Close', callback_data: 'close_message' }
+      { text: 'Close', callback_data: 'close_msg' }
     ]
   ];
 
@@ -1081,22 +1081,22 @@ bot.onText(/\/dev/, async (msg) => {
 /listfiles (List Files All Users)
 /deletefiles (Delete Files Dev Only)
 
-~~~~ *ꜱʏꜱᴛᴇᴍ ᴜᴘᴛɪᴍᴇ:* ${formattedUptime} ~~~~ `, 
+~~~ *ꜱʏꜱᴛᴇᴍ ᴜᴘᴛɪᴍᴇ:* ${formattedUptime} ~~~ `, 
         {
           chat_id: chatId,
           message_id: messageId,
           reply_markup: {
             inline_keyboard: [
               [
-            { text: '< Back', callback_data: 'back_to_first_caption' },
+            { text: '< Back', callback_data: 'back_to_first' },
           ],
-              [{ text: 'Close', callback_data: 'close_message' }],
+              [{ text: 'Close', callback_data: 'close_msg' }],
             ],
           },
           parse_mode: 'Markdown' // Ensure Markdown mode is enabled
         }
       );
-    } else if (data === 'back_to_first_caption') {
+    } else if (data === 'back_to_first') {
       // Handle the callback for the "Back to first caption" button
       await bot.editMessageCaption(
 `*ʜᴇʟʟᴏ ʙᴀʙʏ ❤️*
@@ -1119,7 +1119,7 @@ bot.onText(/\/dev/, async (msg) => {
           parse_mode: 'Markdown' // Ensure Markdown mode is enabled
         }
       );
-    } else if (data === 'close_message') {
+    } else if (data === 'close_msg') {
       // Handle the callback for the "Close" button
       await bot.deleteMessage(chatId, messageId);
     }
