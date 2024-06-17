@@ -799,11 +799,10 @@ bot.onText(/\/admins/, (msg) => {
 
 
 // Event listener for /getprofilepics command with username argument
-bot.onText(/\/getprofilepics/, async (msg) => {
-  const chatId = msg.chat.id;
 
-  // Get the user ID of the user who sent the message
-  const userId = msg.from.id;
+bot.onText(/\/getprofilepics (\d+)/, async (msg, match) => {
+  const chatId = msg.chat.id;
+  const userId = parseInt(match[1].trim(), 10);
 
   try {
     // Call the getUserProfilePhotos method to get the user's profile pictures
@@ -811,6 +810,11 @@ bot.onText(/\/getprofilepics/, async (msg) => {
 
     // Extract the list of photos from the response
     const photos = userProfilePhotos.photos;
+
+    if (photos.length === 0) {
+      bot.sendMessage(chatId, `User ${userId} has no profile pictures.`);
+      return;
+    }
 
     // Send a message with the number of profile pictures and their details
     bot.sendMessage(chatId, `User ${userId} has ${photos.length} profile pictures:`);
@@ -822,9 +826,36 @@ bot.onText(/\/getprofilepics/, async (msg) => {
     });
   } catch (error) {
     console.error('Error fetching user profile photos:', error.message);
-    bot.sendMessage(chatId, 'Failed to fetch user profile photos. Please try again later.');
+    bot.sendMessage(chatId, `Failed to fetch profile photos for user ${userId}. Please ensure the user ID is correct and the user has interacted with the bot.`);
   }
 });
+
+// bot.onText(/\/getprofilepics/, async (msg) => {
+//   const chatId = msg.chat.id;
+
+//   // Get the user ID of the user who sent the message
+//   const userId = msg.from.id;
+
+//   try {
+//     // Call the getUserProfilePhotos method to get the user's profile pictures
+//     const userProfilePhotos = await bot.getUserProfilePhotos(userId);
+
+//     // Extract the list of photos from the response
+//     const photos = userProfilePhotos.photos;
+
+//     // Send a message with the number of profile pictures and their details
+//     bot.sendMessage(chatId, `User ${userId} has ${photos.length} profile pictures:`);
+
+//     // Loop through each photo and send it to the chat
+//     photos.forEach((photo, index) => {
+//       // Send each photo as a separate message
+//       bot.sendPhoto(chatId, photo[0].file_id, { caption: `Photo ${index + 1}` });
+//     });
+//   } catch (error) {
+//     console.error('Error fetching user profile photos:', error.message);
+//     bot.sendMessage(chatId, 'Failed to fetch user profile photos. Please try again later.');
+//   }
+// });
 
 
 
