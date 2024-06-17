@@ -969,6 +969,78 @@ bot.onText(/\/deletefiles/, async (msg) => {
 });
 
 
+
+// Helper function to update chat permissions
+async function setChatPermissions(chatId, permissions) {
+  try {
+    await bot.setChatPermissions(chatId, permissions);
+    return true;
+  } catch (error) {
+    console.error('Error setting chat permissions:', error.message);
+    return false;
+  }
+}
+
+bot.onText(/\/lock (.+)/, async (msg, match) => {
+  const chatId = msg.chat.id;
+  const lockTarget = match[1].trim().toLowerCase();
+  const userId = msg.from.id;
+
+  try {
+    // Fetch the chat member status of the user and the bot
+    const user = await bot.getChatMember(chatId, userId);
+    const botUser = await bot.getChatMember(chatId, bot.id);
+
+    // Check if the user and bot both have the 'can_change_info' permission
+    if (!user.can_change_info || !botUser.can_change_info) {
+      bot.sendMessage(chatId, 'Both you and the bot need to have the "can change info" permission to lock/unlock settings.');
+      return;
+    }
+
+    // Define permissions for locking specific features
+    let permissions = {};
+
+    if (lockTarget === 'all') {
+      permissions = {
+        can_send_messages: false,
+        can_send_media_messages: false,
+        can_send_polls: false,
+        can_send_other_messages: false,
+        can_add_web_page_previews: false,
+        can_change_info: false,
+        can_invite_users: false,
+        can_pin_messages: false
+      };
+    } else if (lockTarget === 'sticker') {
+      permissions = {
+        can_send_messages: true,
+        can_send_media_messages: true,
+        can_send_polls: true,
+        can_send_other_messages: false, // Stickers and GIFs
+        can_add_web_page_previews: true,
+        can_change_info: true,
+        can_invite_users: true,
+        can_pin_messages: true
+      };
+    } else {
+      bot.sendMessage(chatId, `Unknown lock target: ${lockTarget}`);
+      return;
+    }
+
+    // Update chat permissions
+    const success = await setChatPermissions(chatId, permissions);
+
+    if (success) {
+      bot.sendMessage(chatId, `Successfully locked ${lockTarget}.`);
+    } else {
+      bot.sendMessage(chatId, `Failed to lock ${lockTarget}.`);
+    }
+  } catch (error) {
+    console.error('Error handling /lock command:', error.message);
+    bot.sendMessage(chatId, 'An error occurred while processing the lock command.');
+  }
+});
+
   
 // dev commands message
 // bot.onText(/\/dev/, async (msg) => {
