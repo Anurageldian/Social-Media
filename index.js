@@ -970,6 +970,8 @@ bot.onText(/\/deletefiles/, async (msg) => {
 
 
 
+
+
 // Helper function to update chat permissions
 async function setChatPermissions(chatId, permissions) {
   try {
@@ -991,9 +993,15 @@ bot.onText(/\/lock (.+)/, async (msg, match) => {
     const user = await bot.getChatMember(chatId, userId);
     const botUser = await bot.getChatMember(chatId, bot.id);
 
-    // Check if the user and bot both have the 'can_change_info' permission
-    if (!user.can_change_info || !botUser.can_change_info) {
-      bot.sendMessage(chatId, 'Both you and the bot need to have the "can change info" permission to lock/unlock settings.');
+    // Check if the user has the 'can_restrict_members' and 'can_change_info' permissions
+    if (!user.can_restrict_members || !user.can_change_info) {
+      bot.sendMessage(chatId, 'You need to have the "can restrict members" and "can change info" permissions to lock/unlock settings.');
+      return;
+    }
+
+    // Check if the bot has the 'can_restrict_members' and 'can_change_info' permissions
+    if (!botUser.can_restrict_members || !botUser.can_change_info) {
+      bot.sendMessage(chatId, 'The bot needs to have the "can restrict members" and "can change info" permissions to lock/unlock settings.');
       return;
     }
 
@@ -1040,6 +1048,7 @@ bot.onText(/\/lock (.+)/, async (msg, match) => {
     bot.sendMessage(chatId, 'An error occurred while processing the lock command.');
   }
 });
+
 
   
 // dev commands message
