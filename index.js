@@ -1055,6 +1055,7 @@ bot.onText(/\/lock (.+)/, async (msg, match) => {
 
 
 
+
   
 // dev commands message
 // bot.onText(/\/dev/, async (msg) => {
