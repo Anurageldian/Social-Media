@@ -971,18 +971,18 @@ bot.onText(/\/deletefiles/, async (msg) => {
 
 
 // Helper function to update chat permissions
+const TelegramBot = require('node-telegram-bot-api');
+const bot = new TelegramBot('YOUR_BOT_TOKEN', { polling: true });
+
+// Helper function to update chat permissions
 async function setChatPermissions(chatId, permissions) {
+  const form = {
+    chat_id: chatId,
+    permissions: JSON.stringify(permissions)
+  };
+
   try {
-    await bot.setChatPermissions(chatId, {
-      can_send_messages: permissions.can_send_messages || false,
-      can_send_media_messages: permissions.can_send_media_messages || false,
-      can_send_polls: permissions.can_send_polls || false,
-      can_send_other_messages: permissions.can_send_other_messages || false,
-      can_add_web_page_previews: permissions.can_add_web_page_previews || false,
-      can_change_info: permissions.can_change_info || false,
-      can_invite_users: permissions.can_invite_users || false,
-      can_pin_messages: permissions.can_pin_messages || false
-    });
+    await bot.setChatPermissions(form);
     return true;
   } catch (error) {
     console.error('Error setting chat permissions:', error.message);
@@ -1065,6 +1065,7 @@ bot.onText(/\/lock (.+)/, async (msg, match) => {
     bot.sendMessage(chatId, 'An error occurred while processing the lock command.');
   }
 });
+
 
 
 
