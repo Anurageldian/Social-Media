@@ -971,10 +971,6 @@ bot.onText(/\/deletefiles/, async (msg) => {
 
 
 // Helper function to update chat permissions
-const TelegramBot = require('node-telegram-bot-api');
-const bot = new TelegramBot('YOUR_BOT_TOKEN', { polling: true });
-
-// Helper function to update chat permissions
 async function setChatPermissions(chatId, permissions) {
   const form = {
     chat_id: chatId,
