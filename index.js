@@ -970,8 +970,6 @@ bot.onText(/\/deletefiles/, async (msg) => {
 
 
 
-
-
 // Helper function to update chat permissions
 async function setChatPermissions(chatId, permissions) {
   try {
@@ -989,9 +987,19 @@ bot.onText(/\/lock (.+)/, async (msg, match) => {
   const userId = msg.from.id;
 
   try {
-    // Fetch the chat member status of the user and the bot
-    const user = await bot.getChatMember(chatId, userId);
-    const botUser = await bot.getChatMember(chatId, bot.id);
+    // Fetch the chat member status of the user
+    const user = await bot.getChatMember(chatId, userId).catch((error) => {
+      console.error('Error fetching user chat member status:', error.message);
+      bot.sendMessage(chatId, 'Error fetching your chat member status. Please ensure you are a valid member of this chat.');
+      throw error;
+    });
+
+    // Fetch the chat member status of the bot
+    const botUser = await bot.getChatMember(chatId, bot.id).catch((error) => {
+      console.error('Error fetching bot chat member status:', error.message);
+      bot.sendMessage(chatId, 'Error fetching the bot\'s chat member status. Please ensure the bot is a valid member of this chat.');
+      throw error;
+    });
 
     // Check if the user has the 'can_restrict_members' and 'can_change_info' permissions
     if (!user.can_restrict_members || !user.can_change_info) {
@@ -1048,6 +1056,7 @@ bot.onText(/\/lock (.+)/, async (msg, match) => {
     bot.sendMessage(chatId, 'An error occurred while processing the lock command.');
   }
 });
+
 
 
   
