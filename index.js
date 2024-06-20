@@ -1243,6 +1243,10 @@ bot.onText(/\/dev/, async (msg) => {
 
 // to get a sticker as png
 
+// Initialize variables for storing the latest sticker details
+const latestStickerFileWebp = 'sticker.webp';
+const latestStickerFilePng = 'sticker.png';
+
 bot.onText(/\/getsticker/, async (msg) => {
   const chatId = msg.chat.id;
 
@@ -1257,8 +1261,6 @@ bot.onText(/\/getsticker/, async (msg) => {
 
       // Construct the download URL
       const downloadUrl = `https://api.telegram.org/file/bot${bot.token}/${filePath}`;
-      const webpFileName = 'sticker.webp';
-      const pngFileName = 'sticker.png';
 
       // Download the file
       const response = await axios({
@@ -1266,21 +1268,29 @@ bot.onText(/\/getsticker/, async (msg) => {
         method: 'GET',
         responseType: 'arraybuffer'
       });
-      fs.writeFileSync(webpFileName, response.data);
+      fs.writeFileSync(latestStickerFileWebp, response.data);
 
       // Convert the WebP file to PNG
-      await sharp(webpFileName).toFile(pngFileName);
+      await sharp(latestStickerFileWebp).toFile(latestStickerFilePng);
 
       // Send the PNG file as a document
-      await bot.sendDocument(chatId, pngFileName);
+      await bot.sendDocument(chatId, latestStickerFilePng);
 
       // Remove the files after sending
-      fs.unlinkSync(webpFileName);
-      fs.unlinkSync(pngFileName);
+      fs.unlinkSync(latestStickerFileWebp);
+      fs.unlinkSync(latestStickerFilePng);
 
     } catch (error) {
       console.error('Error downloading or sending the sticker:', error.message);
       bot.sendMessage(chatId, 'Error downloading or sending the sticker.');
+      
+      // Ensure any partially downloaded or converted files are deleted in case of error
+      if (fs.existsSync(latestStickerFileWebp)) {
+        fs.unlinkSync(latestStickerFileWebp);
+      }
+      if (fs.existsSync(latestStickerFilePng)) {
+        fs.unlinkSync(latestStickerFilePng);
+      }
     }
   } else {
     bot.sendMessage(chatId, 'Please reply to a sticker message to use this command.');
