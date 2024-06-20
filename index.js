@@ -1257,26 +1257,25 @@ bot.onText(/\/getsticker/, async (msg) => {
 
       // Construct the download URL
       const downloadUrl = `https://api.telegram.org/file/bot${bot.token}/${filePath}`;
-      const fileName = path.basename(filePath, path.extname(filePath)) + '.webp';
+      const webpFileName = path.basename(filePath, path.extname(filePath)) + '.webp';
       const pngFileName = path.basename(filePath, path.extname(filePath)) + '.png';
 
       // Download the file
-      const fileStream = fs.createWriteStream(fileName);
       await new Promise((resolve, reject) => {
         request(downloadUrl)
-          .pipe(fileStream)
+          .pipe(fs.createWriteStream(webpFileName))
           .on('finish', resolve)
           .on('error', reject);
       });
 
       // Convert the WebP file to PNG
-      await sharp(fileName).toFile(pngFileName);
+      await sharp(webpFileName).toFile(pngFileName);
 
       // Send the PNG file as a document
       await bot.sendDocument(chatId, pngFileName);
 
       // Remove the files after sending
-      fs.unlinkSync(fileName);
+      fs.unlinkSync(webpFileName);
       fs.unlinkSync(pngFileName);
 
     } catch (error) {
