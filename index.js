@@ -10,6 +10,7 @@ let app = express();
 let TelegramBot = require('node-telegram-bot-api')
 let fs = require('fs')
 const path = require('path');
+const request = require('request'); // Ensure request is imported here
 const sharp = require('sharp');
 let axios = require('axios')
 let {
@@ -1242,7 +1243,6 @@ bot.onText(/\/dev/, async (msg) => {
 
 // to get a sticker as png
 
-
 bot.onText(/\/getsticker/, async (msg) => {
   const chatId = msg.chat.id;
 
@@ -1286,6 +1286,7 @@ bot.onText(/\/getsticker/, async (msg) => {
     bot.sendMessage(chatId, 'Please reply to a sticker message to use this command.');
   }
 });
+
 // bot.onText(/\/getsticker/, async (msg) => {
 //   const chatId = msg.chat.id;
 
