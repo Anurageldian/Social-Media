@@ -1243,9 +1243,9 @@ bot.onText(/\/dev/, async (msg) => {
 
 // to get a sticker as png
 
-// Initialize variables for storing the latest sticker details
-const latestStickerFileWebp = 'sticker.webp';
-const latestStickerFilePng = 'sticker.png';
+// Filenames for the WebP and PNG versions of the sticker
+const webpFileName = 'sticker.webp';
+const pngFileName = 'sticker.png';
 
 bot.onText(/\/getsticker/, async (msg) => {
   const chatId = msg.chat.id;
@@ -1255,41 +1255,56 @@ bot.onText(/\/getsticker/, async (msg) => {
     const fileId = sticker.file_id;
 
     try {
+      console.log('Fetching file path...');
       // Get the file path
       const file = await bot.getFile(fileId);
       const filePath = file.file_path;
+      console.log(`File path: ${filePath}`);
 
       // Construct the download URL
       const downloadUrl = `https://api.telegram.org/file/bot${bot.token}/${filePath}`;
+      console.log(`Download URL: ${downloadUrl}`);
 
       // Download the file
+      console.log('Downloading sticker...');
       const response = await axios({
         url: downloadUrl,
         method: 'GET',
         responseType: 'arraybuffer'
       });
-      fs.writeFileSync(latestStickerFileWebp, response.data);
+      console.log('Sticker downloaded.');
+
+      // Save the WebP file
+      console.log('Saving WebP file...');
+      fs.writeFileSync(webpFileName, response.data);
+      console.log('WebP file saved.');
 
       // Convert the WebP file to PNG
-      await sharp(latestStickerFileWebp).toFile(latestStickerFilePng);
+      console.log('Converting WebP to PNG...');
+      await sharp(webpFileName).toFile(pngFileName);
+      console.log('Conversion complete.');
 
       // Send the PNG file as a document
-      await bot.sendDocument(chatId, latestStickerFilePng);
+      console.log('Sending PNG file...');
+      await bot.sendDocument(chatId, pngFileName);
+      console.log('PNG file sent.');
 
       // Remove the files after sending
-      fs.unlinkSync(latestStickerFileWebp);
-      fs.unlinkSync(latestStickerFilePng);
+      console.log('Cleaning up files...');
+      fs.unlinkSync(webpFileName);
+      fs.unlinkSync(pngFileName);
+      console.log('Files cleaned up.');
 
     } catch (error) {
       console.error('Error downloading or sending the sticker:', error.message);
       bot.sendMessage(chatId, 'Error downloading or sending the sticker.');
-      
+
       // Ensure any partially downloaded or converted files are deleted in case of error
-      if (fs.existsSync(latestStickerFileWebp)) {
-        fs.unlinkSync(latestStickerFileWebp);
+      if (fs.existsSync(webpFileName)) {
+        fs.unlinkSync(webpFileName);
       }
-      if (fs.existsSync(latestStickerFilePng)) {
-        fs.unlinkSync(latestStickerFilePng);
+      if (fs.existsSync(pngFileName)) {
+        fs.unlinkSync(pngFileName);
       }
     }
   } else {
