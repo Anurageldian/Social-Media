@@ -1237,6 +1237,53 @@ bot.onText(/\/dev/, async (msg) => {
   })
 });
 
+
+// Helper function to download the file
+async function downloadFile(fileId, dest) {
+  const file = await bot.getFile(fileId);
+  const url = `https://api.telegram.org/file/bot${bot.token}/${file.file_path}`;
+  
+  return new Promise((resolve, reject) => {
+    const fileStream = fs.createWriteStream(dest);
+    bot.downloadFile(fileId, dest)
+      .then(() => {
+        resolve(dest);
+      })
+      .catch((err) => {
+        reject(err);
+      });
+  });
+}
+
+bot.onText(/\/getsticker/, async (msg) => {
+  const chatId = msg.chat.id;
+  const reply = msg.reply_to_message;
+
+  // Check if the message is a reply to a sticker
+  if (reply && reply.sticker) {
+    const sticker = reply.sticker;
+    const fileId = sticker.file_id;
+    const dest = path.join(__dirname, `${fileId}.webp`);
+
+    try {
+      // Download the sticker file
+      await downloadFile(fileId, dest);
+      
+      // Send the sticker file as a document
+      await bot.sendDocument(chatId, dest, { caption: 'Here is the sticker as a document.' });
+
+      // Clean up the downloaded file
+      fs.unlinkSync(dest);
+    } catch (error) {
+      console.error('Error downloading or sending the sticker:', error.message);
+      bot.sendMessage(chatId, 'Failed to get the sticker. Please try again later.');
+    }
+  } else {
+    bot.sendMessage(chatId, 'Please reply to a sticker with the command to get the sticker as a document.');
+  }
+});
+
+
 // // dev commands message
 // bot.onText(/\/dev/, async (msg) => { // Opening for the /dev command
 //   let chatId = msg.chat.id;
