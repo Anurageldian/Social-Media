@@ -5,7 +5,7 @@ async function getAiResponse(bot, chatId, input, userName) {
   if (!input) return bot.sendMessage(chatId, `Enter your question, example\n/ai what is javascript`);
   try {
     bot.sendChatAction(chatId, 'typing');
-    let { data } = await axios(`https://onlinegpt.org/wp-json/mwai-ui/v1/chats/submit`, {
+    let { data } = await axios(`https://chatgpt-api.shn.hk/v1/`, {
       method: "post",
       data: {
         botId: "default",
