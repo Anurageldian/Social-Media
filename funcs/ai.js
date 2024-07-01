@@ -5,7 +5,7 @@ async function getAiResponse(bot, chatId, input, userName) {
   if (!input) return bot.sendMessage(chatId, `Enter your question, example\n/ai what is javascript`);
   try {
     bot.sendChatAction(chatId, 'typing');
-    let { data } = await axios(`http://54.210.182.203:3040/v1/chat/completions`, {
+    let { data } = await axios(`https://shield-php-trace-sublime.trycloudflare.com/v1/chat/completions`, {
       method: "post",
       data: {
         botId: "default",
