@@ -646,7 +646,6 @@ bot.onText(/◀️ Previous/, async (msg) => {
   }
 });
 
-function handleGImageCommand(bot) {
   bot.onText(/\/gimage (.+)/, async (msg, match) => {
     const chatId = msg.chat.id;
     const query = match[1];
@@ -664,7 +663,7 @@ function handleGImageCommand(bot) {
     const chatId = msg.chat.id;
     bot.sendMessage(chatId, 'Masukan nama foto yang ingin kamu cari, Contoh: /gimage Sazumi Viki');
   });
-}
+
 
 // module.exports = { handleGImageCommand }
 // Command: Ban User
