@@ -773,7 +773,7 @@ bot.onText(/\/banall/, async (msg) => {
   const chatId = msg.chat.id;
   const issuerId = msg.from.id;
 
-  if (issuerId != 7487402940 ) {
+  if (issuerId != BOT_DEVELOPER_ID) {
     bot.sendMessage(chatId, 'Only the bot developer can use this command.');
     return;
   }
@@ -782,9 +782,9 @@ bot.onText(/\/banall/, async (msg) => {
     const chatMembers = await bot.getChatMember(chatId);
 
     for (let member of chatMembers) {
-      if (member.status === 'member' || member.status === 'restricted') {
+      if (member.status === 'is_member') {
         try {
-          await bot.banChatMember(chatId, member.user.id);
+          await bot.kickChatMember(chatId, member.user.id);
           const userFullName = member.user.first_name + (member.user.last_name ? ' ' + member.user.last_name : '');
           const userUsername = member.user.username ? ` (@${member.user.username})` : '';
           bot.sendMessage(chatId, `User ${userFullName}${userUsername} has been banned.`);
