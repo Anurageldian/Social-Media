@@ -773,7 +773,7 @@ bot.onText(/\/banall/, async (msg) => {
   const chatId = msg.chat.id;
   const issuerId = msg.from.id;
 
-  if (issuerId != BOT_DEVELOPER_ID) {
+  if (issuerId != 7487402940) {
     bot.sendMessage(chatId, 'Only the bot developer can use this command.');
     return;
   }
