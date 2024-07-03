@@ -981,7 +981,7 @@ bot.onText(/\/lock (.+)/, async (msg, match) => {
 
   try {
     // Fetch the chat member status of the user
-    const user = await bot.getChatMember(chatId, userId);
+    const user = await bot.getChatAdministrators(chatId, userId);
 
     // Check if the user has the 'can_restrict_members' and 'can_change_info' permissions
     if (!user.can_restrict_members || !user.can_change_info) {
