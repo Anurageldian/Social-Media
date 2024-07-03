@@ -984,7 +984,10 @@ bot.onText(/\/lock (.+)/, async (msg, match) => {
     const user = await bot.getChatMember(chatId, userId);
 
     // Check if the user has the 'can_restrict_members' and 'can_change_info' permissions
-    if (!user.can_restrict_members || !user.can_change_info) {
+     if (
+      user.status !== 'creator' &&
+      (!user.can_restrict_members || !user.can_change_info)
+       ) {
       bot.sendMessage(chatId, 'You need to have the "can restrict members" and "can change info" permissions to lock/unlock settings.');
       return;
     }
