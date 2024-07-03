@@ -671,10 +671,10 @@ bot.onText(/\/ban (.+)/, async (msg, match) => {
     }
 
     // Check if the bot has the 'can_restrict_members' permission
-    if (!botMember.can_restrict_members) {
-      bot.sendMessage(chatId, 'The bot needs to have the "can restrict members" permission to ban users.');
-      return;
-    }
+    // if (!botMember.can_restrict_members) {
+    //   bot.sendMessage(chatId, 'The bot needs to have the "can restrict members" permission to ban users.');
+    //   return;
+    // }
 
     // Ban the user
     try {
