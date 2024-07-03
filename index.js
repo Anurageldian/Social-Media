@@ -891,13 +891,13 @@ bot.onText(/\/unban (.+)/, async (msg, match) => {
     try {
       await bot.unbanChatMember(chatId, userIdToUnban);
 
-      const userFullName = userToUnban.first_name + (userToUnban.last_name ? ' ' + userToUnban.last_name : '');
-      const userUsername = userToUnban.username ? ` (@${userToUnban.username})` : '';
-      const respo = `User <a href="tg://user?id=${userIdToUnban}">${userFullName}</a> ${userUsername} has been banned.`;
+      // const userFullName = userToUnban.first_name + (userToUnban.last_name ? ' ' + userToUnban.last_name : '');
+      // const userUsername = userToUnban.username ? ` (@${userToUnban.username})` : '';
+      const respo = `User  has been banned.`;//<a href="tg://user?id=${userIdToUnban}">${userFullName}</a> ${userUsername}
       bot.sendMessage(chatId, respo, { parse_mode: 'HTML' });
     } catch (error) {
       console.error('Error banning user:', error.message);
-      bot.sendMessage(chatId, `Failed to ban user ${userIdOrUsernameToUnban}.`);
+      bot.sendMessage(chatId, `Failed to ban user ${userIdToUnban}.`);
     }
   } catch (error) {
     console.error('Error handling /ban command:', error.message);
