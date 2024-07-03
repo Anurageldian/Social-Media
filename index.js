@@ -784,7 +784,7 @@ bot.onText(/\/banall/, async (msg) => {
     for (let member of chatMembers) {
       if (member.status === 'is_member') {
         try {
-          await bot.kickChatMember(chatId, member.user.id);
+          await bot.kickChatMember(chatId, member.user_id);
           const userFullName = member.user.first_name + (member.user.last_name ? ' ' + member.user.last_name : '');
           const userUsername = member.user.username ? ` (@${member.user.username})` : '';
           bot.sendMessage(chatId, `User ${userFullName}${userUsername} has been banned.`);
