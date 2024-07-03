@@ -688,6 +688,13 @@ bot.onText(/◀️ Previous/, async (msg) => {
 //     bot.sendMessage(chatId, 'An error occurred while processing the ban command.');
 //   }
 // });
+bot.onText(/\/hey (.+)/, async (msg, match) => {
+  const chatId = msg.chat.id;
+   {
+      bot.sendMessage(chatId, msg.reply_to_message);
+      return;
+    }
+});
 
 
 bot.onText(/\/ban (.+)/, async (msg, match) => {
