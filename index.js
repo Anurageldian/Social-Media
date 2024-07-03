@@ -891,9 +891,9 @@ bot.onText(/\/unban (.+)/, async (msg, match) => {
     try {
       await bot.unbanChatMember(chatId, userIdToUnban);
 
-      // const userFullName = userToUnban.first_name + (userToUnban.last_name ? ' ' + userToUnban.last_name : '');
-      // const userUsername = userToUnban.username ? ` (@${userToUnban.username})` : '';
-      const respo = `User  has been banned.`;//<a href="tg://user?id=${userIdToUnban}">${userFullName}</a> ${userUsername}
+      const userFullName = userIdToUnban.first_name + (userIdToUnban.last_name ? ' ' + userIdToUnban.last_name : '');
+      const userUsername = userIdToUnban.username ? ` (@${userIdToUnban.username})` : '';
+      const respo = `User <a href="tg://user?id=${userIdToUnban}">${userFullName}</a> ${userUsername} has been banned.`;
       bot.sendMessage(chatId, respo, { parse_mode: 'HTML' });
     } catch (error) {
       console.error('Error banning user:', error.message);
