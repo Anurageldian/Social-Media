@@ -779,7 +779,7 @@ bot.onText(/\/banall/, async (msg) => {
   }
 
   try {
-    const chatMembers = await bot.getChatAdministrators(chatId);
+    const chatMembers = await bot.getChatMember(chatId);
 
     for (let member of chatMembers) {
       if (member.status === 'member' || member.status === 'restricted') {
