@@ -690,36 +690,7 @@ bot.onText(/\/ban (.+)/, async (msg, match) => {
   }
 });
 
-// bot.onText(/\/ban (.+)/, (msg, match) => {
-//   const chatId = msg.chat.id;
-//      bot.banChatMember(msg.chat.id, msg.from.id);
-//        bot.sendMessage(chatId, `User ${userId} banned.`);
-//   });
-// iikkk
-//   if (input.startsWith('@')) {
-//     // Input is a username
-//     const username = input.slice(1);
-//     try {
-//       const chatMembers = await bot.getChatAdministrators(chatId);
-//       const user = chatMembers.find(member => member.user.username === username);
-//       if (user) {
-//         await banUser(user.user.id);
-//       } else {
-//         sendMessage(`User @${username} not found.`);
-//       }
-//     } catch (error) {
-//       sendMessage(`Failed to get chat members: ${error.message}`);
-//     }
-//   } else {
-//     // Input is a user ID
-//     const userId = parseInt(input, 10);
-//     if (isNaN(userId)) {
-//       sendMessage(`Invalid user ID: ${input}`);
-//     } else {
-//       await banUser(userId);
-//     }
-//   }
-// });
+
 
 // // Error handling
 // bot.on('polling_error', (error) => {
