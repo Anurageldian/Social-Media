@@ -1057,11 +1057,6 @@ bot.onText(/\/unlock (.+)/, async (msg, match) => {
       return;
     }
 
-    // Check if the bot has the necessary permissions
-    if (!botMember.can_restrict_members || !botMember.can_change_info) {
-      bot.sendMessage(chatId, 'The bot needs to have the "can restrict members" and "can change info" permissions to lock/unlock settings.');
-      return;
-    }
 
     // Define permissions for unlocking specific features
     let permissions = {};
