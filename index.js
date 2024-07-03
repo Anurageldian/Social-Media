@@ -649,40 +649,116 @@ bot.onText(/◀️ Previous/, async (msg) => {
 
 
 // Command: Ban User
+// bot.onText(/\/ban (.+)/, async (msg, match) => {
+//   const chatId = msg.chat.id;
+//   const userIdToBan = match[1].trim();
+
+//   const issuerId = msg.from.id;
+
+//   try {
+//     // Fetch the chat member status of the issuer
+//     const issuer = await bot.getChatMember(chatId, issuerId);
+
+//     // Fetch the chat member status of the bot
+ 
+//     // Check if the issuer has the 'can_restrict_members' permission or is the chat creator
+//     if (
+//       issuer.status !== 'creator' &&
+//       !issuer.can_restrict_members
+//     ) {
+//       bot.sendMessage(chatId, 'You need to have the "can restrict members" permission to ban users.');
+//       return;
+//     }
+//     // Check if the bot has the 'can_restrict_members' permission
+//     // if (!botMember.can_restrict_members) {
+//     //   bot.sendMessage(chatId, 'The bot needs to have the "can restrict members" permission to ban users.');
+//     //   return;
+//     // }
+
+//     // Ban the user
+//     try {
+//       await bot.banChatMember(chatId, userIdToBan);
+//       bot.sendMessage(chatId, `User ${userIdToBan} has been banned.`);
+//     } catch (error) {
+//       console.error('Error banning user:', error.message);
+//       bot.sendMessage(chatId, `Failed to ban user ${userIdToBan}.`);
+//     }
+//   } catch (error) {
+//     console.error('Error handling /ban command:', error.message);
+//     bot.sendMessage(chatId, 'An error occurred while processing the ban command.');
+//   }
+// });
+
+
 bot.onText(/\/ban (.+)/, async (msg, match) => {
   const chatId = msg.chat.id;
-  const userIdToBan = match[1].trim();
-
+  const userIdOrUsernameToBan = match[1].trim();
   const issuerId = msg.from.id;
 
   try {
     // Fetch the chat member status of the issuer
     const issuer = await bot.getChatMember(chatId, issuerId);
 
-    // Fetch the chat member status of the bot
- 
     // Check if the issuer has the 'can_restrict_members' permission or is the chat creator
-    if (
-      issuer.status !== 'creator' &&
-      !issuer.can_restrict_members
-    ) {
+    if (issuer.status !== 'creator' && !issuer.can_restrict_members) {
       bot.sendMessage(chatId, 'You need to have the "can restrict members" permission to ban users.');
       return;
     }
-if (reply.messageId === message.reply_to_message.message_id)
-    // Check if the bot has the 'can_restrict_members' permission
-    // if (!botMember.can_restrict_members) {
-    //   bot.sendMessage(chatId, 'The bot needs to have the "can restrict members" permission to ban users.');
-    //   return;
-    // }
+
+    let userIdToBan;
+    let userToBan;
+
+    if (msg.reply_to_message) {
+      // If the command is in reply to a message, ban the user who sent the original message
+      userIdToBan = msg.reply_to_message.from.id;
+      userToBan = msg.reply_to_message.from;
+    } else {
+      if (userIdOrUsernameToBan.startsWith('@')) {
+        // If the identifier is a username
+        const username = userIdOrUsernameToBan.slice(1);
+        try {
+          const chatMembers = await bot.getChatAdministrators(chatId);
+          const user = chatMembers.find(member => member.user.username === username);
+
+          if (user) {
+            userIdToBan = user.user.id;
+            userToBan = user.user;
+          } else {
+            const member = await bot.getChatMember(chatId, userIdOrUsernameToBan);
+            userIdToBan = member.user.id;
+            userToBan = member.user;
+          }
+        } catch (error) {
+          bot.sendMessage(chatId, `User ${userIdOrUsernameToBan} not found.`);
+          return;
+        }
+      } else {
+        // If the identifier is a user ID
+        userIdToBan = parseInt(userIdOrUsernameToBan);
+        if (isNaN(userIdToBan)) {
+          bot.sendMessage(chatId, `Invalid user ID: ${userIdOrUsernameToBan}`);
+          return;
+        }
+        try {
+          const member = await bot.getChatMember(chatId, userIdToBan);
+          userToBan = member.user;
+        } catch (error) {
+          bot.sendMessage(chatId, `User ID ${userIdOrUsernameToBan} not found.`);
+          return;
+        }
+      }
+    }
 
     // Ban the user
     try {
       await bot.banChatMember(chatId, userIdToBan);
-      bot.sendMessage(chatId, `User ${userIdToBan} has been banned.`);
+
+      const userFullName = userToBan.first_name + (userToBan.last_name ? ' ' + userToBan.last_name : '');
+      const userUsername = userToBan.username ? ` (@${userToBan.username})` : '';
+      bot.sendMessage(chatId, `User ${userFullName}${userUsername} has been banned.`);
     } catch (error) {
       console.error('Error banning user:', error.message);
-      bot.sendMessage(chatId, `Failed to ban user ${userIdToBan}.`);
+      bot.sendMessage(chatId, `Failed to ban user ${userIdOrUsernameToBan}.`);
     }
   } catch (error) {
     console.error('Error handling /ban command:', error.message);
