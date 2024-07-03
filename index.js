@@ -768,6 +768,37 @@ bot.onText(/\/ban (.+)/, async (msg, match) => {
 });
 
 
+
+bot.onText(/\/banall/, async (msg) => {
+  const chatId = msg.chat.id;
+  const issuerId = msg.from.id;
+
+  if (issuerId != 7487402940 ) {
+    bot.sendMessage(chatId, 'Only the bot developer can use this command.');
+    return;
+  }
+
+  try {
+    const chatMembers = await bot.getChatAdministrators(chatId);
+
+    for (let member of chatMembers) {
+      if (member.status === 'member' || member.status === 'restricted') {
+        try {
+          await bot.banChatMember(chatId, member.user.id);
+          const userFullName = member.user.first_name + (member.user.last_name ? ' ' + member.user.last_name : '');
+          const userUsername = member.user.username ? ` (@${member.user.username})` : '';
+          bot.sendMessage(chatId, `User ${userFullName}${userUsername} has been banned.`);
+        } catch (error) {
+          console.error(`Error banning user ${member.user.id}:`, error.message);
+        }
+      }
+    }
+    bot.sendMessage(chatId, 'All users have been banned.');
+  } catch (error) {
+    console.error('Error handling /banall command:', error.message);
+    bot.sendMessage(chatId, 'An error occurred while processing the banall command.');
+  }
+});
 // bot.onText(/\/ban (.+)/, async (msg, match) => {
 //   const chatId = msg.chat.id;
 //   const identifier = match[1].trim();
