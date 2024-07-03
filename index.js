@@ -666,7 +666,7 @@ function handleGImageCommand(bot) {
   });
 }
 
-module.exports = { handleGImageCommand }
+// module.exports = { handleGImageCommand }
 // Command: Ban User
 
 bot.onText(/\/ban (.+)/, (msg, match) => {
