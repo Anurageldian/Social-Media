@@ -711,7 +711,7 @@ bot.onText(/\/ban (.+)/, async (msg, match) => {
     if (identifier.startsWith('@')) {
       // Fetch user info by username
       const username = identifier.slice(1); // Remove '@' from the beginning
-      const chatMembers = await bot.getChatAdministrators(chatId);
+      const chatMembers = await bot.getChatMember(chatId);
 
       const user = chatMembers.find(member => member.user.username === username);
       if (user) {
