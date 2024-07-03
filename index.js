@@ -696,7 +696,7 @@ bot.onText(/\/hey (.+)/, async (msg, match) => {
   }
   
       await bot.sendMessage(msg.chat.id, msg.reply_to_message, msg.from.id);
-    
+  }
 });
 
 
