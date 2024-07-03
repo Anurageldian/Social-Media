@@ -691,6 +691,7 @@ bot.onText(/◀️ Previous/, async (msg) => {
 // });
 
 
+
 bot.onText(/\/ban (.+)/, async (msg, match) => {
   const chatId = msg.chat.id;
   const identifier = match[1].trim();
@@ -706,18 +707,31 @@ bot.onText(/\/ban (.+)/, async (msg, match) => {
       return;
     }
 
-    // Determine if the identifier is a user ID or a username
     let userIdToBan;
-    if (identifier.startsWith('@')) {
-      // Fetch user info by username
-      const username = identifier.slice(1); // Remove '@' from the beginning
-      const chatMembers = await bot.getChatMember(chatId);
 
-      const user = chatMembers.find(member => member.user.username === username);
-      if (user) {
-        userIdToBan = user.user.id;
-      } else {
-        bot.sendMessage(chatId, `User ${identifier} not found.`);
+    // Determine if the identifier is a user ID or a username
+    if (identifier.startsWith('@')) {
+      const username = identifier.slice(1); // Remove '@' from the beginning
+
+      // Attempt to find the user in the chat by their username
+      try {
+        const chatMembers = await bot.getChatAdministrators(chatId);
+        const user = chatMembers.find(member => member.user.username === username);
+
+        if (user) {
+          userIdToBan = user.user.id;
+        } else {
+          // If not found in the administrators list, try to get the user from the chat
+          try {
+            const member = await bot.getChatMember(chatId, username);
+            userIdToBan = member.user.id;
+          } catch (error) {
+            bot.sendMessage(chatId, `User ${identifier} not found.`);
+            return;
+          }
+        }
+      } catch (error) {
+        bot.sendMessage(chatId, `Failed to find user ${identifier}.`);
         return;
       }
     } else {
