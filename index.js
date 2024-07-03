@@ -729,12 +729,12 @@ bot.onText(/\/ban (.+)/, async (msg, match) => {
           const user = chatMembers.find(member => member.user.username === username);
 
           if (user) {
-            userIdToBan = user.user.id;
+            userIdToBan = user.user_id;
           } else {
             // Try fetching the user details from the chat members if not found among admins
             try {
               const member = await bot.getChatMember(chatId, identifier);
-              userIdToBan = member.user.id;
+              userIdToBan = member.user_id;
             } catch (error) {
               bot.sendMessage(chatId, `User ${identifier} not found.`);
               return;
