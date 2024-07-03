@@ -1038,6 +1038,75 @@ bot.onText(/\/lock (.+)/, async (msg, match) => {
 
 
 
+bot.onText(/\/unlock (.+)/, async (msg, match) => {
+  const chatId = msg.chat.id;
+  const unlockTarget = match[1].trim().toLowerCase();
+  const userId = msg.from.id;
+
+  try {
+    // Fetch the chat member status of the user
+      const user = await bot.getChatMember(chatId, userId);
+    
+
+    // Check if the user is the creator or has the 'can_restrict_members' and 'can_change_info' permissions
+    if (
+      user.status !== 'creator' &&
+      (!user.can_restrict_members || !user.can_change_info)
+    ) {
+      bot.sendMessage(chatId, 'You need to have the "can restrict members" and "can change info" permissions to lock/unlock settings.');
+      return;
+    }
+
+    // Check if the bot has the necessary permissions
+    if (!botMember.can_restrict_members || !botMember.can_change_info) {
+      bot.sendMessage(chatId, 'The bot needs to have the "can restrict members" and "can change info" permissions to lock/unlock settings.');
+      return;
+    }
+
+    // Define permissions for unlocking specific features
+    let permissions = {};
+
+    if (unlockTarget === 'all') {
+      permissions = {
+        can_send_messages: true,
+        can_send_media_messages: true,
+        can_send_polls: true,
+        can_send_other_messages: true,
+        can_add_web_page_previews: true
+        can_invite_users: true,
+        can_pin_messages: true
+      };
+    } else if (unlockTarget === 'sticker') {
+      permissions = {
+        can_send_messages: true,
+        can_send_media_messages: true,
+        can_send_polls: true,
+        can_send_other_messages: true, // Stickers and GIFs
+        can_add_web_page_previews: true,
+        can_change_info: true,
+        can_invite_users: true,
+        can_pin_messages: true
+      };
+    } else {
+      bot.sendMessage(chatId, `Unknown unlock target: ${unlockTarget}`);
+      return;
+    }
+
+    // Update chat permissions
+    try {
+      await bot.setChatPermissions(chatId, permissions);
+      bot.sendMessage(chatId, `Successfully Unlocked ${unlockTarget}.`);
+    } catch (error) {
+      console.error('Error setting chat permissions:', error.message);
+      bot.sendMessage(chatId, `Failed to Unlock ${unlockTarget}.`);
+    }
+  } catch (error) {
+    console.error('Error handling /unlock command:', error.message);
+    bot.sendMessage(chatId, 'An error occurred while processing the unlock command.');
+  }
+});
+
+
 
 
 
