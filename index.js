@@ -660,9 +660,7 @@ bot.onText(/\/ban (.+)/, async (msg, match) => {
     const issuer = await bot.getChatMember(chatId, issuerId);
 
     // Fetch the chat member status of the bot
-    const botInfo = await bot.getMe();
-    const botMember = await bot.getChatMember(chatId, botInfo.id);
-
+ 
     // Check if the issuer has the 'can_restrict_members' permission or is the chat creator
     if (
       issuer.status !== 'creator' &&
@@ -680,7 +678,7 @@ bot.onText(/\/ban (.+)/, async (msg, match) => {
 
     // Ban the user
     try {
-      await bot.kickChatMember(chatId, userIdToBan);
+      await bot.banChatMember(chatId, userIdToBan);
       bot.sendMessage(chatId, `User ${userIdToBan} has been banned.`);
     } catch (error) {
       console.error('Error banning user:', error.message);
