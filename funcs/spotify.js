@@ -54,7 +54,6 @@ function convertMs(duration) {
 
 
 const nodeID3 = require("node-id3")
-const axios = require("axios")
 const cheerio = require("cheerio")
 const fetch = require("node-fetch")
 const spot = require("@nechlophomeriaa/spotify-finder")
