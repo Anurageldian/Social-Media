@@ -22,10 +22,9 @@ https://api.spotifydown.com
 
 async function spotifyScraper(id, endpoint) {
   try {
-    let { data } = await axios.get(`https://spotify-downloader1.p.rapidapi.com/${endpoint}/${id}`, {
+    let { data } = await axios.get(`https://api.apilayer.com/spotify/${endpoint}/${id}`, {
       headers: {
-    'x-rapidapi-key': '71e7181e32msh0ac99a0981956dep1b53c3jsndfd86aca48c7',
-    'x-rapidapi-host': 'spotify-downloader1.p.rapidapi.com'
+    'apikey': 'Ap4iv4tWyxevIVeX0DMW5W4b7G8YHI1h'
   }
     })
     return data
