@@ -21,24 +21,40 @@ https://api.spotifydown.com
 */
 
 async function spotifyScraper(id, endpoint) {
-  try {
-    let {data} = await axios.get(
-      `https://spotify-downloader1.p.rapidapi.com/${endpoint}/${id}`,
-      {
-         headers: {
+  const options = {
+  method: 'GET',
+  url: 'https://spotify-downloader1.p.rapidapi.com/trackList/album/6lggWd5q9Rh66OkDE1eNDr',
+  headers: {
     'x-rapidapi-key': '71e7181e32msh0ac99a0981956dep1b53c3jsndfd86aca48c7',
     'x-rapidapi-host': 'spotify-downloader1.p.rapidapi.com'
-      }
-        // headers: {
-        //   Origin: "https://spotifydown.com",
-        //   Referer: "https://spotifydown.com/",
-        // }
-      })
-    return data
-  } catch (err) {
-    return "Error: " + err
   }
+};
+
+try {
+	const response = await axios.request(options);
+  return options
+	console.log(response.data);
+} catch (error) {
+	console.error(error);
 }
+//   try {
+//     let {data} = await axios.get(
+//       `https://spotify-downloader1.p.rapidapi.com/${endpoint}/${id}`,
+//       {
+//          headers: {
+//     'x-rapidapi-key': '71e7181e32msh0ac99a0981956dep1b53c3jsndfd86aca48c7',
+//     'x-rapidapi-host': 'spotify-downloader1.p.rapidapi.com'
+//       }
+//         // headers: {
+//         //   Origin: "https://spotifydown.com",
+//         //   Referer: "https://spotifydown.com/",
+//         // }
+//       })
+//     return data
+//   } catch (err) {
+//     return "Error: " + err
+//   }
+// }
 
 async function getPlaylistSpotify(bot, chatId, url, userName) {
   let pars = await parse(url)
