@@ -55,7 +55,7 @@ function convertMs(duration) {
 
 const nodeID3 = require('node-id3')
 const cheerio = require("cheerio")
-let fetch = require('node-fetch')
+let fetch = import('node-fetch')
 const spot = require('@nechlophomeriaa/spotify-finder')
 const spotify = new spot({
   consumer: {
