@@ -23,9 +23,9 @@ https://spotify-downloader1.p.rapidapi.com
 async function spotifyScraper(id, endpoint) {
   const options = {
     method: 'GET',
-    url: `https://spotify-downloader1.p.rapidapi.com/${endpoint}/${id}`,
+    url: `https://spotify-downloader1.p.rapidapi.com/download/${endpoint}/${id}`,
     headers: {
-      'x-rapidapi-key': process.env.RAPIDAPI_KEY,
+      'x-rapidapi-key': '71e7181e32msh0ac99a0981956dep1b53c3jsndfd86aca48c7',
       'x-rapidapi-host': 'spotify-downloader1.p.rapidapi.com'
     }
   };
