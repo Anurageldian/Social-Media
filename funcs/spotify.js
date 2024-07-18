@@ -23,12 +23,16 @@ https://api.spotifydown.com
 async function spotifyScraper(id, endpoint) {
   try {
     let {data} = await axios.get(
-      `https://api.spotifydown.com/${endpoint}/${id}`,
+      `https://spotify-downloader1.p.rapidapi.com/${endpoint}/${id}`,
       {
-        headers: {
-          Origin: "https://spotifydown.com",
-          Referer: "https://spotifydown.com/",
-        }
+         headers: {
+    'x-rapidapi-key': '71e7181e32msh0ac99a0981956dep1b53c3jsndfd86aca48c7',
+    'x-rapidapi-host': 'spotify-downloader1.p.rapidapi.com'
+      }
+        // headers: {
+        //   Origin: "https://spotifydown.com",
+        //   Referer: "https://spotifydown.com/",
+        // }
       })
     return data
   } catch (err) {
