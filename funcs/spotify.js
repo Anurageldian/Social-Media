@@ -28,7 +28,9 @@ async function spotifyScraper(id, endpoint) {
     'x-rapidapi-host': 'spotify-downloader1.p.rapidapi.com'
   }
     })
+    const response = await axios.request(data);
     return data
+	console.log(response.data);
   } catch (err) {
     return 'Error: ' + err
   }
