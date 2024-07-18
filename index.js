@@ -27,18 +27,9 @@ let {
   downloadTwitterAudio
 } = require('./funcs/twitter')
 let {
-     
-  tags,
-  convertMs,
-  tags2,
-  getOriginalUrl,
-  search,
-  downloads,
-  downloadTrack,
-  downloadAlbum,
-  downloads2,
-  downloadAlbum2,
-  downloadTrack2
+ getPlaylistSpotify,
+  getAlbumsSpotify,
+  getSpotifySong
 } = require('./funcs/spotify')
 let {
   downloadInstagram
@@ -472,9 +463,6 @@ bot.onText(/(https?:\/\/)?(www\.)?(pinterest\.ca|pinterest\.?com|pin\.?it)\/.+/,
     userLocks[userId] = false;
   }
 })
-function isUrl(url) {
-  return url.match(new RegExp(/https?:\/\/(www\.)?[-a-zA-Z0-9@:%._+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_+.~#?&/=]*)/gi))
-}
 
 // Spotify Track Regex
 bot.onText(/(https?:\/\/)?(www\.)?(open\.spotify\.com|spotify\.?com)\/track\/.+/, async (msg, match) => {
@@ -487,7 +475,7 @@ bot.onText(/(https?:\/\/)?(www\.)?(open\.spotify\.com|spotify\.?com)\/track\/.+/
   userLocks[userId] = true;
   try {
     await bot.sendMessage(String(process.env.DEV_ID), `[ Usage Log ]\n◇ FIRST NAME : ${msg.from.first_name ? msg.from.first_name : "-"}\n◇ LAST NAME : ${msg.from.last_name ? msg.from.last_name : "-"}\n◇ USERNAME : ${msg.from.username ? "@" + msg.from.username : "-"}\n◇ ID : ${msg.from.id}\n\nContent: ${msg.text.slice(0, 1000)}`, { disable_web_page_preview: true })
-    await downloads(bot, msg.chat.id, match[0], msg.chat.username)
+    await getSpotifySong(bot, msg.chat.id, match[0], msg.chat.username)
   } finally {
     userLocks[userId] = false;
   }
@@ -504,7 +492,7 @@ bot.onText(/(https?:\/\/)?(www\.)?(open\.spotify\.com|spotify\.?com)\/album\/.+/
   userLocks[userId] = true;
   try {
     await bot.sendMessage(String(process.env.DEV_ID), `[ Usage Log ]\n◇ FIRST NAME : ${msg.from.first_name ? msg.from.first_name : "-"}\n◇ LAST NAME : ${msg.from.last_name ? msg.from.last_name : "-"}\n◇ USERNAME : ${msg.from.username ? "@" + msg.from.username : "-"}\n◇ ID : ${msg.from.id}\n\nContent: ${msg.text.slice(0, 1000)}`, { disable_web_page_preview: true })
-    await downloadAlbum2(bot, msg.chat.id, match[0], msg.chat.username)
+    await getAlbumsSpotify(bot, msg.chat.id, match[0], msg.chat.username)
   } finally {
     userLocks[userId] = false;
   }
@@ -523,7 +511,7 @@ bot.onText(/(https?:\/\/)?(www\.)?(open\.spotify\.com|spotify\.?com)\/playlist\/
   userLocks[userId] = true;
   try {
     await bot.sendMessage(String(process.env.DEV_ID), `[ Usage Log ]\n◇ FIRST NAME : ${msg.from.first_name ? msg.from.first_name : "-"}\n◇ LAST NAME : ${msg.from.last_name ? msg.from.last_name : "-"}\n◇ USERNAME : ${msg.from.username ? "@" + msg.from.username : "-"}\n◇ ID : ${msg.from.id}\n\nContent: ${msg.text.slice(0, 1000)}`, { disable_web_page_preview: true })
-    await downloadTrack(bot, msg.chat.id, match[0], msg.chat.username)
+    await getPlaylistSpotify(bot, msg.chat.id, match[0], msg.chat.username)
   } finally {
     userLocks[userId] = false;
   }
