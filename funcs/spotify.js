@@ -21,12 +21,16 @@ https://api.spotifydown.com
 */
 
 async function spotifyScraper(id, endpoint) {
+  var myHeaders = new Headers();
+myHeaders.append("apikey", "Ap4iv4tWyxevIVeX0DMW5W4b7G8YHI1h");
+
+var requestOptions = {
+  method: 'GET',
+  redirect: 'follow',
+  headers: myHeaders
+};
   try {
-    let { data } = await axios.get(`https://api.apilayer.com/spotify/${endpoint}?id=${id}`, {
-      headers: {
-    'apikey': 'Ap4iv4tWyxevIVeX0DMW5W4b7G8YHI1h'
-  }
-    })
+    let { data } = await axios.get(`https://api.apilayer.com/spotify/${endpoint}?id=${id}`, requestOptions)
     return data
   } catch (err) {
     return 'Error: ' + err
