@@ -31,7 +31,7 @@ async function spotifyScraper(id, endpoint) {
   };
 
   try {
-    const { data } = await axios.request(options);
+    const { data } = await axios.get(options);
     if (!data.success) {
       throw new Error(data.message || "Unknown error occurred");
     }
