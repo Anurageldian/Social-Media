@@ -22,7 +22,7 @@ https://api.spotifydown.com
 
 async function spotifyScraper(id, endpoint) {
   try {
-    let { data } = await axios.get(`https://api.apilayer.com/spotify/${endpoint}/${id}`, {
+    let { data } = await axios.get(`https://api.apilayer.com/spotify/${endpoint}?id=${id}`, {
       headers: {
     'apikey': 'Ap4iv4tWyxevIVeX0DMW5W4b7G8YHI1h'
   }
