@@ -91,7 +91,7 @@ async function getSpotifySong(bot, chatId, url, userName) {
         await bot.editMessageText(`Downloading song ${getdata.metadata.title} - ${getdata.metadata.artists}, please wait...`, { chat_id: chatId, message_id: load.message_id })
         let buff = await getBuffer(getdata.link);
         await fs.writeFileSync('content/'+fname, buff);
-        await bot.sendAudio(chatId, 'content/'+fname, { caption: `Success download song ${getdata.metadata.title} - ${getdata.metadata.artists}`});
+        await bot.sendAudio(chatId, 'content/'+fname, { caption: `~ ${getdata.metadata.title} - ${getdata.metadata.artists}`});
         await bot.deleteMessage(chatId, load.message_id);
         await fs.unlinkSync('content/'+fname);
       } else {
@@ -113,7 +113,7 @@ async function getSpotifySong(bot, chatId, url, userName) {
     }
   } catch (err) {
     await bot.sendMessage(String(process.env.DEV_ID), `[ ERROR MESSAGE ]\n\n• Username: @${userName}\n• File: funcs/spotify.js\n• Function: getSpotifySong()\n• Url: ${url}\n\n${err}`.trim());
-    return bot.editMessageText('Failed to download song!', { chat_id: chatId, message_id: load.message_id })
+    return bot.editMessageText('~ Failed to download song!', { chat_id: chatId, message_id: load.message_id })
   }
 }
 
