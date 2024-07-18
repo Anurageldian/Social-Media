@@ -27,9 +27,18 @@ let {
   downloadTwitterAudio
 } = require('./funcs/twitter')
 let {
-  getPlaylistSpotify,
-  getAlbumsSpotify,
-  getSpotifySong
+ isUrl,
+  tags,
+  convertMs,
+  tags2,
+  getOriginalUrl,
+  search,
+  downloads,
+  downloadTrack,
+  downloadAlbum,
+  downloads2,
+  downloadAlbum2,
+  downloadTrack2
 } = require('./funcs/spotify')
 let {
   downloadInstagram
