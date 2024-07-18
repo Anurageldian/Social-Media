@@ -9,9 +9,6 @@ const { getBuffer, filterAlphanumericWithDash } = require('./functions');
 const fs = require('fs');
 
 
-function isUrl(url) {
-  return url.match(new RegExp(/https?:\/\/(www\.)?[-a-zA-Z0-9@:%._+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_+.~#?&/=]*)/gi))
-}
 
 function tags2(title, artist, year, album, image) {
   const result = {
