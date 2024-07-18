@@ -413,7 +413,8 @@ async function downloadTrack(song) {
   }
 }
 
-module.exports = isUrl,
+module.exports = {
+  isUrl,
   tags,
   convertMs,
   tags2,
