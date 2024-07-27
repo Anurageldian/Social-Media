@@ -604,14 +604,21 @@ async function fetchStickers(searchTerm, page) {
 }
 
 
+const { generateInstantViewUrl } = require('./funcs/instantView');
 
+// Command to generate Instant View URL
 bot.onText(/\/iv (.+)/, async (msg, match) => {
   const chatId = msg.chat.id;
   const url = match[1].trim();
 
   try {
     const result = await generateInstantViewUrl(url);
-    const message = `Instant View URL:\n${result.instantViewUrl}`;
+    const message = `
+Title: ${result.title}
+Description: ${result.description}
+Image URL: ${result.imageUrl}
+Site Name: ${result.siteName}
+Instant View URL: ${result.instantViewUrl}`;
     await bot.sendMessage(chatId, message);
   } catch (err) {
     console.error('Error generating Instant View URL:', err);
