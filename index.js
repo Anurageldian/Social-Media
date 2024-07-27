@@ -610,29 +610,12 @@ bot.onText(/\/iv (.+)/, async (msg, match) => {
   const url = match[1].trim();
 
   try {
-    const { generateTpl } = await import('./funcs/instantView.js');
-    const result = await generateTpl(url);
-    const message = `Instant View Template:\n\n${result.tpl}`;
+    const result = await generateInstantViewUrl(url);
+    const message = `Instant View URL:\n${result.instantViewUrl}`;
     await bot.sendMessage(chatId, message);
   } catch (err) {
-    console.error('Error generating Instant View template:', err);
-    await bot.sendMessage(chatId, 'Failed to generate Instant View template.');
-  }
-})
-
-// Optional: command to get HTML content (for debugging or additional features)
-bot.onText(/\/html (.+)/, async (msg, match) => {
-  const chatId = msg.chat.id;
-  const url = match[1].trim();
-
-  try {
-    const { getHTML } = await import('./funcs/instantView.js');
-    const htmlContent = await getHTML(url);
-    const message = `HTML Content:\n\nBody Classes: ${htmlContent.bodyClasses}\n\nInline CSS:\n${htmlContent['inline-css']?.join('\n') || 'None'}\n\nLink CSS:\n${htmlContent['link-css']?.join('\n') || 'None'}`;
-    await bot.sendMessage(chatId, message);
-  } catch (err) {
-    console.error('Error fetching HTML content:', err);
-    await bot.sendMessage(chatId, 'Failed to fetch HTML content.');
+    console.error('Error generating Instant View URL:', err);
+    await bot.sendMessage(chatId, 'Failed to generate Instant View URL.');
   }
 })
 
