@@ -3,10 +3,13 @@ const axios = require('axios');
 const cheerio = require('cheerio');
 const fs = require('fs');
 const util = require('util');
-const fetch = require('node-fetch');
+const cheerio = require('cheerio');
 
 async function generateInstantViewUrl(url) {
   try {
+    // Dynamically import node-fetch
+    const fetch = (await import('node-fetch')).default;
+
     // Fetch the HTML content of the URL
     const res = await fetch(url, { headers: { 'User-Agent': 'Web/2.0' } });
     const body = await res.text();
