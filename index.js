@@ -15,10 +15,6 @@ const request = require('request'); // Ensure request is imported here
 const sharp = require('sharp');
 let axios = require('axios')
 let {
-  getHTML,
-  generateTpl
-} = require('./funcs/instantView')
-let {
   getTiktokInfo,
   tiktokVideo,
   tiktokAudio,
@@ -607,11 +603,14 @@ async function fetchStickers(searchTerm, page) {
   }
 }
 
+
+
 bot.onText(/\/iv (.+)/, async (msg, match) => {
   const chatId = msg.chat.id;
   const url = match[1].trim();
 
   try {
+    const { generateTpl } = await import('./funcs/instantView.js');
     const result = await generateTpl(url);
     const message = `Instant View Template:\n\n${result.tpl}`;
     await bot.sendMessage(chatId, message);
@@ -627,6 +626,7 @@ bot.onText(/\/html (.+)/, async (msg, match) => {
   const url = match[1].trim();
 
   try {
+    const { getHTML } = await import('./funcs/instantView.js');
     const htmlContent = await getHTML(url);
     const message = `HTML Content:\n\nBody Classes: ${htmlContent.bodyClasses}\n\nInline CSS:\n${htmlContent['inline-css']?.join('\n') || 'None'}\n\nLink CSS:\n${htmlContent['link-css']?.join('\n') || 'None'}`;
     await bot.sendMessage(chatId, message);
@@ -634,8 +634,7 @@ bot.onText(/\/html (.+)/, async (msg, match) => {
     console.error('Error fetching HTML content:', err);
     await bot.sendMessage(chatId, 'Failed to fetch HTML content.');
   }
-});
-
+})
 
 // /stickers command
 bot.onText(/\/stickers (.+)/, async (msg, match) => {
