@@ -14,7 +14,10 @@ const path = require('path');
 const request = require('request'); // Ensure request is imported here
 const sharp = require('sharp');
 let axios = require('axios')
-const { getHTML, generateTpl } = require('./funcs/instantView');
+let {
+  getHTML,
+  generateTpl
+} = require('./funcs/instantView')
 let {
   getTiktokInfo,
   tiktokVideo,
