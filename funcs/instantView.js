@@ -23,7 +23,7 @@ async function generateInstantViewUrl(url) {
 
     // Construct the Instant View URL
     // Note: Replace YOUR_TELEGRAM_RHASH with your actual rhash value
-    let instantViewUrl = `https://t.me/iv?url=${encodeURIComponent(url)}&rhash=YOUR_TELEGRAM_RHASH`;
+    let instantViewUrl = `https://t.me/iv?url=${encodeURIComponent(url)}&rhash=34`;
 
     return {
       title,
