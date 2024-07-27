@@ -3,9 +3,9 @@ const axios = require('axios');
 const cheerio = require('cheerio');
 const fs = require('fs');
 const util = require('util');
-const fetch = require('node-fetch');
 
 async function getHTML(url) {
+  const fetch = (await import('node-fetch')).default;
   url = encodeURI(url);
   const res = await fetch(url, { headers: { 'User-Agent': 'Web/2.0' } });
   const body = await res.text();
@@ -42,6 +42,7 @@ async function getHTML(url) {
 }
 
 async function generateTpl(url) {
+  const fetch = (await import('node-fetch')).default;
   url = encodeURI(url);
   const res = await fetch(url, { headers: { 'User-Agent': 'Web/2.0' } });
   const body = await res.text();
