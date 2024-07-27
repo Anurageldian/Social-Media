@@ -1,4 +1,8 @@
+require('dotenv').config()
+const axios = require('axios');
 const cheerio = require('cheerio');
+const fs = require('fs');
+const util = require('util');
 const fetch = require('node-fetch');
 
 async function getHTML(url) {
