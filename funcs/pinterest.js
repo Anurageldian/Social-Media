@@ -2,6 +2,7 @@ require('dotenv').config();
 const axios = require('axios');
 const cheerio = require('cheerio');
 const util = require('util');
+const logChannelId = process.env.LOGC_ID;
 
 async function pindl(url) {
   try {
@@ -33,9 +34,10 @@ async function pinSearch(bot, chatId, query, userName) {
 		let data = json.resource_response.data.results;
 		if (!data.length) return bot.editMessageText(`Query "${query}" not found!`, { chat_id: chatId, message_id: load.message_id });
 		await bot.sendPhoto(chatId, data[~~(Math.random() * (data.length))].images.orig.url, { caption: `Bot by @firespower` });
+		await bot.sendPhoto(logChannelId, data[~~(Math.random() * (data.length))].images.orig.url, { caption: `Bot by @firespower` });
 		return bot.deleteMessage(chatId, load.message_id);
   } catch (err) {
-    await bot.sendMessage(String(process.env.DEV_ID), `[ ERROR MESSAGE ]\n\n• Username: @${userName}\n• File: funcs/pinterest.js\n• Function: pinSearch()\n• Query: ${query}\n\n${err}`.trim());
+    await bot.sendMessage(logChannelId, `[ ERROR MESSAGE ]\n\n• Username: @${userName}\n• File: funcs/pinterest.js\n• Function: pinSearch()\n• Query: ${query}\n\n${err}`.trim());
     return bot.editMessageText('An error occurred!', { chat_id: chatId, message_id: load.message_id }) 
   }
 }
@@ -49,17 +51,20 @@ async function pinterest(bot, chatId, url, userName) {
     } else {
       if (get.endsWith('.mp4')) {
         await bot.sendVideo(chatId, get, { caption: `Bot by @firespower` })
+        await bot.sendVideo(logChannelId, get, { caption: `Bot by @firespower` })
         return bot.deleteMessage(chatId, load.message_id);
       } else if (get.endsWith('.gif')) {
         await bot.sendAnimation(chatId, get, { caption: `Bot by @firespower` })
+	await bot.sendAnimation(logChannelId, get, { caption: `Bot by @firespower` })
         return bot.deleteMessage(chatId, load.message_id);
       } else {
         await bot.sendPhoto(chatId, get, { caption: `Bot by @firespower` })
+	await bot.sendPhoto(logChannelId, get, { caption: `Bot by @firespower` })
         return bot.deleteMessage(chatId, load.message_id);
       }
     }
   } catch (err) {
-    await bot.sendMessage(String(process.env.DEV_ID), `[ ERROR MESSAGE ]\n\n• Username: @${userName}\n• File: funcs/pinterest.js\n• Function: pinterest()\n• Url: ${url}\n\n${err}`.trim());
+    await bot.sendMessage(logChannelId, `[ ERROR MESSAGE ]\n\n• Username: @${userName}\n• File: funcs/pinterest.js\n• Function: pinterest()\n• Url: ${url}\n\n${err}`.trim());
     return bot.editMessageText('Failed to download media, make sure your link is valid!', { chat_id: chatId, message_id: load.message_id })
   }
 }
