@@ -1,5 +1,6 @@
 require('dotenv').config();
 const req = require("request-promise")
+const logChannelId = process.env.LOGC_ID;
 
 const _required = (variable) => {
   if (variable === "" || variable === undefined) {
