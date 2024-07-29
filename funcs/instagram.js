@@ -86,7 +86,7 @@ async function downloadInstagram(bot, chatId, url, userName, messageId) {
 
         await bot.deleteMessage(chatId, load.message_id)
       }
-    }
+    
   } catch (err) {
     await bot.sendMessage(logChannelId, `[ ERROR MESSAGE ]\n\n• Username: @${userName}\n• File: funcs/instagram.js\n• Function: downloadInstagram()\n• Url: ${url}\n\n${err}`.trim());
     return bot.editMessageText('An error occurred, make sure your Instagram link is valid!', { chat_id: chatId, message_id: load.message_id })
