@@ -88,6 +88,7 @@ let {
 let userLocks = {};
 let userLocksText = {};
 let userLocksImage = {}
+const logChannelId = process.env.LOGC_ID
 let token = process.env.TOKEN
 let bot = new TelegramBot(token, {
   polling: true
@@ -153,7 +154,7 @@ bot.on('photo', async (msg) => {
     // };
     return bot.sendPhoto(chatId, `${write}`, options)
   } catch (err) {
-    return bot.sendMessage(String(process.env.LOGC_ID), `Error Image Process: ${err}`);
+    return bot.sendMessage(, `Error Image Process: ${err}`);
   }
 });
 
@@ -335,7 +336,7 @@ bot.onText(/\/ai/, async (msg) => {
   }
   userLocksText[userId] = true;
   try {
-    await bot.sendMessage(String(process.env.LOGC_ID), `[ Usage Log ]\n◇ FIRST NAME : ${msg.from.first_name ? msg.from.first_name : "-"}\n◇ LAST NAME : ${msg.from.last_name ? msg.from.last_name : "-"}\n◇ USERNAME : ${msg.from.username ? "@" + msg.from.username : "-"}\n◇ ID : ${msg.from.id}\n\nContent: ${msg.text.slice(0, 1000)}`, { disable_web_page_preview: true })
+    await bot.sendMessage(logChannelId, `[ Usage Log ]\n◇ FIRST NAME : ${msg.from.first_name ? msg.from.first_name : "-"}\n◇ LAST NAME : ${msg.from.last_name ? msg.from.last_name : "-"}\n◇ USERNAME : ${msg.from.username ? "@" + msg.from.username : "-"}\n◇ ID : ${msg.from.id}\n\nContent: ${msg.text.slice(0, 1000)}`, { disable_web_page_preview: true })
     await getAiResponse(bot, msg.chat.id, input, msg.chat.username);
   } finally {
     userLocksText[userId] = false;
@@ -353,7 +354,7 @@ bot.onText(/\/google/, async (msg) => {
   }
   userLocksText[userId] = true;
   try {
-    await bot.sendMessage(String(process.env.LOGC_ID), `[ Usage Log ]\n◇ FIRST NAME : ${msg.from.first_name ? msg.from.first_name : "-"}\n◇ LAST NAME : ${msg.from.last_name ? msg.from.last_name : "-"}\n◇ USERNAME : ${msg.from.username ? "@" + msg.from.username : "-"}\n◇ ID : ${msg.from.id}\n\nContent: ${msg.text.slice(0, 1000)}`, { disable_web_page_preview: true })
+    await bot.sendMessage(logChannelId, `[ Usage Log ]\n◇ FIRST NAME : ${msg.from.first_name ? msg.from.first_name : "-"}\n◇ LAST NAME : ${msg.from.last_name ? msg.from.last_name : "-"}\n◇ USERNAME : ${msg.from.username ? "@" + msg.from.username : "-"}\n◇ ID : ${msg.from.id}\n\nContent: ${msg.text.slice(0, 1000)}`, { disable_web_page_preview: true })
     await googleSearch(bot, msg.chat.id, input, msg.chat.username);
   } finally {
     userLocksText[userId] = false;
@@ -371,7 +372,7 @@ bot.onText(/\/brainly/, async (msg) => {
   }
   userLocksText[userId] = true;
   try {
-    await bot.sendMessage(String(process.env.LOGC_ID), `[ Usage Log ]\n◇ FIRST NAME : ${msg.from.first_name ? msg.from.first_name : "-"}\n◇ LAST NAME : ${msg.from.last_name ? msg.from.last_name : "-"}\n◇ USERNAME : ${msg.from.username ? "@" + msg.from.username : "-"}\n◇ ID : ${msg.from.id}\n\nContent: ${msg.text.slice(0, 1000)}`, { disable_web_page_preview: true })
+    await bot.sendMessage(logChannelId, `[ Usage Log ]\n◇ FIRST NAME : ${msg.from.first_name ? msg.from.first_name : "-"}\n◇ LAST NAME : ${msg.from.last_name ? msg.from.last_name : "-"}\n◇ USERNAME : ${msg.from.username ? "@" + msg.from.username : "-"}\n◇ ID : ${msg.from.id}\n\nContent: ${msg.text.slice(0, 1000)}`, { disable_web_page_preview: true })
     await getBrainlyAnswer(bot, msg.chat.id, input, msg.chat.username);
   } finally {
     userLocksText[userId] = false;
@@ -389,7 +390,7 @@ bot.onText(/^(\/(pin|pinterest))/, async (msg) => {
   }
   userLocksImage[userId] = true;
   try {
-    await bot.sendMessage(String(process.env.LOGC_ID), `[ Usage Log ]\n◇ FIRST NAME : ${msg.from.first_name ? msg.from.first_name : "-"}\n◇ LAST NAME : ${msg.from.last_name ? msg.from.last_name : "-"}\n◇ USERNAME : ${msg.from.username ? "@" + msg.from.username : "-"}\n◇ ID : ${msg.from.id}\n\nContent: ${msg.text.slice(0, 1000)}`, { disable_web_page_preview: true })
+    await bot.sendMessage(logChannelId, `[ Usage Log ]\n◇ FIRST NAME : ${msg.from.first_name ? msg.from.first_name : "-"}\n◇ LAST NAME : ${msg.from.last_name ? msg.from.last_name : "-"}\n◇ USERNAME : ${msg.from.username ? "@" + msg.from.username : "-"}\n◇ ID : ${msg.from.id}\n\nContent: ${msg.text.slice(0, 1000)}`, { disable_web_page_preview: true })
     await pinSearch(bot, msg.chat.id, input, msg.chat.username);
   } finally {
     userLocksImage[userId] = false;
@@ -406,7 +407,7 @@ bot.onText(/https?:\/\/(?:.*\.)?tiktok\.com/, async (msg) => {
   }
   userLocks[userId] = true;
   try {
-    await bot.sendMessage(String(process.env.LOGC_ID), `[ Usage Log ]\n◇ FIRST NAME : ${msg.from.first_name ? msg.from.first_name : "-"}\n◇ LAST NAME : ${msg.from.last_name ? msg.from.last_name : "-"}\n◇ USERNAME : ${msg.from.username ? "@" + msg.from.username : "-"}\n◇ ID : ${msg.from.id}\n\nContent: ${msg.text.slice(0, 1000)}`, { disable_web_page_preview: true })
+    await bot.sendMessage(logChannelId, `[ Usage Log ]\n◇ FIRST NAME : ${msg.from.first_name ? msg.from.first_name : "-"}\n◇ LAST NAME : ${msg.from.last_name ? msg.from.last_name : "-"}\n◇ USERNAME : ${msg.from.username ? "@" + msg.from.username : "-"}\n◇ ID : ${msg.from.id}\n\nContent: ${msg.text.slice(0, 1000)}`, { disable_web_page_preview: true })
     await getTiktokInfo(bot, msg.chat.id, msg.text, msg.chat.username);
   } finally {
     userLocks[userId] = false;
@@ -423,7 +424,7 @@ bot.onText(/https?:\/\/(?:.*\.)?(twitter\.com|x\.com)/, async (msg) => {
   }
   userLocks[userId] = true;
   try {
-    await bot.sendMessage(String(process.env.LOGC_ID), `[ Usage Log ]\n◇ FIRST NAME : ${msg.from.first_name ? msg.from.first_name : "-"}\n◇ LAST NAME : ${msg.from.last_name ? msg.from.last_name : "-"}\n◇ USERNAME : ${msg.from.username ? "@" + msg.from.username : "-"}\n◇ ID : ${msg.from.id}\n\nContent: ${msg.text.slice(0, 1000)}`, { disable_web_page_preview: true })
+    await bot.sendMessage(logChannelId, `[ Usage Log ]\n◇ FIRST NAME : ${msg.from.first_name ? msg.from.first_name : "-"}\n◇ LAST NAME : ${msg.from.last_name ? msg.from.last_name : "-"}\n◇ USERNAME : ${msg.from.username ? "@" + msg.from.username : "-"}\n◇ ID : ${msg.from.id}\n\nContent: ${msg.text.slice(0, 1000)}`, { disable_web_page_preview: true })
     await getDataTwitter(bot, msg.chat.id, msg.text, msg.chat.username);
   } finally {
     userLocks[userId] = false;
@@ -440,7 +441,7 @@ bot.onText(/(https?:\/\/)?(www\.)?(instagram\.com)\/.+/, async (msg) => {
   }
   userLocks[userId] = true;
   try {
-    await bot.sendMessage(String(process.env.LOGC_ID), `[ Usage Log ]\n◇ FIRST NAME : ${msg.from.first_name ? msg.from.first_name : "-"}\n◇ LAST NAME : ${msg.from.last_name ? msg.from.last_name : "-"}\n◇ USERNAME : ${msg.from.username ? "@" + msg.from.username : "-"}\n◇ ID : ${msg.from.id}\n\nContent: ${msg.text.slice(0, 1000)}`, { disable_web_page_preview: true })
+    await bot.sendMessage(logChannelId, `[ Usage Log ]\n◇ FIRST NAME : ${msg.from.first_name ? msg.from.first_name : "-"}\n◇ LAST NAME : ${msg.from.last_name ? msg.from.last_name : "-"}\n◇ USERNAME : ${msg.from.username ? "@" + msg.from.username : "-"}\n◇ ID : ${msg.from.id}\n\nContent: ${msg.text.slice(0, 1000)}`, { disable_web_page_preview: true })
     await downloadInstagram(bot, msg.chat.id, msg.text, msg.chat.username);
   } finally {
     userLocks[userId] = false;
@@ -457,7 +458,7 @@ bot.onText(/(https?:\/\/)?(www\.)?(pinterest\.ca|pinterest\.?com|pin\.?it)\/.+/,
   }
   userLocks[userId] = true;
   try {
-    await bot.sendMessage(String(process.env.LOGC_ID), `[ Usage Log ]\n◇ FIRST NAME : ${msg.from.first_name ? msg.from.first_name : "-"}\n◇ LAST NAME : ${msg.from.last_name ? msg.from.last_name : "-"}\n◇ USERNAME : ${msg.from.username ? "@" + msg.from.username : "-"}\n◇ ID : ${msg.from.id}\n\nContent: ${msg.text.slice(0, 1000)}`, { disable_web_page_preview: true })
+    await bot.sendMessage(logChannelId, `[ Usage Log ]\n◇ FIRST NAME : ${msg.from.first_name ? msg.from.first_name : "-"}\n◇ LAST NAME : ${msg.from.last_name ? msg.from.last_name : "-"}\n◇ USERNAME : ${msg.from.username ? "@" + msg.from.username : "-"}\n◇ ID : ${msg.from.id}\n\nContent: ${msg.text.slice(0, 1000)}`, { disable_web_page_preview: true })
     await pinterest(bot, msg.chat.id, msg.text, msg.chat.username);
   } finally {
     userLocks[userId] = false;
@@ -474,7 +475,7 @@ bot.onText(/(https?:\/\/)?(www\.)?(open\.spotify\.com|spotify\.?com)\/track\/.+/
   }
   userLocks[userId] = true;
   try {
-    await bot.sendMessage(String(process.env.LOGC_ID), `[ Usage Log ]\n◇ FIRST NAME : ${msg.from.first_name ? msg.from.first_name : "-"}\n◇ LAST NAME : ${msg.from.last_name ? msg.from.last_name : "-"}\n◇ USERNAME : ${msg.from.username ? "@" + msg.from.username : "-"}\n◇ ID : ${msg.from.id}\n\nContent: ${msg.text.slice(0, 1000)}`, { disable_web_page_preview: true })
+    await bot.sendMessage(logChannelId, `[ Usage Log ]\n◇ FIRST NAME : ${msg.from.first_name ? msg.from.first_name : "-"}\n◇ LAST NAME : ${msg.from.last_name ? msg.from.last_name : "-"}\n◇ USERNAME : ${msg.from.username ? "@" + msg.from.username : "-"}\n◇ ID : ${msg.from.id}\n\nContent: ${msg.text.slice(0, 1000)}`, { disable_web_page_preview: true })
     await getSpotifySong(bot, msg.chat.id, match[0], msg.chat.username)
   } finally {
     userLocks[userId] = false;
@@ -491,7 +492,7 @@ bot.onText(/(https?:\/\/)?(www\.)?(open\.spotify\.com|spotify\.?com)\/album\/.+/
   }
   userLocks[userId] = true;
   try {
-    await bot.sendMessage(String(process.env.LOGC_ID), `[ Usage Log ]\n◇ FIRST NAME : ${msg.from.first_name ? msg.from.first_name : "-"}\n◇ LAST NAME : ${msg.from.last_name ? msg.from.last_name : "-"}\n◇ USERNAME : ${msg.from.username ? "@" + msg.from.username : "-"}\n◇ ID : ${msg.from.id}\n\nContent: ${msg.text.slice(0, 1000)}`, { disable_web_page_preview: true })
+    await bot.sendMessage(logChannelId, `[ Usage Log ]\n◇ FIRST NAME : ${msg.from.first_name ? msg.from.first_name : "-"}\n◇ LAST NAME : ${msg.from.last_name ? msg.from.last_name : "-"}\n◇ USERNAME : ${msg.from.username ? "@" + msg.from.username : "-"}\n◇ ID : ${msg.from.id}\n\nContent: ${msg.text.slice(0, 1000)}`, { disable_web_page_preview: true })
     await getAlbumsSpotify(bot, msg.chat.id, match[0], msg.chat.username)
   } finally {
     userLocks[userId] = false;
@@ -510,7 +511,7 @@ bot.onText(/(https?:\/\/)?(www\.)?(open\.spotify\.com|spotify\.?com)\/playlist\/
   }
   userLocks[userId] = true;
   try {
-    await bot.sendMessage(String(process.env.LOGC_ID), `[ Usage Log ]\n◇ FIRST NAME : ${msg.from.first_name ? msg.from.first_name : "-"}\n◇ LAST NAME : ${msg.from.last_name ? msg.from.last_name : "-"}\n◇ USERNAME : ${msg.from.username ? "@" + msg.from.username : "-"}\n◇ ID : ${msg.from.id}\n\nContent: ${msg.text.slice(0, 1000)}`, { disable_web_page_preview: true })
+    await bot.sendMessage(logChannelId, `[ Usage Log ]\n◇ FIRST NAME : ${msg.from.first_name ? msg.from.first_name : "-"}\n◇ LAST NAME : ${msg.from.last_name ? msg.from.last_name : "-"}\n◇ USERNAME : ${msg.from.username ? "@" + msg.from.username : "-"}\n◇ ID : ${msg.from.id}\n\nContent: ${msg.text.slice(0, 1000)}`, { disable_web_page_preview: true })
     await getPlaylistSpotify(bot, msg.chat.id, match[0], msg.chat.username)
   } finally {
     userLocks[userId] = false;
@@ -529,7 +530,7 @@ bot.onText(/^(?:https?:\/\/)?(?:www\.|m\.|music\.)?youtu\.?be(?:\.com)?\/?.*(?:w
   userLocks[userId] = true;
   try {
     if (match[0].includes("/live/")) return bot.sendMessage(msg.chat.id, `Cannot download livestream video`)
-    await bot.sendMessage(String(process.env.LOGC_ID), `[ Usage Log ]\n◇ FIRST NAME : ${msg.from.first_name ? msg.from.first_name : "-"}\n◇ LAST NAME : ${msg.from.last_name ? msg.from.last_name : "-"}\n◇ USERNAME : ${msg.from.username ? "@" + msg.from.username : "-"}\n◇ ID : ${msg.from.id}\n\nContent: ${msg.text.slice(0, 1000)}`, { disable_web_page_preview: true })
+    await bot.sendMessage(logChannelId, `[ Usage Log ]\n◇ FIRST NAME : ${msg.from.first_name ? msg.from.first_name : "-"}\n◇ LAST NAME : ${msg.from.last_name ? msg.from.last_name : "-"}\n◇ USERNAME : ${msg.from.username ? "@" + msg.from.username : "-"}\n◇ ID : ${msg.from.id}\n\nContent: ${msg.text.slice(0, 1000)}`, { disable_web_page_preview: true })
     await getYoutube(bot, msg.chat.id, match[0], msg.chat.username)
   } finally {
     userLocks[userId] = false;
@@ -546,7 +547,7 @@ bot.onText(/^https?:\/\/(www\.)?(m\.)?facebook\.com\/.+/, async (msg, match) => 
   }
   userLocks[userId] = true;
   try {
-    await bot.sendMessage(String(process.env.LOGC_ID), `[ Usage Log ]\n◇ FIRST NAME : ${msg.from.first_name ? msg.from.first_name : "-"}\n◇ LAST NAME : ${msg.from.last_name ? msg.from.last_name : "-"}\n◇ USERNAME : ${msg.from.username ? "@" + msg.from.username : "-"}\n◇ ID : ${msg.from.id}\n\nContent: ${msg.text.slice(0, 1000)}`, { disable_web_page_preview: true })
+    await bot.sendMessage(logChannelId, `[ Usage Log ]\n◇ FIRST NAME : ${msg.from.first_name ? msg.from.first_name : "-"}\n◇ LAST NAME : ${msg.from.last_name ? msg.from.last_name : "-"}\n◇ USERNAME : ${msg.from.username ? "@" + msg.from.username : "-"}\n◇ ID : ${msg.from.id}\n\nContent: ${msg.text.slice(0, 1000)}`, { disable_web_page_preview: true })
     await getFacebook(bot, msg.chat.id, match[0], msg.chat.username)
   } finally {
     userLocks[userId] = false;
@@ -563,7 +564,7 @@ bot.onText(/^https?:\/\/(www\.)?threads\.net\/.+/, async (msg, match) => {
   }
   userLocks[userId] = true;
   try {
-    await bot.sendMessage(String(process.env.LOGC_ID), `[ Usage Log ]\n◇ FIRST NAME : ${msg.from.first_name ? msg.from.first_name : "-"}\n◇ LAST NAME : ${msg.from.last_name ? msg.from.last_name : "-"}\n◇ USERNAME : ${msg.from.username ? "@" + msg.from.username : "-"}\n◇ ID : ${msg.from.id}\n\nContent: ${msg.text.slice(0, 1000)}`, { disable_web_page_preview: true })
+    await bot.sendMessage(logChannelId, `[ Usage Log ]\n◇ FIRST NAME : ${msg.from.first_name ? msg.from.first_name : "-"}\n◇ LAST NAME : ${msg.from.last_name ? msg.from.last_name : "-"}\n◇ USERNAME : ${msg.from.username ? "@" + msg.from.username : "-"}\n◇ ID : ${msg.from.id}\n\nContent: ${msg.text.slice(0, 1000)}`, { disable_web_page_preview: true })
     await threadsDownload(bot, msg.chat.id, match[0], msg.chat.username)
   } finally {
     userLocks[userId] = false;
@@ -580,7 +581,7 @@ bot.onText(/(?:https|git)(?::\/\/|@)github\.com[\/:]([^\/:]+)\/(.+)/i, async (ms
   }
   userLocks[userId] = true;
   try {
-    await bot.sendMessage(String(process.env.LOGC_ID), `[ Usage Log ]\n◇ FIRST NAME : ${msg.from.first_name ? msg.from.first_name : "-"}\n◇ LAST NAME : ${msg.from.last_name ? msg.from.last_name : "-"}\n◇ USERNAME : ${msg.from.username ? "@" + msg.from.username : "-"}\n◇ ID : ${msg.from.id}\n\nContent: ${msg.text.slice(0, 1000)}`, { disable_web_page_preview: true })
+    await bot.sendMessage(logChannelId, `[ Usage Log ]\n◇ FIRST NAME : ${msg.from.first_name ? msg.from.first_name : "-"}\n◇ LAST NAME : ${msg.from.last_name ? msg.from.last_name : "-"}\n◇ USERNAME : ${msg.from.username ? "@" + msg.from.username : "-"}\n◇ ID : ${msg.from.id}\n\nContent: ${msg.text.slice(0, 1000)}`, { disable_web_page_preview: true })
     await gitClone(bot, msg.chat.id, match[0], msg.chat.username)
   } finally {
     userLocks[userId] = false;
