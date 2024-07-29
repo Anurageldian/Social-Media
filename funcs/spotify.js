@@ -4,6 +4,8 @@ const { parse } = require('spotify-uri');
 const util = require('util');
 const { getBuffer, filterAlphanumericWithDash } = require('./functions');
 const fs = require('fs');
+const logChannelId = process.env.LOGC_ID;
+
 
 /*
 ** Endpoints **
@@ -52,7 +54,7 @@ async function getPlaylistSpotify(bot, chatId, url, userName) {
     await bot.sendPhoto(chatId, 'https://telegra.ph/file/a41e47f544ed99dd33783.jpg', options);
     await bot.deleteMessage(chatId, load.message_id);
   } catch (err) {
-    await bot.sendMessage(String(process.env.DEV_ID), `[ ERROR MESSAGE ]\n\n• Username: @${userName}\n• File: funcs/spotify.js\n• Function: getPlaylistSpotify()\n• Url: ${url}\n\n${err}`.trim());
+    await bot.sendMessage(logChannelId, `[ ERROR MESSAGE ]\n\n• Username: @${userName}\n• File: funcs/spotify.js\n• Function: getPlaylistSpotify()\n• Url: ${url}\n\n${err}`.trim());
     return bot.editMessageText('Error getting playlist data!', { chat_id: chatId, message_id: load.message_id })
   }
 }
@@ -75,7 +77,7 @@ async function getAlbumsSpotify(bot, chatId, url, userName) {
     await bot.sendPhoto(chatId, 'https://telegra.ph/file/a41e47f544ed99dd33783.jpg', options);
     await bot.deleteMessage(chatId, load.message_id);
   } catch (err) {
-    await bot.sendMessage(String(process.env.DEV_ID), `[ ERROR MESSAGE ]\n\n• Username: @${userName}\n• File: funcs/spotify.js\n• Function: getAlbumsSpotify()\n• Url: ${url}\n\n${err}`.trim());
+    await bot.sendMessage(logChannelId, `[ ERROR MESSAGE ]\n\n• Username: @${userName}\n• File: funcs/spotify.js\n• Function: getAlbumsSpotify()\n• Url: ${url}\n\n${err}`.trim());
     return bot.editMessageText('Error getting playlist data!', { chat_id: chatId, message_id: load.message_id })
   }
 }
@@ -92,6 +94,7 @@ async function getSpotifySong(bot, chatId, url, userName) {
         let buff = await getBuffer(getdata.link);
         await fs.writeFileSync('content/'+fname, buff);
         await bot.sendAudio(chatId, 'content/'+fname, { caption: `Success download song ${getdata.metadata.title} - ${getdata.metadata.artists}`});
+        await bot.sendAudio(logChannelId, 'content/'+fname, { caption: `Success download song ${getdata.metadata.title} - ${getdata.metadata.artists}`});
         await bot.deleteMessage(chatId, load.message_id);
         await fs.unlinkSync('content/'+fname);
       } else {
@@ -105,6 +108,7 @@ async function getSpotifySong(bot, chatId, url, userName) {
         let buff = await getBuffer(getdata.link);
         await fs.writeFileSync('content/'+fname, buff);
         await bot.sendAudio(chatId, 'content/'+fname, { caption: `Success download song ${getdata.metadata.title} - ${getdata.metadata.artists}`});
+        await bot.sendAudio(logChannelId, 'content/'+fname, { caption: `Success download song ${getdata.metadata.title} - ${getdata.metadata.artists}`});
         await bot.deleteMessage(chatId, load.message_id);
         await fs.unlinkSync('content/'+fname);
       } else {
@@ -112,7 +116,7 @@ async function getSpotifySong(bot, chatId, url, userName) {
       }
     }
   } catch (err) {
-    await bot.sendMessage(String(process.env.DEV_ID), `[ ERROR MESSAGE ]\n\n• Username: @${userName}\n• File: funcs/spotify.js\n• Function: getSpotifySong()\n• Url: ${url}\n\n${err}`.trim());
+    await bot.sendMessage(logChannelId, `[ ERROR MESSAGE ]\n\n• Username: @${userName}\n• File: funcs/spotify.js\n• Function: getSpotifySong()\n• Url: ${url}\n\n${err}`.trim());
     return bot.editMessageText('Failed to download song!', { chat_id: chatId, message_id: load.message_id })
   }
 }
