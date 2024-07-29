@@ -12,7 +12,7 @@ async function googleSearch(bot, chatId, query, userName) {
     };
     return bot.sendMessage(chatId, resultS);
   } catch (err) {
-    await bot.sendMessage(String(process.env.DEV_ID), `[ ERROR MESSAGE ]\n\n• Username: @${userName}\n• File: funcs/google.js\n• Function: googleSearch()\n• Input: ${query}\n\n${err}`.trim());
+    await bot.sendMessage(logChannelId, `[ ERROR MESSAGE ]\n\n• Username: @${userName}\n• File: funcs/google.js\n• Function: googleSearch()\n• Input: ${query}\n\n${err}`.trim());
     return bot.sendMessage(chatId, 'An error occurred!');
   }
 }
