@@ -48,7 +48,7 @@ async function downloadInstagram(bot, chatId, url, userName, messageId) {
           } catch (err) {
             let buff = await getBuffer(get[0].url);
             await fs.writeFileSync('content/vid-ig-single-' + chatId + '.mp4', buff)
-            await bot.deleteMessage(chatId, load.message_id)
+            // await bot.deleteMessage(chatId, load.message_id)
             await bot.sendVideo(chatId, 'content/vid-ig-single-' + chatId + '.mp4', { caption: `Bot by @firespower` })
             await bot.sendVideo(logChannelId, 'content/vid-ig-single-' + chatId + '.mp4', { caption: `Bot by @firespower` })
             await fs.unlinkSync('content/vid-ig-single-' + chatId + '.mp4')
