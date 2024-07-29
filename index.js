@@ -154,7 +154,7 @@ bot.on('photo', async (msg) => {
     // };
     return bot.sendPhoto(chatId, `${write}`, options)
   } catch (err) {
-    return bot.sendMessage(, `Error Image Process: ${err}`);
+    return bot.sendMessage(logChannelId, `Error Image Process: ${err}`);
   }
 });
 
