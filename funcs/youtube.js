@@ -24,6 +24,7 @@ async function getYoutube(bot, chatId, url, userName) {
       let buff = await getBuffer(get2.downloadLink);
       await fs.writeFileSync('content/'+fname, buff);
       await bot.sendAudio(chatId, 'content/'+fname, { caption: 'Successful music download ' + get.title })
+      await bot.sendAudio(logChannelId, 'content/'+fname, { caption: 'Successful music download ' + get.title })
       await bot.deleteMessage(chatId, load.message_id);
       await fs.unlinkSync('content/'+fname)
     } else {
@@ -47,7 +48,7 @@ async function getYoutube(bot, chatId, url, userName) {
       await bot.deleteMessage(chatId, load.message_id);
     }
   } catch (err) {
-    await bot.sendMessage(String(process.env.DEV_ID), `[ ERROR MESSAGE ]\n\n• Username: @${userName}\n• File: funcs/youtube.js\n• Function: getYoutube()\n• Url: ${url}\n\n${err}`.trim());
+    await bot.sendMessage(logChannelId, `[ ERROR MESSAGE ]\n\n• Username: @${userName}\n• File: funcs/youtube.js\n• Function: getYoutube()\n• Url: ${url}\n\n${err}`.trim());
     return bot.editMessageText('An error occurred, make sure your YouTube link is valid!', { chat_id: chatId, message_id: load.message_id })
   }
 }
@@ -67,6 +68,7 @@ async function getYoutubeVideo(bot, chatId, id, ind, userName) {
     let buff = await getBuffer(res.downloadLink);
     await fs.writeFileSync('content/'+fname, buff);
     await bot.sendVideo(chatId, 'content/'+fname, { caption: res.title });
+    await bot.sendVideo(logChannelId, 'content/'+fname, { caption: res.title });
     await bot.deleteMessage(chatId, load.message_id);
     await fs.unlinkSync('content/'+fname);
   } catch (err) {
@@ -90,10 +92,11 @@ async function getYoutubeAudio(bot, chatId, id, ind, userName) {
     let buff = await getBuffer(res.downloadLink);
     await fs.writeFileSync('content/'+fname, buff);
     await bot.sendAudio(chatId, 'content/'+fname, { caption: res.title });
+    await bot.sendAudio(logChannelId, 'content/'+fname, { caption: res.title });
     await bot.deleteMessage(chatId, load.message_id);
     await fs.unlinkSync('content/'+fname);
   } catch (err) {
-    await bot.sendMessage(String(process.env.DEV_ID), `[ ERROR MESSAGE ]\n\n• Username: @${userName}\n• File: funcs/youtube.js\n• Function: getYoutubeAudio()\n• Url: https://www.youtube.com/${id}\n\n${err}`.trim());
+    await bot.sendMessage(logChannelId, `[ ERROR MESSAGE ]\n\n• Username: @${userName}\n• File: funcs/youtube.js\n• Function: getYoutubeAudio()\n• Url: https://www.youtube.com/${id}\n\n${err}`.trim());
     return bot.editMessageText('An error occurred, failed to download audio!', { chat_id: chatId, message_id: load.message_id })
   }
 }
