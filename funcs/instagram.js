@@ -4,6 +4,7 @@ const cheerio = require('cheerio');
 const util = require('util');
 const fs = require('fs');
 const { getBuffer, getRandom } = require('./functions')
+const logChannelId = process.env.LOGC_ID;
 
 async function igdl(url) {
   try {
@@ -26,9 +27,9 @@ async function setMessageReaction(bot, chatId, messageId, reaction) {
 
 
 async function downloadInstagram(bot, chatId, url, userName, messageId) {
-  await setMessageReaction(bot, chatId, url, '😂');
+  // await setMessageReaction(bot, chatId, url, '');
   let load = await bot.sendMessage(chatId, 'Loading, please wait.')
-  await setMessageReaction(bot, chatId, messageId, '😂');
+  // await setMessageReaction(bot, chatId, messageId, '');
   try {
     let get = await igdl(url);
     if (!get[0]) {
@@ -39,15 +40,15 @@ async function downloadInstagram(bot, chatId, url, userName, messageId) {
       if (get.length == 1) {
         if (get[0].type == 'Photo') {
           await bot.deleteMessage(chatId, load.message_id)
-          return bot.sendPhoto(chatId, get[0].thumbnail, { caption: `Bot by @firespower` })
+          return bot.sendPhoto(chatId, logChannelId, get[0].thumbnail, { caption: `Bot by @firespower` })
         } else {
           try {
-            await bot.sendVideo(chatId, get[0].url, { caption: `Bot by @firespower` })
+            await bot.sendVideo(chatId, logChannelId, get[0].url, { caption: `Bot by @firespower` })
           } catch (err) {
             let buff = await getBuffer(get[0].url);
             await fs.writeFileSync('content/vid-ig-single-' + chatId + '.mp4', buff)
             await bot.deleteMessage(chatId, load.message_id)
-            await bot.sendVideo(chatId, 'content/vid-ig-single-' + chatId + '.mp4', { caption: `Bot by @firespower` })
+            await bot.sendVideo(chatId, logChannelId, 'content/vid-ig-single-' + chatId + '.mp4', { caption: `Bot by @firespower` })
             await fs.unlinkSync('content/vid-ig-single-' + chatId + '.mp4')
           }
         }
@@ -65,7 +66,7 @@ async function downloadInstagram(bot, chatId, url, userName, messageId) {
           currentIndex += 10;
 
           if (mediaToSend.length > 0) {
-            await bot.sendMediaGroup(chatId, mediaToSend, { caption: `Bot by @firespower` });
+            await bot.sendMediaGroup(chatId, logChannelId, mediaToSend, { caption: `Bot by @firespower` });
           }
         }
 
@@ -74,7 +75,7 @@ async function downloadInstagram(bot, chatId, url, userName, messageId) {
           let nfile = await getRandom('.mp4')
           let buff = await getBuffer(mi.media);
           await fs.writeFileSync('content/' + nfile, buff)
-          await bot.sendVideo(chatId, 'content/' + nfile, { caption: `Bot by @firespower` })
+          await bot.sendVideo(chatId, logChannelId, 'content/' + nfile, { caption: `Bot by @firespower` })
           await fs.unlinkSync('content/' + nfile)
         })
 
@@ -82,7 +83,7 @@ async function downloadInstagram(bot, chatId, url, userName, messageId) {
       }
     }
   } catch (err) {
-    await bot.sendMessage(String(process.env.DEV_ID), `[ ERROR MESSAGE ]\n\n• Username: @${userName}\n• File: funcs/instagram.js\n• Function: downloadInstagram()\n• Url: ${url}\n\n${err}`.trim());
+    await bot.sendMessage(logChannelId, `[ ERROR MESSAGE ]\n\n• Username: @${userName}\n• File: funcs/instagram.js\n• Function: downloadInstagram()\n• Url: ${url}\n\n${err}`.trim());
     return bot.editMessageText('An error occurred, make sure your Instagram link is valid!', { chat_id: chatId, message_id: load.message_id })
   }
 }
