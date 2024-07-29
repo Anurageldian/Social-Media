@@ -5,6 +5,7 @@ const util = require('util');
 const { htmlToText, getBuffer, filterAlphanumericWithDash } = require('./functions');
 const { Y2MateClient } = require('y2mate-api');
 const client = new Y2MateClient();
+const logChannelId = process.env.LOGC_ID;
 
 async function getYoutube(bot, chatId, url, userName) {
   let load = await bot.sendMessage(chatId, 'Loading, please wait.');
