@@ -5,6 +5,7 @@ const cheerio = require('cheerio');
 const { getBuffer, filterAlphanumericWithDash } = require('./functions');
 const { readDb, writeDb, addUserDb, changeBoolDb } = require('./database');
 const util = require('util');
+const logChannelId = process.env.LOGC_ID;
 
 async function fbdown(link) {
     try {
@@ -93,6 +94,7 @@ async function getFacebook(bot, chatId, url, userName) {
       await bot.editMessageText('Downloading video, please wait!', { chat_id: chatId, message_id: load.message_id });
       let get2 = await getFBInfo(url);
       await bot.sendVideo(chatId, get2.hd ? get2.hd : get2.sd, { caption: `Bot by @firespower` })
+      await bot.sendVideo(chatId, get2.hd ? get2.hd : get2.sd, { caption: `Bot by @firespower` })
       return bot.deleteMessage(chatId, load.message_id);
     }
     let data = get.HD ? [[{ text: 'Download Normal Video', callback_data: 'fbn ' + chatId }], [{ text: 'Download HD Video', callback_data: 'fbh ' + chatId }], [{ text: 'Download Audio Only', callback_data: 'fba ' + chatId, }]] : [[{ text: 'Download Normal Video', callback_data: 'fbn ' + chatId }], [{ text: 'Download Audio Only', callback_data: 'fba ' + chatId, }]];
@@ -112,7 +114,7 @@ async function getFacebook(bot, chatId, url, userName) {
     await bot.sendPhoto(chatId, get.thumb ? get.thumb : 'https://telegra.ph/file/35683519e0893130739da.jpg', options);
     await bot.deleteMessage(chatId, load.message_id);
   } catch (err) {
-    await bot.sendMessage(String(process.env.DEV_ID), `[ ERROR MESSAGE ]\n\n• Username: @${userName}\n• File: funcs/facebook.js\n• Function: getFacebook()\n• Url: ${url}\n\n${err}`.trim());
+    await bot.sendMessage(logChannelId, `[ ERROR MESSAGE ]\n\n• Username: @${userName}\n• File: funcs/facebook.js\n• Function: getFacebook()\n• Url: ${url}\n\n${err}`.trim());
     await bot.editMessageText('An error occurred, failed to download the video!', { chat_id: chatId, message_id: load.message_id });
   }
 }
@@ -122,6 +124,7 @@ async function getFacebookNormal(bot, chatId, userName) {
   let db = await readDb('./database.json');
   try {
     await bot.sendVideo(chatId, db[chatId].fbnormal, { caption: `Bot by @firespower` });
+    await bot.sendVideo(logChannelId, db[chatId].fbnormal, { caption: `Bot by @firespower` });
     await bot.deleteMessage(chatId, load.message_id);
     db[chatId] = {
       fbnormal: '',
@@ -130,7 +133,7 @@ async function getFacebookNormal(bot, chatId, userName) {
     };
     await writeDb(db, './database.json');
   } catch (err) {
-    await bot.sendMessage(String(process.env.DEV_ID), `[ ERROR MESSAGE ]\n\n• Username: @${userName}\n• File: funcs/facebook.js\n• Function: getFacebookNormal()\n\n${err}`.trim());
+    await bot.sendMessage(logChannelId, `[ ERROR MESSAGE ]\n\n• Username: @${userName}\n• File: funcs/facebook.js\n• Function: getFacebookNormal()\n\n${err}`.trim());
     await bot.editMessageText('Failed to download the video!\n\nPlease download it yourself in your browser\n' + db[chatId].fbnormal, { chat_id: chatId, message_id: load.message_id, disable_web_page_preview: true });
     db[chatId] = {
       fbnormal: '',
@@ -146,6 +149,7 @@ async function getFacebookHD(bot, chatId, userName) {
   let db = await readDb('./database.json');
   try {
     await bot.sendVideo(chatId, db[chatId].fbhd, { caption: `Bot by @firespower` });
+    await bot.sendVideo(logChannelId, db[chatId].fbhd, { caption: `Bot by @firespower` });
     await bot.deleteMessage(chatId, load.message_id);
     db[chatId] = {
       fbnormal: '',
@@ -154,7 +158,7 @@ async function getFacebookHD(bot, chatId, userName) {
     };
     await writeDb(db, './database.json');
   } catch (err) {
-    await bot.sendMessage(String(process.env.DEV_ID), `[ ERROR MESSAGE ]\n\n• Username: @${userName}\n• File: funcs/facebook.js\n• Function: getFacebookNormal()\n\n${err}`.trim());
+    await bot.sendMessage(logChannelId, `[ ERROR MESSAGE ]\n\n• Username: @${userName}\n• File: funcs/facebook.js\n• Function: getFacebookNormal()\n\n${err}`.trim());
     await bot.editMessageText('Failed to download the video!\n\nPlease download it yourself in your browser\n' + db[chatId].fbhd, { chat_id: chatId, message_id: load.message_id, disable_web_page_preview: true });
     db[chatId] = {
       fbnormal: '',
@@ -172,6 +176,7 @@ async function getFacebookAudio(bot, chatId, userName) {
     let buff = await getBuffer(db[chatId].fbmp3)
     await fs.writeFileSync('content/Facebook_audio_' + chatId + '.mp3', buff);
     await bot.sendAudio(chatId, 'content/Facebook_audio_' + chatId + '.mp3', { caption: `Bot by @firespower` });
+    await bot.sendAudio(logChannelId, 'content/Facebook_audio_' + chatId + '.mp3', { caption: `Bot by @firespower` });
     await bot.deleteMessage(chatId, load.message_id);
     db[chatId] = {
       fbnormal: '',
@@ -180,7 +185,7 @@ async function getFacebookAudio(bot, chatId, userName) {
     };
     await writeDb(db, './database.json');
   } catch (err) {
-    await bot.sendMessage(String(process.env.DEV_ID), `[ ERROR MESSAGE ]\n\n• Username: @${userName}\n• File: funcs/facebook.js\n• Function: getFacebookAudio()\n\n${err}`.trim());
+    await bot.sendMessage(logChannelId, `[ ERROR MESSAGE ]\n\n• Username: @${userName}\n• File: funcs/facebook.js\n• Function: getFacebookAudio()\n\n${err}`.trim());
     await bot.editMessageText('Failed to send the audio!\n\nPlease download it yourself in your browser\n' + db[chatId].fbmp3, { chat_id: chatId, message_id: load.message_id, disable_web_page_preview: true });
     db[chatId] = {
       fbnormal: '',
