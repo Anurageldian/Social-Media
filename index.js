@@ -103,44 +103,6 @@ app.get('/', async (req, res) => {
 app.listen(5000, function () {});
 console.log('Bot is running...')
 
-async function getUpdates(botToken, offset) {
-  try {
-    const response = await axios.get(`https://api.telegram.org/bot${botToken}/getUpdates`, {
-      params: {
-        offset: offset,
-        timeout: 30 // Long polling timeout in seconds
-      }
-    });
-    return response.data.result;
-  } catch (error) {
-    console.error('Error getting updates:', error);
-    return [];
-  }
-}
-
-async function processUpdates(updates) {
-  for (const update of updates) {
-    // Process each update (e.g., new message, command)
-    console.log('New update:', update);
-    // Your processing logic here
-  }
-}
-
-async function main() {
-  const botToken = process.env.BOT_TOKEN;
-  let offset = 0;
-
-  while (true) {
-    const updates = await getUpdates(botToken, offset);
-    if (updates.length > 0) {
-      await processUpdates(updates);
-      offset = updates[updates.length - 1].update_id + 1; // Update offset to avoid receiving the same updates again
-    }
-  }
-}
-
-main();
-
 bot.on('photo', async (msg) => {
   let chatId = msg.chat.id;
   let getban = await getBanned(chatId);
