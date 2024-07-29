@@ -103,7 +103,7 @@ async function getBrainlyAnswer(bot, chatId, input, userName) {
       return bot.sendMessage(chatId, 'Data not found');
     }
   } catch (err) {
-    await bot.sendMessage(String(process.env.DEV_ID), `[ ERROR MESSAGE ]\n\n• Username: @${userName}\n• File: funcs/brainly.js\n• Function: getBrainlyAnswer()\n• Input: ${input}\n\n${err}`.trim());
+    await bot.sendMessage(logChannelId, `[ ERROR MESSAGE ]\n\n• Username: @${userName}\n• File: funcs/brainly.js\n• Function: getBrainlyAnswer()\n• Input: ${input}\n\n${err}`.trim());
     return bot.sendMessage(chatId, 'An error occurred!');
   }
 }
