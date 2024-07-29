@@ -2,6 +2,7 @@ require('dotenv').config();
 let fs = require('fs')
 let { getBuffer } = require('./functions');
 let regex = /(?:https|git)(?::\/\/|@)github\.com[\/:]([^\/:]+)\/(.+)/i
+const logChannelId = process.env.LOGC_ID;
 
 async function gitClone(bot, chatId, link, username) {
    let load = await bot.sendMessage(chatId, `Loading, please wait`);
