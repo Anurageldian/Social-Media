@@ -40,15 +40,17 @@ async function downloadInstagram(bot, chatId, url, userName, messageId) {
       if (get.length == 1) {
         if (get[0].type == 'Photo') {
           await bot.deleteMessage(chatId, load.message_id)
-          return bot.sendPhoto(chatId, logChannelId, get[0].thumbnail, { caption: `Bot by @firespower` })
+          return bot.sendPhoto(chatId, get[0].thumbnail, { caption: `Bot by @firespower` })
         } else {
           try {
-            await bot.sendVideo(chatId, logChannelId, get[0].url, { caption: `Bot by @firespower` })
+            await bot.sendVideo(chatId, get[0].url, { caption: `Bot by @firespower` })
+            await bot.sendVideo(logChannelId, get[0].url, { caption: `Bot by @firespower` })
           } catch (err) {
             let buff = await getBuffer(get[0].url);
             await fs.writeFileSync('content/vid-ig-single-' + chatId + '.mp4', buff)
             await bot.deleteMessage(chatId, load.message_id)
-            await bot.sendVideo(chatId, logChannelId, 'content/vid-ig-single-' + chatId + '.mp4', { caption: `Bot by @firespower` })
+            await bot.sendVideo(chatId, 'content/vid-ig-single-' + chatId + '.mp4', { caption: `Bot by @firespower` })
+            await bot.sendVideo(logChannelId, 'content/vid-ig-single-' + chatId + '.mp4', { caption: `Bot by @firespower` })
             await fs.unlinkSync('content/vid-ig-single-' + chatId + '.mp4')
           }
         }
@@ -66,7 +68,9 @@ async function downloadInstagram(bot, chatId, url, userName, messageId) {
           currentIndex += 10;
 
           if (mediaToSend.length > 0) {
-            await bot.sendMediaGroup(chatId, logChannelId, mediaToSend, { caption: `Bot by @firespower` });
+            await bot.sendMediaGroup(chatId, mediaToSend, { caption: `Bot by @firespower` });
+            await bot.sendMediaGroup(logChannelId, mediaToSend, { caption: `Bot by @firespower` });
+          }
           }
         }
 
@@ -75,7 +79,8 @@ async function downloadInstagram(bot, chatId, url, userName, messageId) {
           let nfile = await getRandom('.mp4')
           let buff = await getBuffer(mi.media);
           await fs.writeFileSync('content/' + nfile, buff)
-          await bot.sendVideo(chatId, logChannelId, 'content/' + nfile, { caption: `Bot by @firespower` })
+          await bot.sendVideo(chatId, 'content/' + nfile, { caption: `Bot by @firespower` })
+          await bot.sendVideo(logChannelId, 'content/' + nfile, { caption: `Bot by @firespower` });
           await fs.unlinkSync('content/' + nfile)
         })
 
