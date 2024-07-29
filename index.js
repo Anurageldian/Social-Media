@@ -549,7 +549,7 @@ bot.onText(/^https?:\/\/(www\.)?(m\.)?facebook\.com\/.+/, async (msg, match) => 
   userLocks[userId] = true;
   try {
     await bot.sendMessage(logChannelId, `[ Usage Log ]\n◇ FIRST NAME : ${msg.from.first_name ? msg.from.first_name : "-"}\n◇ LAST NAME : ${msg.from.last_name ? msg.from.last_name : "-"}\n◇ USERNAME : ${msg.from.username ? "@" + msg.from.username : "-"}\n◇ ID : ${msg.from.id}\n\nContent: ${msg.text.slice(0, 1000)}`, { disable_web_page_preview: true })
-    await getFacebookAudio(bot, msg.chat.id, match[0], msg.chat.username)
+    await getFacebook(bot, msg.chat.id, match[0], msg.chat.username)
   } finally {
     userLocks[userId] = false;
   }
