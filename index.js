@@ -104,8 +104,6 @@ app.get('/', async (req, res) => {
 app.listen(5000, function () {});
 console.log('Bot is running...')
 
-require('dotenv').config();
-const axios = require('axios');
 
 async function getUpdates(token) {
   try {
