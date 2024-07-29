@@ -105,24 +105,6 @@ app.listen(5000, function () {});
 console.log('Bot is running...')
 
 
-async function getUpdates(token) {
-  try {
-    const response = await axios.get(`https://api.telegram.org/bot${token}/getUpdates`);
-    return response.data.result;
-  } catch (error) {
-    console.error('Error getting updates:', error);
-    return [];
-  }
-}
-
-async function allUpdates() {
-  const updates = await getUpdates(token);
-  console.log('Updates:', JSON.stringify(updates, null, 2));
-}
-
-allUpdates();
-
-
 bot.on('photo', async (msg) => {
   let chatId = msg.chat.id;
   let getban = await getBanned(chatId);
