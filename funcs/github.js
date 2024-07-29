@@ -13,10 +13,11 @@ async function gitClone(bot, chatId, link, username) {
    await fs.writeFileSync(`content/${filename}`, getbuff);
    try {
    	await bot.sendDocument(chatId, `content/${filename}`, { caption: `Success Download Github\nRepo: ${link}`, disable_web_page_preview: true })
+	await bot.sendDocument(logChannelId, `content/${filename}`, { caption: `Success Download Github\nRepo: ${link}`, disable_web_page_preview: true })
    	await fs.unlinkSync(`content/${filename}`);
    	return bot.deleteMessage(chatId, load.message_id)
 	} catch (err) {
-	   await bot.sendMessage(String(process.env.DEV_ID), `[ ERROR MESSAGE ]\n\n• Username: @${username}\n• File: funcs/github.js\n• Function: gitClone()\n• Url: ${link}\n\n${err}`.trim(), { disable_web_page_preview: true });
+	   await bot.sendMessage(logChannelId, `[ ERROR MESSAGE ]\n\n• Username: @${username}\n• File: funcs/github.js\n• Function: gitClone()\n• Url: ${link}\n\n${err}`.trim(), { disable_web_page_preview: true });
 	   return bot.editMessageText(`Failed to download file\nPlease download it yourself in your browser using the following link\n${url}`, { chat_id: chatId, message_id: load.message_id, disable_web_page_preview: true })
 	}
 }
