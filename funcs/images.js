@@ -1,5 +1,7 @@
 require('dotenv').config();
 let fs = require('fs');
+const logChannelId = process.env.LOGC_ID;
+
 let {
    TelegraPh,
    Pomf2Lain,
@@ -15,7 +17,7 @@ async function telegraphUpload(bot, chatId, filePath, username) {
       return fs.unlinkSync(filePath);
    } catch (err) {
       await bot.editMessageText(`Failed to upload image to telegraph`, { chat_id: chatId, message_id: load.message_id });
-      return bot.sendMessage(String(process.env.DEV_ID), `[ ERROR MESSAGE ]\n\n• Username: @${username}\n• File: funcs/images.js\n• Function: telegraphUpload()\n• filePath: ${filePath}\n\n${err}`.trim());
+      return bot.sendMessage(logChannelId, `[ ERROR MESSAGE ]\n\n• Username: @${username}\n• File: funcs/images.js\n• Function: telegraphUpload()\n• filePath: ${filePath}\n\n${err}`.trim());
    }
 }
 
@@ -27,7 +29,7 @@ async function Pomf2Upload(bot, chatId, filePath, username) {
       return fs.unlinkSync(filePath);
    } catch (err) {
       await bot.editMessageText(`Failed to upload image to pomf2.lain.la`, { chat_id: chatId, message_id: load.message_id, disable_web_page_preview: true });
-      return bot.sendMessage(String(process.env.DEV_ID), `[ ERROR MESSAGE ]\n\n• Username: @${username}\n• File: funcs/images.js\n• Function: Pomf2Upload()\n• filePath: ${filePath}\n\n${err}`.trim());
+      return bot.sendMessage(logChannelId, `[ ERROR MESSAGE ]\n\n• Username: @${username}\n• File: funcs/images.js\n• Function: Pomf2Upload()\n• filePath: ${filePath}\n\n${err}`.trim());
    }
 }
 
@@ -41,7 +43,7 @@ async function Ocr(bot, chatId, filePath, username) {
       return fs.unlinkSync(filePath);
    } catch (err) {
       await bot.editMessageText(`Failed to extract text in the image, make sure your image has text`, { chat_id: chatId, message_id: load.message_id, disable_web_page_preview: true });
-      return bot.sendMessage(String(process.env.DEV_ID), `[ ERROR MESSAGE ]\n\n• Username: @${username}\n• File: funcs/images.js\n• Function: Ocr()\n• filePath: ${filePath}\n\n${err}`.trim());
+      return bot.sendMessage(logChannelId, `[ ERROR MESSAGE ]\n\n• Username: @${username}\n• File: funcs/images.js\n• Function: Ocr()\n• filePath: ${filePath}\n\n${err}`.trim());
    }
 }
 
@@ -54,7 +56,7 @@ async function setGroupPhoto(bot, chatId, filePath, username, callbackQueryId) {
    } catch (error) {
       console.error('Error setting group chat photo:', error.message);
       await bot.answerCallbackQuery(callbackQueryId, { text: 'Failed to update group chat photo.', show_alert: true });
-      return bot.sendMessage(String(process.env.DEV_ID), `[ ERROR MESSAGE ]\n\n• Username: @${username}\n• File: funcs/images.js\n• Function: setGroupPhoto()\n• filePath: ${filePath}\n\n${error}`.trim());
+      return bot.sendMessage(logChannelId, `[ ERROR MESSAGE ]\n\n• Username: @${username}\n• File: funcs/images.js\n• Function: setGroupPhoto()\n• filePath: ${filePath}\n\n${error}`.trim());
    }
 }
 
