@@ -11,20 +11,27 @@ async function pindl(url) {
     }});
     
     const $ = cheerio.load(data);
-    const scriptTag = $('script[data-test-id="video-snippet"]').html() || $('script[data-test-id="leaf-snippet"]').html();
+    const scriptTags = $('script[type="application/ld+json"]');
+
+    let mediaUrls = [];
     
-    if (scriptTag) {
-      const jsonData = JSON.parse(scriptTag);
-      const mediaUrls = jsonData.contentUrl || jsonData.image || jsonData.images || jsonData.videos;
-      
-      if (Array.isArray(mediaUrls)) {
-        return mediaUrls;  // Return all media URLs if multiple exist
-      } else {
-        return [mediaUrls]; // Return single URL in an array
+    scriptTags.each((i, element) => {
+      const jsonData = JSON.parse($(element).html());
+
+      // Extract images or videos depending on the structure
+      if (jsonData.image && Array.isArray(jsonData.image)) {
+        mediaUrls = mediaUrls.concat(jsonData.image);
+      } else if (jsonData.video && jsonData.video.contentUrl) {
+        mediaUrls.push(jsonData.video.contentUrl);
+      } else if (jsonData.image) {
+        mediaUrls.push(jsonData.image);
       }
-      
+    });
+
+    if (mediaUrls.length > 0) {
+      return mediaUrls;  // Return all media URLs found
     } else {
-      return ["Error: Invalid URL!"];
+      return ["Error: No media found!"];
     }
   } catch (err) {
     return ["Error: Invalid URL!"];
