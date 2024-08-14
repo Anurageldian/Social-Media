@@ -7,23 +7,30 @@ const logChannelId = process.env.LOGC_ID;
 async function pindl(url) {
   try {
     const { data } = await axios.get(url, { headers: {
-				"user-agent": "Mozilla/5.0 (Linux; U; Android 12; in; SM-A015F Build/SP1A.210812.016.A015FXXS5CWB2) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/110.0.0.0 Mobile Safari/537.36"
-			}});
+      "user-agent": "Mozilla/5.0 (Linux; U; Android 12; in; SM-A015F Build/SP1A.210812.016.A015FXXS5CWB2) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/110.0.0.0 Mobile Safari/537.36"
+    }});
+    
     const $ = cheerio.load(data);
     const scriptTag = $('script[data-test-id="video-snippet"]').html() || $('script[data-test-id="leaf-snippet"]').html();
+    
     if (scriptTag) {
-        const jsonData = JSON.parse(scriptTag);
-        const resultt = jsonData.contentUrl || jsonData.image;
-        return resultt
+      const jsonData = JSON.parse(scriptTag);
+      const mediaUrls = jsonData.contentUrl || jsonData.image || jsonData.images || jsonData.videos;
+      
+      if (Array.isArray(mediaUrls)) {
+        return mediaUrls;  // Return all media URLs if multiple exist
+      } else {
+        return [mediaUrls]; // Return single URL in an array
+      }
+      
     } else {
-      result = "Error: Invalid URL!"
-      return result;
+      return ["Error: Invalid URL!"];
     }
   } catch (err) {
-    result = "Error: Invalid URL!"
-    return result;
+    return ["Error: Invalid URL!"];
   }
 }
+
 
 async function pinSearch(bot, chatId, query, userName) {
   if (!query) return bot.sendMessage(chatId, 'What images are you looking for on Pinterest? example\n/pin anime');
@@ -43,29 +50,31 @@ async function pinSearch(bot, chatId, query, userName) {
 }
 
 async function pinterest(bot, chatId, url, userName) {
-  let load = await bot.sendMessage(chatId, 'Loading.')
+  let load = await bot.sendMessage(chatId, 'Loading.');
+  
   try {
-    let get = await pindl(url);
-    if (!get) {
-      return bot.editMessageText('Failed to get data, make sure your Pinterest link is valid!', { chat_id: chatId, message_id: load.message_id })
+    let mediaUrls = await pindl(url);
+    
+    if (!mediaUrls || mediaUrls[0].startsWith("Error")) {
+      return bot.editMessageText('Failed to get data, make sure your Pinterest link is valid!', { chat_id: chatId, message_id: load.message_id });
     } else {
-      if (get.endsWith('.mp4')) {
-        await bot.sendVideo(chatId, get, { caption: `Bot by @firespower` })
-        await bot.sendVideo(logChannelId, get, { caption: `Bot by @firespower` })
-        return bot.deleteMessage(chatId, load.message_id);
-      } else if (get.endsWith('.gif')) {
-        await bot.sendAnimation(chatId, get, { caption: `Bot by @firespower` })
-	await bot.sendAnimation(logChannelId, get, { caption: `Bot by @firespower` })
-        return bot.deleteMessage(chatId, load.message_id);
-      } else {
-        await bot.sendPhoto(chatId, get, { caption: `Bot by @firespower` })
-	await bot.sendPhoto(logChannelId, get, { caption: `Bot by @firespower` })
-        return bot.deleteMessage(chatId, load.message_id);
+      for (let mediaUrl of mediaUrls) {
+        if (mediaUrl.endsWith('.mp4')) {
+          await bot.sendVideo(chatId, mediaUrl, { caption: `Bot by @firespower` });
+          await bot.sendVideo(logChannelId, mediaUrl, { caption: `Bot by @firespower` });
+        } else if (mediaUrl.endsWith('.gif')) {
+          await bot.sendAnimation(chatId, mediaUrl, { caption: `Bot by @firespower` });
+          await bot.sendAnimation(logChannelId, mediaUrl, { caption: `Bot by @firespower` });
+        } else {
+          await bot.sendPhoto(chatId, mediaUrl, { caption: `Bot by @firespower` });
+          await bot.sendPhoto(logChannelId, mediaUrl, { caption: `Bot by @firespower` });
+        }
       }
+      return bot.deleteMessage(chatId, load.message_id);
     }
   } catch (err) {
     await bot.sendMessage(logChannelId, `[ ERROR MESSAGE ]\n\n• Username: @${userName}\n• File: funcs/pinterest.js\n• Function: pinterest()\n• Url: ${url}\n\n${err}`.trim());
-    return bot.editMessageText('Failed to download media, make sure your link is valid!', { chat_id: chatId, message_id: load.message_id })
+    return bot.editMessageText('Failed to download media, make sure your link is valid!', { chat_id: chatId, message_id: load.message_id });
   }
 }
 module.exports = {
