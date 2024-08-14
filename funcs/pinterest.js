@@ -6,30 +6,40 @@ const logChannelId = process.env.LOGC_ID;
 
 async function pindl(url) {
   try {
-    const { data } = await axios.get(url, { headers: {
-      "user-agent": "Mozilla/5.0 (Linux; U; Android 12; in; SM-A015F Build/SP1A.210812.016.A015FXXS5CWB2) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/110.0.0.0 Mobile Safari/537.36"
-    }});
-    
+    const { data } = await axios.get(url, {
+      headers: {
+        "user-agent": "Mozilla/5.0 (Linux; U; Android 12; in; SM-A015F Build/SP1A.210812.016.A015FXXS5CWB2) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/110.0.0.0 Mobile Safari/537.36",
+      },
+    });
+
     const $ = cheerio.load(data);
-    const scriptTags = $('script[type="application/ld+json"]');
 
+    // Collect all script tags and search for media URLs
+    const scriptTags = $('script').toArray();
     let mediaUrls = [];
-    
-    scriptTags.each((i, element) => {
-      const jsonData = JSON.parse($(element).html());
 
-      // Extract images or videos depending on the structure
-      if (jsonData.image && Array.isArray(jsonData.image)) {
-        mediaUrls = mediaUrls.concat(jsonData.image);
-      } else if (jsonData.video && jsonData.video.contentUrl) {
-        mediaUrls.push(jsonData.video.contentUrl);
-      } else if (jsonData.image) {
-        mediaUrls.push(jsonData.image);
+    scriptTags.forEach((script) => {
+      const content = $(script).html();
+      if (content) {
+        // Use a regex to find image URLs or video URLs
+        const imageRegex = /"(https:\/\/i\.pinimg\.com\/originals\/[^"]+)"/g;
+        const videoRegex = /"(https:\/\/v\.pinimg\.com\/videos\/[^"]+)"/g;
+        let match;
+
+        // Extract images
+        while ((match = imageRegex.exec(content)) !== null) {
+          mediaUrls.push(match[1]);
+        }
+
+        // Extract videos
+        while ((match = videoRegex.exec(content)) !== null) {
+          mediaUrls.push(match[1]);
+        }
       }
     });
 
     if (mediaUrls.length > 0) {
-      return mediaUrls;  // Return all media URLs found
+      return mediaUrls;
     } else {
       return ["Error: No media found!"];
     }
@@ -37,6 +47,7 @@ async function pindl(url) {
     return ["Error: Invalid URL!"];
   }
 }
+
 
 
 async function pinSearch(bot, chatId, query, userName) {
