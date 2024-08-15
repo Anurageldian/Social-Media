@@ -84,4 +84,6 @@ async function downloadFromYoutube(bot, chatId, url) {
 	}
 }
 
-module.exports = downloadFromYoutube
+module.exports = {
+	downloadFromYoutube
+}
