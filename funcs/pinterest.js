@@ -16,7 +16,7 @@ async function pindl(url) {
 
     // Collect all script tags and search for media URLs
     const scriptTags = $('script').toArray();
-    let mediaUrls = [];
+    let mediaUrls = new Set(); // Use a set to avoid duplicates
 
     scriptTags.forEach((script) => {
       const content = $(script).html();
@@ -28,15 +28,18 @@ async function pindl(url) {
 
         // Extract images
         while ((match = imageRegex.exec(content)) !== null) {
-          mediaUrls.push(match[1]);
+          mediaUrls.add(match[1]);
         }
 
         // Extract videos
         while ((match = videoRegex.exec(content)) !== null) {
-          mediaUrls.push(match[1]);
+          mediaUrls.add(match[1]);
         }
       }
     });
+
+    // Convert the set back to an array
+    mediaUrls = Array.from(mediaUrls);
 
     if (mediaUrls.length > 0) {
       return mediaUrls;
@@ -47,6 +50,7 @@ async function pindl(url) {
     return ["Error: Invalid URL!"];
   }
 }
+
 
 
 
@@ -95,6 +99,7 @@ async function pinterest(bot, chatId, url, userName) {
     return bot.editMessageText('Failed to download media, make sure your link is valid!', { chat_id: chatId, message_id: load.message_id });
   }
 }
+
 module.exports = {
   pinterest,
   pinSearch
