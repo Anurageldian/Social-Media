@@ -4,7 +4,10 @@ const util = require('util');
 const { exec } = require('child_process');
 const { htmlToText, getBuffer, filterAlphanumericWithDash } = require('./functions');
 const execPromise = util.promisify(exec);
-const fetch = require('node-fetch');
+const fetch = async () => {
+  const { default: fetch } = await import('node-fetch');
+  return fetch;
+};
 
 const logChannelId = process.env.LOGC_ID;
 
