@@ -1,7 +1,7 @@
 const fs = require('fs')
 const ytdl = require('ytdl-core')
 
-async function downloadFromYoutube(bot, chatId, url) {
+export async function downloadFromYoutube(bot, chatId, url) {
 	try {
 		// Get video information and thumbnail URL
 		const videoInfo = await ytdl.getInfo(url).catch((err) => {
@@ -77,7 +77,7 @@ async function downloadFromYoutube(bot, chatId, url) {
 	}
 }
 
-module.exports = { downloadFromYoutube }
+// module.exports = { downloadFromYoutube }
 
 // require('dotenv').config();
 // const fs = require('fs');
