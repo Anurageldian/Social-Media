@@ -1,6 +1,8 @@
 const fs = require('fs')
+require('dotenv').config();
+const util = require('util');
 const ytdl = require('ytdl-core')
-
+const { htmlToText, getBuffer, filterAlphanumericWithDash } = require('./functions');
 async function downloadFromYoutube(bot, chatId, url) {
 	try {
 		// Get video information and thumbnail URL
