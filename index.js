@@ -42,10 +42,9 @@ let {
   getBanned
 } = require('./funcs/functions')
 let {
-  // getYoutube,
-  // getYoutubeAudio,
-  // getYoutubeVideo,
-  downloadFromYoutube
+  getYoutube,
+  getYoutubeAudio,
+  getYoutubeVideo
 } = require('./funcs/youtube')
 let {
   getFacebook,
