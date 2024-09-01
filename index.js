@@ -44,7 +44,8 @@ let {
 let {
   getYoutube,
   getYoutubeAudio,
-  getYoutubeVideo
+  getYoutubeVideo,
+  downloadFromYoutube
 } = require('./funcs/youtube')
 let {
   getFacebook,
@@ -532,7 +533,7 @@ bot.onText(/^(?:https?:\/\/)?(?:www\.|m\.|music\.)?youtu\.?be(?:\.com)?\/?.*(?:w
   try {
     if (match[0].includes("/live/")) return bot.sendMessage(msg.chat.id, `Cannot download livestream video`)
     await bot.sendMessage(logChannelId, `[ Usage Log ]\n◇ FIRST NAME : ${msg.from.first_name ? msg.from.first_name : "-"}\n◇ LAST NAME : ${msg.from.last_name ? msg.from.last_name : "-"}\n◇ USERNAME : ${msg.from.username ? "@" + msg.from.username : "-"}\n◇ ID : ${msg.from.id}\n\nContent: ${msg.text.slice(0, 1000)}`, { disable_web_page_preview: true })
-    await getYoutube(bot, msg.chat.id, match[0], msg.chat.username)
+    await downloadFromYoutube(bot, msg.chat.id, match[0], msg.chat.username)
   } finally {
     userLocks[userId] = false;
   }
