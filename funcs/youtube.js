@@ -77,7 +77,7 @@ export async function downloadFromYoutube(bot, chatId, url) {
 	}
 }
 
-// module.exports = { downloadFromYoutube }
+module.exports = { downloadFromYoutube }
 
 // require('dotenv').config();
 // const fs = require('fs');
