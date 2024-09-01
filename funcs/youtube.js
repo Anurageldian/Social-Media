@@ -1,7 +1,7 @@
 const fs = require('fs')
 const ytdl = require('ytdl-core')
 
-export async function downloadFromYoutube(bot, chatId, url) {
+async function downloadFromYoutube(bot, chatId, url) {
 	try {
 		// Get video information and thumbnail URL
 		const videoInfo = await ytdl.getInfo(url).catch((err) => {
