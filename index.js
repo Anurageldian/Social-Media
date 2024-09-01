@@ -13,7 +13,9 @@ let fetch = import('node-fetch')
 const path = require('path');
 const request = require('request'); // Ensure request is imported here
 const sharp = require('sharp');
-import { downloadFromYoutube } from './funcs/youtube.js';
+const downloadFromYoutube = require('./funcs/youtube');
+console.log(downloadFromYoutube); // Should log the function definition
+
 let axios = require('axios')
 let {
   getTiktokInfo,
