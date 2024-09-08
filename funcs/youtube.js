@@ -15,8 +15,8 @@ const { getBuffer, filterAlphanumericWithDash } = require('./functions'); // Ens
 const logChannelId = process.env.LOGC_ID;
 const cookiesFilePath = path.join(__dirname, 'cookies.txt');
 
-const jsonCookiesFilePath = './cookies.json'; // Path to your JSON cookies file
-const netscapeCookiesFilePath = './cookies.txt'; // Path where you want to save the Netscape cookies
+const jsonCookiesFilePath = './funcs/cookies.json'; // Path to your JSON cookies file
+const netscapeCookiesFilePath = './funcs/cookies.txt'; // Path where you want to save the Netscape cookies
 
 // Function to convert JSON cookies to Netscape format
 function convertCookiesToNetscape(jsonCookies) {
