@@ -21,14 +21,21 @@ async function getYoutube(bot, chatId, url, userName) {
     const isMusicUrl = url.includes('music.youtube.com');
     const targetUrl = isMusicUrl ? url.replace('music.youtube.com', 'www.youtube.com') : url;
     
-    // Use youtube-dl-exec to fetch info
+    // Fetch video metadata using youtube-dl-exec
     let videoInfo = await youtubedl(targetUrl, {
-      dumpJson: true,
+      dumpJson: true,   // Fetch full video details
+    }).catch((err) => {
+      console.error(`Failed to fetch video metadata: ${err.message}`);
+      throw new Error('Video metadata fetch failed.');
     });
 
+    if (!videoInfo || !videoInfo.formats) {
+      throw new Error('Invalid YouTube video metadata.');
+    }
+
     if (isMusicUrl) {
-      let audioFormat = 'bestaudio'; // You can specify 'mp3' if needed
-      let sizeInMb = videoInfo.filesize / (1024 * 1024);
+      let audioFormat = 'bestaudio';  // You can specify 'mp3' if needed
+      let sizeInMb = videoInfo.filesize ? videoInfo.filesize / (1024 * 1024) : 0;
 
       if (sizeInMb > 50) {
         return bot.editMessageText('The file size is more than 50 MB, bots can only download under 50 MB.', { chat_id: chatId, message_id: load.message_id });
@@ -38,7 +45,7 @@ async function getYoutube(bot, chatId, url, userName) {
       await bot.editMessageText(`Downloading music ${videoInfo.title}, please wait.`, { chat_id: chatId, message_id: load.message_id });
 
       // Download the audio
-      let audioBuffer = await youtubedl(targetUrl, {
+      await youtubedl(targetUrl, {
         format: audioFormat,
         output: `content/${fname}`,
       });
@@ -62,7 +69,7 @@ async function getYoutube(bot, chatId, url, userName) {
       }
 
       let options = {
-        caption: `${videoInfo.title}\n\nPlease select the following option!`,
+        caption: `${videoInfo.title}\n\nPlease select an option!`,
         reply_markup: JSON.stringify({
           inline_keyboard: data,
         }),
@@ -72,6 +79,7 @@ async function getYoutube(bot, chatId, url, userName) {
       await bot.deleteMessage(chatId, load.message_id);
     }
   } catch (err) {
+    console.error(`Error in getYoutube: ${err.message}`);
     await bot.sendMessage(logChannelId, `[ ERROR MESSAGE ]\n\n• Username: @${userName}\n• File: funcs/youtube.js\n• Function: getYoutube()\n• Url: ${url}\n\n${err}`.trim());
     return bot.editMessageText('An error occurred, make sure your YouTube link is valid!', { chat_id: chatId, message_id: load.message_id });
   }
@@ -85,6 +93,9 @@ async function getYoutubeVideo(bot, chatId, id, formatId, userName) {
     let videoInfo = await youtubedl(videoUrl, {
       format: formatId,
       dumpSingleJson: true,
+    }).catch((err) => {
+      console.error(`Failed to fetch video: ${err.message}`);
+      throw new Error('Video fetch failed.');
     });
 
     let sizeInMb = (videoInfo.filesize || 0) / (1024 * 1024);
@@ -99,7 +110,7 @@ async function getYoutubeVideo(bot, chatId, id, formatId, userName) {
     let fname = filterAlphanumericWithDash(videoInfo.title) + '.mp4';
     await bot.editMessageText('Downloading video, please wait.', { chat_id: chatId, message_id: load.message_id });
 
-    let buffer = await youtubedl(videoUrl, {
+    await youtubedl(videoUrl, {
       format: formatId,
       output: `content/${fname}`,
     });
@@ -109,6 +120,7 @@ async function getYoutubeVideo(bot, chatId, id, formatId, userName) {
     await bot.deleteMessage(chatId, load.message_id);
     fs.unlinkSync(`content/${fname}`);
   } catch (err) {
+    console.error(`Error in getYoutubeVideo: ${err.message}`);
     await bot.sendMessage(process.env.DEV_ID, `[ ERROR MESSAGE ]\n\n• Username: @${userName}\n• File: funcs/youtube.js\n• Function: getYoutubeVideo()\n• Url: https://www.youtube.com/${id}\n\n${err}`.trim());
     return bot.editMessageText('An error occurred, failed to download video!', { chat_id: chatId, message_id: load.message_id });
   }
@@ -122,6 +134,9 @@ async function getYoutubeAudio(bot, chatId, id, formatId, userName) {
     let videoInfo = await youtubedl(videoUrl, {
       format: formatId,
       dumpSingleJson: true,
+    }).catch((err) => {
+      console.error(`Failed to fetch audio: ${err.message}`);
+      throw new Error('Audio fetch failed.');
     });
 
     let sizeInMb = (videoInfo.filesize || 0) / (1024 * 1024);
@@ -136,7 +151,7 @@ async function getYoutubeAudio(bot, chatId, id, formatId, userName) {
     let fname = filterAlphanumericWithDash(videoInfo.title) + '.mp3';
     await bot.editMessageText('Downloading audio, please wait.', { chat_id: chatId, message_id: load.message_id });
 
-    let buffer = await youtubedl(videoUrl, {
+    await youtubedl(videoUrl, {
       format: formatId,
       output: `content/${fname}`,
     });
@@ -146,6 +161,7 @@ async function getYoutubeAudio(bot, chatId, id, formatId, userName) {
     await bot.deleteMessage(chatId, load.message_id);
     fs.unlinkSync(`content/${fname}`);
   } catch (err) {
+    console.error(`Error in getYoutubeAudio: ${err.message}`);
     await bot.sendMessage(logChannelId, `[ ERROR MESSAGE ]\n\n• Username: @${userName}\n• File: funcs/youtube.js\n• Function: getYoutubeAudio()\n• Url: https://www.youtube.com/${id}\n\n${err}`.trim());
     return bot.editMessageText('An error occurred, failed to download audio!', { chat_id: chatId, message_id: load.message_id });
   }
