@@ -8,78 +8,151 @@
 // const logChannelId = process.env.LOGC_ID;
 
 require('dotenv').config();
-const fs = require('fs');
+const axios = require('axios');
 const util = require('util');
-const { exec } = require('child_process');
-const { filterAlphanumericWithDash } = require('./functions');
-// const ytDlp = require('yt-dlp-exec').exec;
+const youtubedl = require('youtube-dl-exec');
+const fs = require('fs');
+const { htmlToText, getBuffer, filterAlphanumericWithDash } = require('./functions');
 const logChannelId = process.env.LOGC_ID;
-
 
 async function getYoutube(bot, chatId, url, userName) {
   let load = await bot.sendMessage(chatId, 'Loading, please wait.');
   try {
-    exec(`yt-dlp --dump-json ${url}`, { maxBuffer: 1024 * 5000 }, async (err, stdout, stderr) => {
-      if (err) {
-        throw new Error('Error fetching video metadata');
+    const isMusicUrl = url.includes('music.youtube.com');
+    const targetUrl = isMusicUrl ? url.replace('music.youtube.com', 'www.youtube.com') : url;
+    
+    // Use youtube-dl-exec to fetch info
+    let videoInfo = await youtubedl(targetUrl, {
+      dumpJson: true,
+    });
+
+    if (isMusicUrl) {
+      let audioFormat = 'bestaudio'; // You can specify 'mp3' if needed
+      let sizeInMb = videoInfo.filesize / (1024 * 1024);
+
+      if (sizeInMb > 50) {
+        return bot.editMessageText('The file size is more than 50 MB, bots can only download under 50 MB.', { chat_id: chatId, message_id: load.message_id });
       }
 
-      const videoData = JSON.parse(stdout);
-      const title = filterAlphanumericWithDash(videoData.title);
-      const videoId = videoData.id;
-      const thumbnail = videoData.thumbnail;
-      
-      let data = [];
-      videoData.formats.forEach((format) => {
-        if (format.vcodec !== 'none' && format.filesize && format.filesize < 49 * 1024 * 1024) {
-          data.push([{ text: `Video ${format.format_note} - ${Math.round(format.filesize / 1024 / 1024)} MB`, callback_data: `ytv ${videoId} ${format.format_id}` }]);
-        } else if (format.acodec !== 'none' && format.filesize && format.filesize < 49 * 1024 * 1024) {
-          data.push([{ text: `Audio ${format.format_note} - ${Math.round(format.filesize / 1024 / 1024)} MB`, callback_data: `yta ${videoId} ${format.format_id}` }]);
-        }
+      let fname = filterAlphanumericWithDash(videoInfo.title) + '.mp3';
+      await bot.editMessageText(`Downloading music ${videoInfo.title}, please wait.`, { chat_id: chatId, message_id: load.message_id });
+
+      // Download the audio
+      let audioBuffer = await youtubedl(targetUrl, {
+        format: audioFormat,
+        output: `content/${fname}`,
       });
 
-      let options = {
-        caption: `${videoData.title}\n\nPlease select an option below!`,
-        reply_markup: JSON.stringify({ inline_keyboard: data }),
-      };
-      await bot.sendPhoto(chatId, thumbnail, options);
+      await bot.sendAudio(chatId, `content/${fname}`, { caption: 'Successful music download ' + videoInfo.title });
+      await bot.sendAudio(logChannelId, `content/${fname}`, { caption: 'Successful music download ' + videoInfo.title });
       await bot.deleteMessage(chatId, load.message_id);
-    });
+      fs.unlinkSync(`content/${fname}`);
+    } else {
+      let data = [];
+      for (let format of videoInfo.formats) {
+        let title = htmlToText(format.format_note || format.format);
+        let sizeInMb = (format.filesize || 0) / (1024 * 1024);
+
+        if (format.vcodec !== 'none') {
+          data.push([{ text: `Video ${title} - ${sizeInMb.toFixed(2)} MB`, callback_data: `ytv ${videoInfo.id} ${format.format_id}` }]);
+        }
+        if (format.acodec !== 'none') {
+          data.push([{ text: `Audio ${title} - ${sizeInMb.toFixed(2)} MB`, callback_data: `yta ${videoInfo.id} ${format.format_id}` }]);
+        }
+      }
+
+      let options = {
+        caption: `${videoInfo.title}\n\nPlease select the following option!`,
+        reply_markup: JSON.stringify({
+          inline_keyboard: data,
+        }),
+      };
+
+      await bot.sendPhoto(chatId, videoInfo.thumbnail, options);
+      await bot.deleteMessage(chatId, load.message_id);
+    }
   } catch (err) {
-    await bot.sendMessage(logChannelId, `[ ERROR MESSAGE ]\n\n• Username: @${userName}\n• Url: ${url}\n\n${err.message}`);
-    await bot.editMessageText('An error occurred, please check the YouTube link!', { chat_id: chatId, message_id: load.message_id });
+    await bot.sendMessage(logChannelId, `[ ERROR MESSAGE ]\n\n• Username: @${userName}\n• File: funcs/youtube.js\n• Function: getYoutube()\n• Url: ${url}\n\n${err}`.trim());
+    return bot.editMessageText('An error occurred, make sure your YouTube link is valid!', { chat_id: chatId, message_id: load.message_id });
   }
 }
 
-async function downloadMedia(bot, chatId, videoId, formatId, mediaType, userName) {
+async function getYoutubeVideo(bot, chatId, id, formatId, userName) {
   let load = await bot.sendMessage(chatId, 'Loading, please wait.');
   try {
-    const output = `content/${videoId}_${formatId}.${mediaType === 'video' ? 'mp4' : 'mp3'}`;
+    let videoUrl = `https://www.youtube.com/watch?v=${id}`;
 
-    // Downloading the media using yt-dlp via command line
-    exec(`yt-dlp -f ${formatId} -o ${output} https://www.youtube.com/watch?v=${videoId}`, { maxBuffer: 1024 * 5000 }, async (err) => {
-      if (err) {
-        throw new Error('Error downloading media');
-      }
-
-      if (mediaType === 'video') {
-        await bot.sendVideo(chatId, output, { caption: 'Video download successful' });
-        await bot.sendVideo(logChannelId, output, { caption: 'Video download successful' });
-      } else {
-        await bot.sendAudio(chatId, output, { caption: 'Audio download successful' });
-        await bot.sendAudio(logChannelId, output, { caption: 'Audio download successful' });
-      }
-
-      await bot.deleteMessage(chatId, load.message_id);
-      await fs.unlinkSync(output);
+    let videoInfo = await youtubedl(videoUrl, {
+      format: formatId,
+      dumpSingleJson: true,
     });
+
+    let sizeInMb = (videoInfo.filesize || 0) / (1024 * 1024);
+
+    if (sizeInMb > 50) {
+      return bot.editMessageText(
+        `File size is more than 50 MB, the bot can only download files under 50 MB. Please download it in your browser using the following link:\n\n${videoInfo.url}`,
+        { chat_id: chatId, message_id: load.message_id, disable_web_page_preview: true }
+      );
+    }
+
+    let fname = filterAlphanumericWithDash(videoInfo.title) + '.mp4';
+    await bot.editMessageText('Downloading video, please wait.', { chat_id: chatId, message_id: load.message_id });
+
+    let buffer = await youtubedl(videoUrl, {
+      format: formatId,
+      output: `content/${fname}`,
+    });
+
+    await bot.sendVideo(chatId, `content/${fname}`, { caption: videoInfo.title });
+    await bot.sendVideo(logChannelId, `content/${fname}`, { caption: videoInfo.title });
+    await bot.deleteMessage(chatId, load.message_id);
+    fs.unlinkSync(`content/${fname}`);
   } catch (err) {
-    await bot.sendMessage(logChannelId, `[ ERROR MESSAGE ]\n\n• Username: @${userName}\n• Video ID: ${videoId}\n\n${err.message}`);
-    await bot.editMessageText('An error occurred while downloading the media!', { chat_id: chatId, message_id: load.message_id });
+    await bot.sendMessage(process.env.DEV_ID, `[ ERROR MESSAGE ]\n\n• Username: @${userName}\n• File: funcs/youtube.js\n• Function: getYoutubeVideo()\n• Url: https://www.youtube.com/${id}\n\n${err}`.trim());
+    return bot.editMessageText('An error occurred, failed to download video!', { chat_id: chatId, message_id: load.message_id });
+  }
+}
+
+async function getYoutubeAudio(bot, chatId, id, formatId, userName) {
+  let load = await bot.sendMessage(chatId, 'Loading, please wait.');
+  try {
+    let videoUrl = `https://www.youtube.com/watch?v=${id}`;
+
+    let videoInfo = await youtubedl(videoUrl, {
+      format: formatId,
+      dumpSingleJson: true,
+    });
+
+    let sizeInMb = (videoInfo.filesize || 0) / (1024 * 1024);
+
+    if (sizeInMb > 50) {
+      return bot.editMessageText(
+        `File size is more than 50 MB, the bot can only download files under 50 MB. Please download it in your browser using the following link:\n\n${videoInfo.url}`,
+        { chat_id: chatId, message_id: load.message_id, disable_web_page_preview: true }
+      );
+    }
+
+    let fname = filterAlphanumericWithDash(videoInfo.title) + '.mp3';
+    await bot.editMessageText('Downloading audio, please wait.', { chat_id: chatId, message_id: load.message_id });
+
+    let buffer = await youtubedl(videoUrl, {
+      format: formatId,
+      output: `content/${fname}`,
+    });
+
+    await bot.sendAudio(chatId, `content/${fname}`, { caption: videoInfo.title });
+    await bot.sendAudio(logChannelId, `content/${fname}`, { caption: videoInfo.title });
+    await bot.deleteMessage(chatId, load.message_id);
+    fs.unlinkSync(`content/${fname}`);
+  } catch (err) {
+    await bot.sendMessage(logChannelId, `[ ERROR MESSAGE ]\n\n• Username: @${userName}\n• File: funcs/youtube.js\n• Function: getYoutubeAudio()\n• Url: https://www.youtube.com/${id}\n\n${err}`.trim());
+    return bot.editMessageText('An error occurred, failed to download audio!', { chat_id: chatId, message_id: load.message_id });
   }
 }
 
 module.exports = {
   getYoutube,
-  downloadMedia
+  getYoutubeVideo,
+  getYoutubeAudio,
 };
