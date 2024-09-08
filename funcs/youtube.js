@@ -14,7 +14,7 @@ const { exec } = require('child_process');
 
 const execPromise = util.promisify(exec);
 
-async function downloadYoutubeVideo(url, outputPath) {
+async function getYoutube(url, outputPath) {
   try {
     // Construct the command for yt-dlp
     const command = `yt-dlp -f best -o "${outputPath}" ${url}`;
@@ -39,7 +39,7 @@ async function downloadYoutubeVideo(url, outputPath) {
 const url = 'https://www.youtube.com/watch?v=YOUR_VIDEO_ID';
 const outputPath = path.join(__dirname, 'downloaded_video.mp4');
 
-downloadYoutubeVideo(url, outputPath);
+getYoutube(url, outputPath);
 
 // require('dotenv').config();
 // const axios = require('axios');
