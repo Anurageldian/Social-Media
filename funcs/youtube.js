@@ -12,14 +12,14 @@ const fs = require('fs');
 const util = require('util');
 const { exec } = require('child_process');
 const { filterAlphanumericWithDash } = require('./functions');
-const ytDlp = require('yt-dlp-exec').exec;
+// const ytDlp = require('yt-dlp-exec').exec;
 const logChannelId = process.env.LOGC_ID;
+
 
 async function getYoutube(bot, chatId, url, userName) {
   let load = await bot.sendMessage(chatId, 'Loading, please wait.');
   try {
-    // Fetch metadata using yt-dlp
-    ytDlp([url, '--dump-json'], { maxBuffer: 1024 * 5000 }, async (err, stdout) => {
+    exec(`yt-dlp --dump-json ${url}`, { maxBuffer: 1024 * 5000 }, async (err, stdout, stderr) => {
       if (err) {
         throw new Error('Error fetching video metadata');
       }
@@ -56,8 +56,8 @@ async function downloadMedia(bot, chatId, videoId, formatId, mediaType, userName
   try {
     const output = `content/${videoId}_${formatId}.${mediaType === 'video' ? 'mp4' : 'mp3'}`;
 
-    // Downloading the media using yt-dlp
-    ytDlp([`https://www.youtube.com/watch?v=${videoId}`, '-f', formatId, '-o', output], { maxBuffer: 1024 * 5000 }, async (err) => {
+    // Downloading the media using yt-dlp via command line
+    exec(`yt-dlp -f ${formatId} -o ${output} https://www.youtube.com/watch?v=${videoId}`, { maxBuffer: 1024 * 5000 }, async (err) => {
       if (err) {
         throw new Error('Error downloading media');
       }
