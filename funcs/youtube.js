@@ -36,10 +36,9 @@ async function getYoutube(url, outputPath) {
 }
 
 // Example usage
-const url = 'https://www.youtube.com/watch?v=YOUR_VIDEO_ID';
-const outputPath = path.join(__dirname, 'downloaded_video.mp4');
-
-getYoutube(url, outputPath);
+module.exports = {
+  getYoutube
+};
 
 // require('dotenv').config();
 // const axios = require('axios');
