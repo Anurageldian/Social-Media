@@ -111,14 +111,12 @@ const fs = require('fs');
 async function getYoutubeInfo(bot, chatId, url, userName) {
     let load = await bot.sendMessage(chatId, 'Loading video info, please wait.');
     try {
-        // Fetch video info
-        const info = await ytdl.getInfo(url);
+        const info = await ytdl.getInfo(url);  // Fetch video info
 
-        // Extract available formats for video and audio
+        // Process video info and present options to user
         const videoFormats = ytdl.filterFormats(info.formats, 'videoonly');
         const audioFormats = ytdl.filterFormats(info.formats, 'audioonly');
 
-        // Prepare a list of video and audio formats for the user to choose
         let options = [];
 
         videoFormats.forEach((format, index) => {
@@ -135,7 +133,6 @@ async function getYoutubeInfo(bot, chatId, url, userName) {
             }]);
         });
 
-        // Send the format options to the user
         let messageOptions = {
             caption: `${info.videoDetails.title}\n\nPlease select the desired quality or audio:`,
             reply_markup: JSON.stringify({
@@ -147,10 +144,14 @@ async function getYoutubeInfo(bot, chatId, url, userName) {
         await bot.deleteMessage(chatId, load.message_id);
 
     } catch (err) {
-        await bot.sendMessage(String(process.env.DEV_ID), `[ ERROR MESSAGE ]\n\n• Username: @${userName}\n• File: youtube.js\n• Function: getYoutubeInfo()\n• Url: ${url}\n\n${err}`);
+        // Send detailed error message for debugging
+        console.error('Error while retrieving video information:', err);
+
+        await bot.sendMessage(process.env.DEV_ID, `[ ERROR MESSAGE ]\n\n• Username: @${userName}\n• File: youtube.js\n• Function: getYoutubeInfo()\n• Url: ${url}\n\nError: ${err.message}`);
         return bot.editMessageText('An error occurred while retrieving video information.', { chat_id: chatId, message_id: load.message_id });
     }
 }
+
 
 async function downloadYoutube(bot, chatId, url, format, userName) {
     let load = await bot.sendMessage(chatId, 'Downloading, please wait.');
