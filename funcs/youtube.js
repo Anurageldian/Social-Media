@@ -105,7 +105,6 @@
 //   getYoutubeAudio
 // }
 
-
 require('dotenv').config();
 const axios = require('axios');
 const fs = require('fs');
@@ -113,13 +112,16 @@ const util = require('util');
 const { htmlToText, getBuffer, filterAlphanumericWithDash } = require('./functions');
 const { exec } = require('child_process');
 
+const proxy = 'http://your-proxy-server:8080';
+const userAgent = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/74.0.3729.169 Safari/537.3';
+
 async function getYoutube(bot, chatId, url, userName) {
   let load = await bot.sendMessage(chatId, 'Loading, please wait.');
   let data = [];
   try {
     if (url.includes('music.youtube.com')) {
       let newUrl = url.replace('music.youtube.com', 'www.youtube.com');
-      let command = `yt-dlp -f bestaudio --extract-audio --audio-format mp3 ${newUrl}`;
+      let command = `yt-dlp -f bestaudio --extract-audio --audio-format mp3 --proxy ${proxy} --user-agent "${userAgent}" ${newUrl}`;
       exec(command, (error, stdout, stderr) => {
         if (error) {
           console.error(error);
@@ -133,7 +135,7 @@ async function getYoutube(bot, chatId, url, userName) {
         fs.unlinkSync(`content/${filename}`);
       });
     } else {
-      let command = `yt-dlp -F ${url}`;
+      let command = `yt-dlp -F --proxy ${proxy} --user-agent "${userAgent}" ${url}`;
       exec(command, (error, stdout, stderr) => {
         if (error) {
           console.error(error);
@@ -166,7 +168,7 @@ async function getYoutube(bot, chatId, url, userName) {
 async function getYoutubeVideo(bot, chatId, url, formatId, userName) {
   let load = await bot.sendMessage(chatId, 'Loading, please wait.');
   try {
-    let command = `yt-dlp -f ${formatId} ${url}`;
+    let command = `yt-dlp -f ${formatId} --proxy ${proxy} --user-agent "${userAgent}" ${url}`;
     exec(command, (error, stdout, stderr) => {
       if (error) {
         console.error(error);
@@ -181,14 +183,14 @@ async function getYoutubeVideo(bot, chatId, url, formatId, userName) {
     });
   } catch (err) {
     bot.sendMessage(String(process.env.DEV_ID), `[ ERROR MESSAGE ]\n\n• Username: @${userName}\n• File: funcs/youtube.js\n• Function: getYoutubeVideo()\n• Url: ${url}\n\n${err}`.trim());
-    return bot.editMessageText('An error occurred, failed to download video!', { chat_id: chatId, message_id: load.message_id });
+    return bot.editMessageText(' An error occurred, failed to download video!', { chat_id: chatId, message_id: load.message_id });
   }
 }
 
 async function getYoutubeAudio(bot, chatId, url, formatId, userName) {
   let load = await bot.sendMessage(chatId, 'Loading, please wait.');
   try {
-    let command = `yt-dlp -f ${formatId} --extract-audio --audio-format mp3 ${url}`;
+    let command = `yt-dlp -f ${formatId} --extract-audio --audio-format mp3 --proxy ${proxy} --user-agent "${userAgent}" ${url}`;
     exec(command, (error, stdout, stderr) => {
       if (error) {
         console.error(error);
