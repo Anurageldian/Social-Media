@@ -111,26 +111,104 @@ const axios = require('axios');
 const fs = require('fs');
 const util = require('util');
 const { htmlToText, getBuffer, filterAlphanumericWithDash } = require('./functions');
-const youtubeScraper = require('youtube-scraper');
+const { exec } = require('child_process');
 
-async function getYoutube(bot, chatId, url) {
+async function getYoutube(bot, chatId, url, userName) {
+  let load = await bot.sendMessage(chatId, 'Loading, please wait.');
+  let data = [];
   try {
-    const video = await youtubeScraper.getVideo(url);
-    const filename = `${video.title}.${video.format}`;
-    const filepath = `content/${filename}`;
-    const stream = await video.getStream();
-    const writer = fs.createWriteStream(filepath);
-    stream.pipe(writer);
-    writer.on('finish', () => {
-      bot.sendVideo(chatId, filepath, { caption: filename });
-      fs.unlinkSync(filepath);
+    if (url.includes('music.youtube.com')) {
+      let newUrl = url.replace('music.youtube.com', 'www.youtube.com');
+      let command = `yt-dlp -f bestaudio --extract-audio --audio-format mp3 ${newUrl}`;
+      exec(command, (error, stdout, stderr) => {
+        if (error) {
+          console.error(error);
+          return bot.editMessageText('An error occurred, failed to download music!', { chat_id: chatId, message_id: load.message_id });
+        }
+        let filename = stdout.split('\n')[0].split(' ')[-1];
+        filename = filename.replace('content/', '');
+        bot.editMessageText(`Downloading music ${filename}, please wait.`, { chat_id: chatId, message_id: load.message_id });
+        bot.sendAudio(chatId, `content/${filename}`, { caption: 'Successful music download ' + filename });
+        bot.deleteMessage(chatId, load.message_id);
+        fs.unlinkSync(`content/${filename}`);
+      });
+    } else {
+      let command = `yt-dlp -F ${url}`;
+      exec(command, (error, stdout, stderr) => {
+        if (error) {
+          console.error(error);
+          return bot.editMessageText('An error occurred, failed to get video formats!', { chat_id: chatId, message_id: load.message_id });
+        }
+        let formats = stdout.split('\n');
+        for (let format of formats) {
+          if (format.includes('format')) {
+            let formatId = format.split(' ')[0];
+            let formatName = format.split(' ')[1];
+            data.push([{ text: `Video ${formatName}`, callback_data: `ytv ${url} ${formatId}`}]);
+          }
+        }
+        let options = {
+          caption: 'Please select the following option!',
+          reply_markup: JSON.stringify({
+            inline_keyboard: data
+          })
+        }
+        bot.sendPhoto(chatId, `https://i.ytimg.com/vi/${url.split('v=')[1]}/0.jpg`, options);
+        bot.deleteMessage(chatId, load.message_id);
+      });
+    }
+  } catch (err) {
+    bot.sendMessage(String(process.env.DEV_ID), `[ ERROR MESSAGE ]\n\n• Username: @${userName}\n• File: funcs/youtube.js\n• Function: getYoutube()\n• Url: ${url}\n\n${err}`.trim());
+    return bot.editMessageText('An error occurred, make sure your YouTube link is valid!', { chat_id: chatId, message_id: load.message_id });
+  }
+}
+
+async function getYoutubeVideo(bot, chatId, url, formatId, userName) {
+  let load = await bot.sendMessage(chatId, 'Loading, please wait.');
+  try {
+    let command = `yt-dlp -f ${formatId} ${url}`;
+    exec(command, (error, stdout, stderr) => {
+      if (error) {
+        console.error(error);
+        return bot.editMessageText('An error occurred, failed to download video!', { chat_id: chatId, message_id: load.message_id });
+      }
+      let filename = stdout.split('\n')[0].split(' ')[-1];
+      filename = filename.replace('content/', '');
+      bot.editMessageText('Loading, downloading video ' + filename, { chat_id: chatId, message_id: load.message_id });
+      bot.sendVideo(chatId, `content/${filename}`, { caption: filename });
+      bot.deleteMessage(chatId, load.message_id);
+      fs.unlinkSync(`content/${filename}`);
     });
-  } catch (error) {
-    console.error(error);
+  } catch (err) {
+    bot.sendMessage(String(process.env.DEV_ID), `[ ERROR MESSAGE ]\n\n• Username: @${userName}\n• File: funcs/youtube.js\n• Function: getYoutubeVideo()\n• Url: ${url}\n\n${err}`.trim());
     return bot.editMessageText('An error occurred, failed to download video!', { chat_id: chatId, message_id: load.message_id });
   }
 }
 
- module.exports = {
-   getYoutube
- }
+async function getYoutubeAudio(bot, chatId, url, formatId, userName) {
+  let load = await bot.sendMessage(chatId, 'Loading, please wait.');
+  try {
+    let command = `yt-dlp -f ${formatId} --extract-audio --audio-format mp3 ${url}`;
+    exec(command, (error, stdout, stderr) => {
+      if (error) {
+        console.error(error);
+        return bot.editMessageText('An error occurred, failed to download audio!', { chat_id: chatId, message_id: load.message_id });
+      }
+      let filename = stdout.split('\n')[0].split(' ')[-1];
+      filename = filename.replace('content/', '');
+      bot.editMessageText('Loading, downloading audio ' + filename, { chat_id: chatId, message_id: load.message_id });
+      bot.sendAudio(chatId, `content/${filename}`, { caption: filename });
+      bot.deleteMessage(chatId, load.message_id);
+      fs.unlinkSync(`content/${filename}`);
+    });
+  } catch (err) {
+    bot.sendMessage(String(process.env.DEV_ID), `[ ERROR MESSAGE ]\n\n• Username: @${userName}\n• File: funcs/youtube.js\n• Function: getYoutubeAudio()\n• Url: ${url}\n\n${err}`.trim());
+    return bot.editMessageText('An error occurred, failed to download audio!', { chat_id: chatId, message_id: load.message_id });
+  }
+}
+
+module.exports = {
+  getYoutube,
+  getYoutubeVideo,
+  getYoutubeAudio
+}
