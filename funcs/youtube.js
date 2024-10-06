@@ -114,6 +114,7 @@ const { exec } = require('child_process');
 
 const proxy = 'http://your-proxy-server:8080';
 const userAgent = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/74.0.3729.169 Safari/537.3';
+const dnsServer = '8.8.8.8';
 
 async function getYoutube(bot, chatId, url, userName) {
   let load = await bot.sendMessage(chatId, 'Loading, please wait.');
@@ -121,7 +122,7 @@ async function getYoutube(bot, chatId, url, userName) {
   try {
     if (url.includes('music.youtube.com')) {
       let newUrl = url.replace('music.youtube.com', 'www.youtube.com');
-      let command = `yt-dlp -f bestaudio --extract-audio --audio-format mp3 --proxy ${proxy} --user-agent "${userAgent}" ${newUrl}`;
+      let command = `yt-dlp -f bestaudio --extract-audio --audio-format mp3 --proxy ${proxy} --user-agent "${userAgent}" --dns ${dnsServer} ${newUrl}`;
       exec(command, (error, stdout, stderr) => {
         if (error) {
           console.error(error);
@@ -135,7 +136,7 @@ async function getYoutube(bot, chatId, url, userName) {
         fs.unlinkSync(`content/${filename}`);
       });
     } else {
-      let command = `yt-dlp -F --proxy ${proxy} --user-agent "${userAgent}" ${url}`;
+      let command = `yt-dlp -F --proxy ${proxy} --user-agent "${userAgent}" --dns ${dnsServer} ${url}`;
       exec(command, (error, stdout, stderr) => {
         if (error) {
           console.error(error);
@@ -164,6 +165,8 @@ async function getYoutube(bot, chatId, url, userName) {
     return bot.editMessageText('An error occurred, make sure your YouTube link is valid!', { chat_id: chatId, message_id: load.message_id });
   }
 }
+
+// ... rest of the code ...
 
 async function getYoutubeVideo(bot, chatId, url, formatId, userName) {
   let load = await bot.sendMessage(chatId, 'Loading, please wait.');
