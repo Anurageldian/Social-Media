@@ -113,95 +113,24 @@ const util = require('util');
 const { htmlToText, getBuffer, filterAlphanumericWithDash } = require('./functions');
 const youtubeScraper = require('youtube-scraper');
 
-async function getYoutube(bot, chatId, url, userName) {
-  let load = await bot.sendMessage(chatId, 'Loading, please wait.');
-  let data = [];
+async function getYoutube(bot, chatId, url) {
   try {
-    if (url.includes('music.youtube.com')) {
-      let newUrl = url.replace('music.youtube.com', 'www.youtube.com');
-      let video = await youtubeScraper.getVideo(newUrl);
-      let filename = `${video.title}.mp3`;
-      let filepath = `content/${filename}`;
-      let stream = await video.getAudioStream();
-      const writer = fs.createWriteStream(filepath);
-      stream.pipe(writer);
-      writer.on('finish', async () => {
-        await bot.editMessageText(`Downloading music ${video.title}, please wait.`, { chat_id: chatId, message_id: load.message_id });
-        await bot.sendAudio(chatId, filepath, { caption: 'Successful music download ' + video.title });
-        await bot.deleteMessage(chatId, load.message_id);
-        await fs.unlinkSync(filepath);
-      });
-    } else {
-      let video = await youtubeScraper.getVideo(url);
-      for (let format of video.formats) {
-        let title = htmlToText(format.title);
-        data.push([{ text: `Video ${title} - ${format.size}`, callback_data: `ytv ${video.id} ${format.formatId}`}]);
-      }
-      for (let format of video.audioFormats) {
-        let title = htmlToText(format.title);
-        data.push([{ text: `Audio ${title} - ${format.size}`, callback_data: `yta ${video.id} ${format.formatId}`}]);
-      }
-      let options = {
-        caption: `${video.title}\n\nPlease select the following option!`,
-        reply_markup: JSON.stringify({
-          inline_keyboard: data
-        })
-      }
-      await bot.sendPhoto(chatId, `https://i.ytimg.com/vi/${video.id}/0.jpg`, options);
-      await bot.deleteMessage(chatId, load.message_id);
-    }
-  } catch (err) {
-    await bot.sendMessage(String(process.env.DEV_ID), `[ ERROR MESSAGE ]\n\n• Username: @${userName}\n• File: funcs/youtube.js\n• Function: getYoutube()\n• Url: ${url}\n\n${err}`.trim());
-    return bot.editMessageText('An error occurred, make sure your YouTube link is valid!', { chat_id: chatId, message_id: load.message_id });
-  }
-}
-
-async function getYoutubeVideo(bot, chatId, id, ind, userName) {
-  let load = await bot.sendMessage(chatId, 'Loading, please wait.');
-  try {
-    let video = await youtubeScraper.getVideo(`https://www.youtube.com/${id}`);
-    let format = video.formats.find(format => format.formatId === ind);
-    let filename = `${format.title}.${format.container}`;
-    let filepath = `content/${filename}`;
-    let stream = await video.getStream(format.formatId);
+    const video = await youtubeScraper.getVideo(url);
+    const filename = `${video.title}.${video.format}`;
+    const filepath = `content/${filename}`;
+    const stream = await video.getStream();
     const writer = fs.createWriteStream(filepath);
     stream.pipe(writer);
-    writer.on('finish', async () => {
-      await bot.editMessageText('Loading, downloading video ' + video.title, { chat_id: chatId, message_id: load.message_id });
-      await bot.sendVideo(chatId, filepath, { caption: format.title });
-      await bot.deleteMessage(chatId, load.message_id);
-      await fs.unlinkSync(filepath);
+    writer.on('finish', () => {
+      bot.sendVideo(chatId, filepath, { caption: filename });
+      fs.unlinkSync(filepath);
     });
-  } catch (err) {
-    await bot.sendMessage(String(process.env.DEV_ID), `[ ERROR MESSAGE ]\n\n• Username: @${userName}\n• File: funcs/youtube.js\n• Function: getYoutubeVideo()\n• Url: https://www.youtube.com/${id}\n\n${err}`.trim());
+  } catch (error) {
+    console.error(error);
     return bot.editMessageText('An error occurred, failed to download video!', { chat_id: chatId, message_id: load.message_id });
   }
 }
 
-async function getYoutubeAudio(bot, chatId, id, ind, userName) {
-  let load = await bot.sendMessage(chatId, 'Loading, please wait.');
-  try {
-    let video = await youtubeScraper.getVideo(`https://www.youtube.com/${id}`);
-    let format = video.audioFormats.find(format => format.formatId === ind);
-    let filename = `${format.title}.mp3`;
-    let filepath = `content/${filename}`;
-    let stream = await video.getAudioStream(format.formatId);
-    const writer = fs.createWriteStream(filepath);
-    stream.pipe(writer);
-    writer.on('finish', async () => {
-      await bot.editMessageText('Loading, downloading audio ' + video.title, { chat_id: chatId, message_id: load.message_id });
-      await bot.sendAudio(chatId, filepath, { caption: format.title });
-      await bot.deleteMessage(chatId, load.message_id);
-      await fs.unlinkSync(filepath);
-    });
-  } catch (err) {
-    await bot.sendMessage(String(process.env.DEV_ID), `[ ERROR MESSAGE ]\n\n• Username: @${userName}\n• File: funcs/youtube.js\n• Function: getYoutubeAudio()\n• Url: https://www.youtube.com/${id}\n\n${err}`.trim());
-    return bot.editMessageText('An error occurred, failed to download audio!', { chat_id: chatId, message_id: load.message_id });
-  }
-}
-
-module.exports = {
-  getYoutube,
-  getYoutubeVideo,
-  getYoutubeAudio
-}
+ module.exports = {
+   getYoutube
+ }
