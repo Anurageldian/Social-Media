@@ -22,7 +22,7 @@
 //   googleSearch
 // }
 require('dotenv').config();
-const google = require('google-that');
+import google from 'google-that';
 const logChannelId = process.env.LOGC_ID;
 
 async function googleSearch(bot, chatId, query, userName) {
