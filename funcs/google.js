@@ -31,9 +31,18 @@ async function googleSearch(bot, chatId, query, userName) {
   
   try {
     const searchResults = await search({ query: query });
-    let resultS = `GOOGLE SEARCH\n\n`;
 
-    // Loop through search results but only if they exist
+    // Log the search results for debugging
+    console.log('Search Results:', searchResults); // To see if results are being returned
+
+    let resultS = `🔍 **Google Search Results** 🔍\n\n`;
+
+    // Check if searchResults contains any data
+    if (searchResults.length === 0) {
+      return bot.sendMessage(chatId, 'No results found.');
+    }
+
+    // Loop through search results
     for (let i = 0; i < Math.min(5, searchResults.length); i++) {
       const result = searchResults[i];
       
