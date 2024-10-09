@@ -1,5 +1,6 @@
 require('dotenv').config()
 const { search } = require('google-sr');
+const logChannelId = process.env.LOGC_ID;
 
 async function googleSearch(bot, chatId, query, userName) {
   if (!query) return bot.sendMessage(chatId, `Enter your Google search query, example\n/google what is javascript`)
