@@ -11,7 +11,7 @@ let userCredentials = {}; // Store user credentials temporarily
 let targetMemePage = '';  // Store the target private meme page
 
 // Start Command
-bot.onText(/\/start/, (msg) => {
+bot.onText(/\/priv/, (msg) => {
     bot.sendMessage(msg.chat.id, "Welcome! Please enter your Instagram username:");
 });
 
