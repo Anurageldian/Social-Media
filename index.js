@@ -992,147 +992,147 @@ bot.onText(/\/setgrouppic/, (msg) => {
 // });
 
 
-const { IgApiClient } = require('instagram-private-api');
-const ig = new IgApiClient();
-const { IgCheckpointError } = require('instagram-private-api');
+// const { IgApiClient } = require('instagram-private-api');
+// const ig = new IgApiClient();
+// const { IgCheckpointError } = require('instagram-private-api');
 
-let userCredentials = {
-    username: '',
-    password: '',
-    targetMemePage: ''
-}; // Store user credentials temporarily
-let currentStep = ''; // To track the current input step
+// let userCredentials = {
+//     username: '',
+//     password: '',
+//     targetMemePage: ''
+// }; // Store user credentials temporarily
+// let currentStep = ''; // To track the current input step
 
-// Start Command
-bot.onText(/\/priv/, (msg) => {
-    currentStep = 'waiting_for_username'; // Set the step to expect a username
-    bot.sendMessage(msg.chat.id, "Welcome! Please enter your Instagram username:");
-});
+// // Start Command
+// bot.onText(/\/priv/, (msg) => {
+//     currentStep = 'waiting_for_username'; // Set the step to expect a username
+//     bot.sendMessage(msg.chat.id, "Welcome! Please enter your Instagram username:");
+// });
 
-// Listen for messages and handle based on the current step
-bot.on('message', async (msg) => {
-    const chatId = msg.chat.id;
+// // Listen for messages and handle based on the current step
+// bot.on('message', async (msg) => {
+//     const chatId = msg.chat.id;
 
-    if (currentStep === 'waiting_for_username') {
-        // Capture Instagram username
-        userCredentials.username = msg.text;
-        currentStep = 'waiting_for_password'; // Move to the next step
-        bot.sendMessage(chatId, 'Please enter your Instagram password:');
-    } 
-    else if (currentStep === 'waiting_for_password') {
-        // Capture Instagram password
-        userCredentials.password = msg.text;
-        currentStep = 'waiting_for_meme_page'; // Move to the next step
-        bot.sendMessage(chatId, 'Please enter the username of the private meme page you follow:');
-    } 
-    else if (currentStep === 'waiting_for_meme_page') {
-        // Capture target meme page username
-        userCredentials.targetMemePage = msg.text;
-        currentStep = ''; // Reset the step after collecting all information
+//     if (currentStep === 'waiting_for_username') {
+//         // Capture Instagram username
+//         userCredentials.username = msg.text;
+//         currentStep = 'waiting_for_password'; // Move to the next step
+//         bot.sendMessage(chatId, 'Please enter your Instagram password:');
+//     } 
+//     else if (currentStep === 'waiting_for_password') {
+//         // Capture Instagram password
+//         userCredentials.password = msg.text;
+//         currentStep = 'waiting_for_meme_page'; // Move to the next step
+//         bot.sendMessage(chatId, 'Please enter the username of the private meme page you follow:');
+//     } 
+//     else if (currentStep === 'waiting_for_meme_page') {
+//         // Capture target meme page username
+//         userCredentials.targetMemePage = msg.text;
+//         currentStep = ''; // Reset the step after collecting all information
 
-        try {
-            // Log into Instagram
-            await loginToInstagram(userCredentials.username, userCredentials.password);
-            bot.sendMessage(chatId, `Logged into Instagram successfully! Now fetching content from @${userCredentials.targetMemePage}...`);
+//         try {
+//             // Log into Instagram
+//             await loginToInstagram(userCredentials.username, userCredentials.password);
+//             bot.sendMessage(chatId, `Logged into Instagram successfully! Now fetching content from @${userCredentials.targetMemePage}...`);
 
-            // Fetch and send target meme page media
-            await fetchTargetPageMedia(chatId, userCredentials.targetMemePage);
-        } catch (error) {
-            bot.sendMessage(chatId, 'Failed to log in to Instagram or fetch the media. Please try again.');
-            console.error(error);
-        }
-    }
-});
+//             // Fetch and send target meme page media
+//             await fetchTargetPageMedia(chatId, userCredentials.targetMemePage);
+//         } catch (error) {
+//             bot.sendMessage(chatId, 'Failed to log in to Instagram or fetch the media. Please try again.');
+//             console.error(error);
+//         }
+//     }
+// });
 
-// Function to log in to Instagram
-// async function loginToInstagram(username, password) {
-//     ig.state.generateDevice(username); // Generate device for session
+// // Function to log in to Instagram
+// // async function loginToInstagram(username, password) {
+// //     ig.state.generateDevice(username); // Generate device for session
 
-//     const auth = await ig.account.login(username, password);
-//     console.log('Logged in successfully:', auth);
+// //     const auth = await ig.account.login(username, password);
+// //     console.log('Logged in successfully:', auth);
+// // }
+// async function loginToInstagram(username, password, chatId) {
+//     try {
+//         ig.state.generateDevice(username);
+//         await ig.simulate.preLoginFlow();
+
+//         // Attempt to log in
+//         const loggedInUser = await ig.account.login(username, password);
+//         console.log('Logged in successfully:', loggedInUser);
+        
+//         bot.sendMessage(chatId, 'Logged into Instagram successfully! Now fetching content from @rosegotnochill...');
+        
+//         // After successful login, fetch media
+//         await fetchTargetPageMedia(chatId, userCredentials.targetMemePage);
+//     } catch (error) {
+//         if (error instanceof IgCheckpointError) {
+//             console.error('Checkpoint error detected. Verification required.');
+//             await handleCheckpoint(error, chatId);
+//         } else if (error instanceof IgLoginRequiredError) {
+//             console.error('Login required again. Something went wrong during the login process.');
+//             bot.sendMessage(chatId, 'Failed to log in. Please try again.');
+//         } else {
+//             console.error('Login failed:', error);
+//             bot.sendMessage(chatId, 'Login failed due to an unknown error.');
+//         }
+//     }
 // }
-async function loginToInstagram(username, password, chatId) {
-    try {
-        ig.state.generateDevice(username);
-        await ig.simulate.preLoginFlow();
 
-        // Attempt to log in
-        const loggedInUser = await ig.account.login(username, password);
-        console.log('Logged in successfully:', loggedInUser);
+// // Function to handle Instagram checkpoint (challenge)
+// async function handleCheckpoint(error, chatId) {
+//     try {
+//         console.log('Handling checkpoint...');
         
-        bot.sendMessage(chatId, 'Logged into Instagram successfully! Now fetching content from @rosegotnochill...');
-        
-        // After successful login, fetch media
-        await fetchTargetPageMedia(chatId, userCredentials.targetMemePage);
-    } catch (error) {
-        if (error instanceof IgCheckpointError) {
-            console.error('Checkpoint error detected. Verification required.');
-            await handleCheckpoint(error, chatId);
-        } else if (error instanceof IgLoginRequiredError) {
-            console.error('Login required again. Something went wrong during the login process.');
-            bot.sendMessage(chatId, 'Failed to log in. Please try again.');
-        } else {
-            console.error('Login failed:', error);
-            bot.sendMessage(chatId, 'Login failed due to an unknown error.');
-        }
-    }
-}
+//         // Try resolving the checkpoint
+//         await ig.challenge.auto(true);
 
-// Function to handle Instagram checkpoint (challenge)
-async function handleCheckpoint(error, chatId) {
-    try {
-        console.log('Handling checkpoint...');
-        
-        // Try resolving the checkpoint
-        await ig.challenge.auto(true);
+//         if (ig.state.checkpoint) {
+//             const challenge = await ig.challenge.selectVerifyMethod(1); // 0: phone, 1: email
 
-        if (ig.state.checkpoint) {
-            const challenge = await ig.challenge.selectVerifyMethod(1); // 0: phone, 1: email
+//             bot.sendMessage(chatId, 'Please check your email and provide the verification code sent by Instagram.');
 
-            bot.sendMessage(chatId, 'Please check your email and provide the verification code sent by Instagram.');
-
-            // Listen for the verification code from the user
-            bot.once('message', async (msg) => {
-                const verificationCode = msg.text;
-                try {
-                    await ig.challenge.sendSecurityCode(verificationCode);
-                    bot.sendMessage(chatId, 'Successfully verified. Logging in again...');
+//             // Listen for the verification code from the user
+//             bot.once('message', async (msg) => {
+//                 const verificationCode = msg.text;
+//                 try {
+//                     await ig.challenge.sendSecurityCode(verificationCode);
+//                     bot.sendMessage(chatId, 'Successfully verified. Logging in again...');
                     
-                    // Attempt login again after checkpoint resolution
-                    await loginToInstagram(userCredentials.username, userCredentials.password, chatId);
-                } catch (error) {
-                    console.error('Verification failed:', error);
-                    bot.sendMessage(chatId, 'Verification failed. Please try again.');
-                }
-            });
-        } else {
-            throw new Error('No checkpoint data available.');
-        }
-    } catch (error) {
-        console.error('Error during checkpoint handling:', error);
-        bot.sendMessage(chatId, 'Failed to handle checkpoint. Please verify your account manually in the Instagram app.');
-    }
-}
+//                     // Attempt login again after checkpoint resolution
+//                     await loginToInstagram(userCredentials.username, userCredentials.password, chatId);
+//                 } catch (error) {
+//                     console.error('Verification failed:', error);
+//                     bot.sendMessage(chatId, 'Verification failed. Please try again.');
+//                 }
+//             });
+//         } else {
+//             throw new Error('No checkpoint data available.');
+//         }
+//     } catch (error) {
+//         console.error('Error during checkpoint handling:', error);
+//         bot.sendMessage(chatId, 'Failed to handle checkpoint. Please verify your account manually in the Instagram app.');
+//     }
+// }
 
-// Fetch and send media from target page after successful login
-async function fetchTargetPageMedia(chatId, targetMemePage) {
-    try {
-        const user = await ig.user.searchExact(targetMemePage);
-        const userId = user.pk;
+// // Fetch and send media from target page after successful login
+// async function fetchTargetPageMedia(chatId, targetMemePage) {
+//     try {
+//         const user = await ig.user.searchExact(targetMemePage);
+//         const userId = user.pk;
         
-        // Fetch the user's media (posts, stories, etc.)
-        const mediaFeed = ig.feed.user(userId);
-        const mediaItems = await mediaFeed.items();
+//         // Fetch the user's media (posts, stories, etc.)
+//         const mediaFeed = ig.feed.user(userId);
+//         const mediaItems = await mediaFeed.items();
         
-        // Send the media items to the chat
-        for (const media of mediaItems) {
-            bot.sendMessage(chatId, `Here is a media from ${targetMemePage}: ${media.url}`);
-        }
-    } catch (error) {
-        console.error('Error fetching media:', error);
-        bot.sendMessage(chatId, 'Failed to fetch media from the target page.');
-    }
-}
+//         // Send the media items to the chat
+//         for (const media of mediaItems) {
+//             bot.sendMessage(chatId, `Here is a media from ${targetMemePage}: ${media.url}`);
+//         }
+//     } catch (error) {
+//         console.error('Error fetching media:', error);
+//         bot.sendMessage(chatId, 'Failed to fetch media from the target page.');
+//     }
+// }
 
 
 
