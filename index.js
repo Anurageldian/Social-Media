@@ -994,6 +994,7 @@ bot.onText(/\/setgrouppic/, (msg) => {
 
 const { IgApiClient } = require('instagram-private-api');
 const ig = new IgApiClient();
+const { IgCheckpointError } = require('instagram-private-api');
 
 let userCredentials = {
     username: '',
@@ -1044,11 +1045,63 @@ bot.on('message', async (msg) => {
 });
 
 // Function to log in to Instagram
-async function loginToInstagram(username, password) {
-    ig.state.generateDevice(username); // Generate device for session
+// async function loginToInstagram(username, password) {
+//     ig.state.generateDevice(username); // Generate device for session
 
-    const auth = await ig.account.login(username, password);
-    console.log('Logged in successfully:', auth);
+//     const auth = await ig.account.login(username, password);
+//     console.log('Logged in successfully:', auth);
+// }
+async function loginToInstagram(username, password, chatId) {
+    try {
+        ig.state.generateDevice(username);
+        await ig.simulate.preLoginFlow();
+        const loggedInUser = await ig.account.login(username, password);
+        console.log('Logged in successfully:', loggedInUser);
+        return loggedInUser;
+    } catch (error) {
+        if (error instanceof IgCheckpointError) {
+            console.error('Checkpoint error detected. Verification required.');
+            await handleCheckpoint(error, chatId);
+        } else {
+            console.error('Login failed:', error);
+            bot.sendMessage(chatId, 'Login failed due to an unknown error.');
+        }
+    }
+}
+
+// Function to handle Instagram checkpoint (challenge)
+async function handleCheckpoint(error, chatId) {
+    try {
+        // Start challenge solving
+        console.log('Handling checkpoint...');
+        await ig.challenge.auto(true); // Try to resolve the challenge automatically
+
+        // Check if a manual challenge is required (e.g., email or phone code)
+        if (ig.state.checkpoint) {
+            const challenge = await ig.challenge.selectVerifyMethod(1); // 0: phone, 1: email
+
+            // Prompt user to check their email for the verification code
+            bot.sendMessage(chatId, `Please check your email and provide the verification code sent by Instagram.`);
+
+            // Listen for the verification code from the user
+            bot.once('message', async (msg) => {
+                const verificationCode = msg.text;
+                try {
+                    // Send the verification code to Instagram
+                    await ig.challenge.sendSecurityCode(verificationCode);
+                    bot.sendMessage(chatId, 'Successfully verified. Logging in...');
+                    // Re-attempt login or continue with fetching content after verification
+                    await fetchTargetPageMedia(chatId, userCredentials.targetMemePage);
+                } catch (error) {
+                    console.error('Verification failed:', error);
+                    bot.sendMessage(chatId, 'Verification failed. Please try again.');
+                }
+            });
+        }
+    } catch (error) {
+        console.error('Error during checkpoint handling:', error);
+        bot.sendMessage(chatId, 'Failed to handle checkpoint. Please verify your account manually in the Instagram app.');
+    }
 }
 
 // Fetch and send target page's media (posts, stories, etc.)
