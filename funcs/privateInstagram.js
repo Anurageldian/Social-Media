@@ -1,40 +1,47 @@
-require('dotenv').config(); // For environment variables
+require('dotenv').config();
 const TelegramBot = require('node-telegram-bot-api');
 const { IgApiClient } = require('instagram-private-api');
-const fs = require('fs');
-const path = require('path');
+const axios = require('axios');
 
 // Initialize Telegram Bot
 const bot = new TelegramBot(process.env.TELEGRAM_BOT_TOKEN, { polling: true });
-const ig = new IgApiClient(); // Initialize Instagram Client
+const ig = new IgApiClient();
 
-let userCredentials = {}; // Temporarily store username and password
+let userCredentials = {}; // Store user credentials temporarily
+let targetMemePage = '';  // Store the target private meme page
 
-// Start Command for Telegram Bot
-bot.onText(/\/priv/, (msg) => {
+// Start Command
+bot.onText(/\/start/, (msg) => {
     bot.sendMessage(msg.chat.id, "Welcome! Please enter your Instagram username:");
 });
 
-// Capture Instagram username
+// Listen for username and password
 bot.on('message', async (msg) => {
     const chatId = msg.chat.id;
-    
-    // If username hasn't been entered, prompt for password next
+
+    // Capture Instagram username
     if (!userCredentials.username) {
         userCredentials.username = msg.text;
         bot.sendMessage(chatId, 'Please enter your Instagram password:');
-    } else if (!userCredentials.password) {
+    }
+    // Capture Instagram password
+    else if (!userCredentials.password) {
         userCredentials.password = msg.text;
-        
+        bot.sendMessage(chatId, 'Please enter the username of the private meme page you follow:');
+    }
+    // Capture target meme page username
+    else if (!targetMemePage) {
+        targetMemePage = msg.text;
+
         try {
-            // Attempt to log in to Instagram
+            // Log into Instagram
             await loginToInstagram(userCredentials.username, userCredentials.password);
-            bot.sendMessage(chatId, 'Logged into Instagram successfully!');
-            
-            // Fetch and send user's story highlights, posts, etc.
-            await sendUserMedia(chatId);
+            bot.sendMessage(chatId, `Logged into Instagram successfully! Now fetching content from @${targetMemePage}...`);
+
+            // Fetch and send target meme page media directly to Telegram
+            await fetchTargetPageMedia(chatId, targetMemePage);
         } catch (error) {
-            bot.sendMessage(chatId, 'Failed to log in to Instagram. Please try again.');
+            bot.sendMessage(chatId, 'Failed to log in to Instagram or fetch the media. Please try again.');
             console.error(error);
         }
     }
@@ -48,47 +55,67 @@ async function loginToInstagram(username, password) {
     console.log('Logged in successfully:', auth);
 }
 
-// Fetch and send media (posts, stories, etc.) to the user
-async function sendUserMedia(chatId) {
-    // Fetch user's stories, highlights, and posts using Instagram API
-    const userId = await ig.user.getIdByUsername(userCredentials.username);
-    
-    // Example of getting user feed
-    const userFeed = ig.feed.user(userId);
-    const posts = await userFeed.items();
-    
-    // Download first post as an example
-    for (let post of posts) {
-        if (post.image_versions2) {
-            const imageUrl = post.image_versions2.candidates[0].url;
-            const fileName = `post_${post.id}.jpg`;
+// Fetch and send target page's media (posts, stories, etc.)
+async function fetchTargetPageMedia(chatId, targetMemePage) {
+    try {
+        // Get the target page's user ID
+        const targetUserId = await ig.user.getIdByUsername(targetMemePage);
 
-            await downloadImage(imageUrl, fileName);
-            bot.sendPhoto(chatId, fileName);
+        // Get target page posts (for example, you can also fetch stories)
+        const userFeed = ig.feed.user(targetUserId);
+        const posts = await userFeed.items();
+
+        // Loop through and send the media directly to the user on Telegram
+        for (let post of posts) {
+            if (post.image_versions2) {
+                const imageUrl = post.image_versions2.candidates[0].url;
+
+                // Send the image directly to the user's Telegram chat without saving
+                await sendImageDirectlyToTelegram(chatId, imageUrl);
+            } else if (post.video_versions) {
+                const videoUrl = post.video_versions[0].url;
+
+                // Send the video directly to the user's Telegram chat
+                await sendVideoDirectlyToTelegram(chatId, videoUrl);
+            }
         }
+
+        bot.sendMessage(chatId, `Successfully sent content from @${targetMemePage}.`);
+    } catch (error) {
+        console.error('Error fetching media:', error);
+        bot.sendMessage(chatId, 'Failed to fetch media from the target page.');
     }
-    
-    // Fetching more data like stories, highlights can be done similarly
 }
 
-// Function to download and save media
-async function downloadImage(url, filename) {
-    const axios = require('axios');
-    const response = await axios({
-        url,
-        responseType: 'stream',
-    });
-    
-    const writer = fs.createWriteStream(path.resolve(__dirname, filename));
-    response.data.pipe(writer);
-    
-    return new Promise((resolve, reject) => {
-        writer.on('finish', resolve);
-        writer.on('error', reject);
-    });
+// Send image directly to Telegram chat without saving locally
+async function sendImageDirectlyToTelegram(chatId, imageUrl) {
+    try {
+        const response = await axios({
+            url: imageUrl,
+            responseType: 'arraybuffer' // Download as a binary stream to directly send to Telegram
+        });
+
+        const buffer = Buffer.from(response.data, 'binary');
+        await bot.sendPhoto(chatId, buffer); // Send the image buffer to Telegram
+    } catch (error) {
+        console.error('Failed to send image:', error);
+    }
 }
 
+// Send video directly to Telegram chat without saving locally
+async function sendVideoDirectlyToTelegram(chatId, videoUrl) {
+    try {
+        const response = await axios({
+            url: videoUrl,
+            responseType: 'arraybuffer' // Download as a binary stream to directly send to Telegram
+        });
 
+        const buffer = Buffer.from(response.data, 'binary');
+        await bot.sendVideo(chatId, buffer); // Send the video buffer to Telegram
+    } catch (error) {
+        console.error('Failed to send video:', error);
+    }
+}
 
 
 // const puppeteer = require('puppeteer');
