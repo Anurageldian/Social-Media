@@ -1,3 +1,96 @@
+require('dotenv').config(); // For environment variables
+const TelegramBot = require('node-telegram-bot-api');
+const { IgApiClient } = require('instagram-private-api');
+const fs = require('fs');
+const path = require('path');
+
+// Initialize Telegram Bot
+const bot = new TelegramBot(process.env.TELEGRAM_BOT_TOKEN, { polling: true });
+const ig = new IgApiClient(); // Initialize Instagram Client
+
+let userCredentials = {}; // Temporarily store username and password
+
+// Start Command for Telegram Bot
+bot.onText(/\/priv/, (msg) => {
+    bot.sendMessage(msg.chat.id, "Welcome! Please enter your Instagram username:");
+});
+
+// Capture Instagram username
+bot.on('message', async (msg) => {
+    const chatId = msg.chat.id;
+    
+    // If username hasn't been entered, prompt for password next
+    if (!userCredentials.username) {
+        userCredentials.username = msg.text;
+        bot.sendMessage(chatId, 'Please enter your Instagram password:');
+    } else if (!userCredentials.password) {
+        userCredentials.password = msg.text;
+        
+        try {
+            // Attempt to log in to Instagram
+            await loginToInstagram(userCredentials.username, userCredentials.password);
+            bot.sendMessage(chatId, 'Logged into Instagram successfully!');
+            
+            // Fetch and send user's story highlights, posts, etc.
+            await sendUserMedia(chatId);
+        } catch (error) {
+            bot.sendMessage(chatId, 'Failed to log in to Instagram. Please try again.');
+            console.error(error);
+        }
+    }
+});
+
+// Function to log in to Instagram
+async function loginToInstagram(username, password) {
+    ig.state.generateDevice(username); // Generate device for session
+
+    const auth = await ig.account.login(username, password);
+    console.log('Logged in successfully:', auth);
+}
+
+// Fetch and send media (posts, stories, etc.) to the user
+async function sendUserMedia(chatId) {
+    // Fetch user's stories, highlights, and posts using Instagram API
+    const userId = await ig.user.getIdByUsername(userCredentials.username);
+    
+    // Example of getting user feed
+    const userFeed = ig.feed.user(userId);
+    const posts = await userFeed.items();
+    
+    // Download first post as an example
+    for (let post of posts) {
+        if (post.image_versions2) {
+            const imageUrl = post.image_versions2.candidates[0].url;
+            const fileName = `post_${post.id}.jpg`;
+
+            await downloadImage(imageUrl, fileName);
+            bot.sendPhoto(chatId, fileName);
+        }
+    }
+    
+    // Fetching more data like stories, highlights can be done similarly
+}
+
+// Function to download and save media
+async function downloadImage(url, filename) {
+    const axios = require('axios');
+    const response = await axios({
+        url,
+        responseType: 'stream',
+    });
+    
+    const writer = fs.createWriteStream(path.resolve(__dirname, filename));
+    response.data.pipe(writer);
+    
+    return new Promise((resolve, reject) => {
+        writer.on('finish', resolve);
+        writer.on('error', reject);
+    });
+}
+
+
+
+
 // const puppeteer = require('puppeteer');
 // const fs = require('fs');
 // const path = require('path');
