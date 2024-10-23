@@ -18,11 +18,11 @@ async function downloadFromYoutube(bot, chatId, url) {
 		})
 
 		// const title = videoInfo.player_response.videoDetails.title
-		// const thumbnailUrl =
-		// 	videoInfo.videoDetails.thumbnails[
-		// 		videoInfo.videoDetails.thumbnails.length - 1
-		// 	].url
-		// // Send a message to show the download progress
+		const thumbnailUrl =
+			videoInfo.videoDetails.thumbnails[
+				videoInfo.videoDetails.thumbnails.length - 1
+			].url
+		// Send a message to show the download progress
 		await bot
 			.sendMessage(chatId, `*Downloading video:* ${title}`)
 			.catch((err) => {
