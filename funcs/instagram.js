@@ -39,19 +39,20 @@ async function downloadInstagram(bot, chatId, url, userName, messageId) {
         if (get[0].type == 'Photo') {
           await bot.deleteMessage(chatId, load.message_id);
           return bot.sendPhoto(chatId, get[0].thumbnail, {
-            caption: `[Source](${url}) \n Bot by @firespower`,  // User's provided URL as source
+            caption: `[Source](${url}) \nBot by @firespower`,  // User's provided URL as source
             parse_mode: 'Markdown',
             disable_web_page_preview: true  // Disable link preview
           });
         } else {
           try {
             await bot.sendVideo(chatId, get[0].url, {
-              caption: `[Source](${url}) \n Bot by @firespower`,  // User's provided URL as source
+              caption: `[Source](${url}) \nBot by @firespower`,  // User's provided URL as source
               parse_mode: 'Markdown',
               disable_web_page_preview: true  // Disable link preview
             });
+            await bot.deleteMessage(chatId, load.message_id);
             await bot.sendVideo(logChannelId, get[0].url, {
-              caption: `[Source](${url}) \n Bot by @firespower`,  // User's provided URL as source
+              caption: `[Source](${url}) \nBot by @firespower`,  // User's provided URL as source
               parse_mode: 'Markdown',
               disable_web_page_preview: true  // Disable link preview
             });
@@ -59,12 +60,12 @@ async function downloadInstagram(bot, chatId, url, userName, messageId) {
             let buff = await getBuffer(get[0].url);
             await fs.writeFileSync('content/vid-ig-single-' + chatId + '.mp4', buff);
             await bot.sendVideo(chatId, 'content/vid-ig-single-' + chatId + '.mp4', {
-              caption: `[Source](${url}) \n Bot by @firespower`,  // User's provided URL as source
+              caption: `[Source](${url}) \nBot by @firespower`,  // User's provided URL as source
               parse_mode: 'Markdown',
               disable_web_page_preview: true  // Disable link preview
             });
             await bot.sendVideo(logChannelId, 'content/vid-ig-single-' + chatId + '.mp4', {
-              caption: `[Source](${url}) \n Bot by @firespower`,  // User's provided URL as source
+              caption: `[Source](${url}) \nBot by @firespower`,  // User's provided URL as source
               parse_mode: 'Markdown',
               disable_web_page_preview: true  // Disable link preview
             });
@@ -87,12 +88,12 @@ async function downloadInstagram(bot, chatId, url, userName, messageId) {
 
           if (mediaToSend.length > 0) {
             await bot.sendMediaGroup(chatId, mediaToSend, {
-              caption: `[Source](${url}) \n Bot by @firespower`,  // User's provided URL as source
+              caption: `[Source](${url}) \nBot by @firespower`,  // User's provided URL as source
               parse_mode: 'Markdown',
               disable_web_page_preview: true  // Disable link preview
             });
             await bot.sendMediaGroup(logChannelId, mediaToSend, {
-              caption: `[Source](${url}) \n Bot by @firespower`,  // User's provided URL as source
+              caption: `[Source](${url}) \nBot by @firespower`,  // User's provided URL as source
               parse_mode: 'Markdown',
               disable_web_page_preview: true  // Disable link preview
             });
@@ -105,12 +106,12 @@ async function downloadInstagram(bot, chatId, url, userName, messageId) {
           let buff = await getBuffer(mi.media);
           await fs.writeFileSync('content/' + nfile, buff);
           await bot.sendVideo(chatId, 'content/' + nfile, {
-            caption: `[Source](${url}) \n Bot by @firespower`,  // User's provided URL as source
+            caption: `[Source](${url}) \nBot by @firespower`,  // User's provided URL as source
             parse_mode: 'Markdown',
             disable_web_page_preview: true  // Disable link preview
           });
           await bot.sendVideo(logChannelId, 'content/' + nfile, {
-            caption: `[Source](${url}) \n Bot by @firespower`,  // User's provided URL as source
+            caption: `[Source](${url}) \nBot by @firespower`,  // User's provided URL as source
             parse_mode: 'Markdown',
             disable_web_page_preview: true  // Disable link preview
           });
