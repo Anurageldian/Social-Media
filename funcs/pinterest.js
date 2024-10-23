@@ -50,16 +50,40 @@ async function pinterest(bot, chatId, url, userName) {
       return bot.editMessageText('Failed to get data, make sure your Pinterest link is valid!', { chat_id: chatId, message_id: load.message_id })
     } else {
       if (get.endsWith('.mp4')) {
-        await bot.sendVideo(chatId, get, { caption: `[Source](${url}) \nBot by @firespower` })
-        await bot.sendVideo(logChannelId, get, { caption: `[Source](${url}) \nBot by @firespower` })
+        await bot.sendVideo(chatId, get, { 
+		caption: `[Source](${url}) \nBot by @firespower`,
+             	parse_mode: 'Markdown',
+                disable_web_page_preview: true
+	})
+        await bot.sendVideo(logChannelId, get, { 
+		caption: `[Source](${url}) \nBot by @firespower`,
+             	parse_mode: 'Markdown',
+                disable_web_page_preview: true
+	})
         return bot.deleteMessage(chatId, load.message_id);
       } else if (get.endsWith('.gif')) {
-        await bot.sendAnimation(chatId, get, { caption: `[Source](${url}) \nBot by @firespower` })
-	await bot.sendAnimation(logChannelId, get, { caption: `[Source](${url}) \nBot by @firespower` })
+        await bot.sendAnimation(chatId, get, { 
+		caption: `[Source](${url}) \nBot by @firespower`,
+             	parse_mode: 'Markdown',
+                disable_web_page_preview: true
+	})
+	await bot.sendAnimation(logChannelId, get, { 
+		caption: `[Source](${url}) \nBot by @firespower`,
+             	parse_mode: 'Markdown',
+                disable_web_page_preview: true
+	})
         return bot.deleteMessage(chatId, load.message_id);
       } else {
-        await bot.sendPhoto(chatId, get, { caption: `[Source](${url}) \nBot by @firespower` })
-	await bot.sendPhoto(logChannelId, get, { caption: `[Source](${url}) \nBot by @firespower` })
+        await bot.sendPhoto(chatId, get, { 
+		caption: `[Source](${url}) \nBot by @firespower`,
+             	parse_mode: 'Markdown',
+                disable_web_page_preview: true
+	})
+	await bot.sendPhoto(logChannelId, get, { 
+		caption: `[Source](${url}) \nBot by @firespower`,
+             	parse_mode: 'Markdown',
+                disable_web_page_preview: true
+	})
         return bot.deleteMessage(chatId, load.message_id);
       }
     }
