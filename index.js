@@ -1100,7 +1100,10 @@ bot.onText(/\/unban (.+)/, async (msg, match) => {
 
     // If the user is still in the chat, inform the admin that the user is not banned
     if (userStatus.status !== 'kicked') {
-      bot.sendMessage(chatId, `The user with ID ${userIdToUnban} is not banned.`);
+      const userFullName = userStatus.user.first_name + (userStatus.user.last_name ? ' ' + userStatus.user.last_name : '');
+      const userUsername = userStatus.user.username ? ` (@${userStatus.user.username})` : '';
+      const respo = `The user <a href="tg://user?id=${userIdToUnban}">${userFullName}</a> ${userUsername} is not banned.`;
+      bot.sendMessage(chatId, respo, { parse_mode: 'HTML' });
       return;
     }
 
