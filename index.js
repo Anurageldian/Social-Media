@@ -1099,7 +1099,7 @@ bot.onText(/\/unban (.+)/, async (msg, match) => {
 
       const userFullName = userIdToUnban.first_name + (userIdToUnban.last_name ? ' ' + userIdToUnban.last_name : '');
       const userUsername = userIdToUnban.username ? ` (@${userIdToUnban.username})` : '';
-      const respo = `<a href="tg://user?id=${userIdToUnban}">User</a> ${userUsername} has been banned.`;
+      const respo = `<a href="tg://user?id=${userIdToUnban}">${userFullName}/a> ${userUsername} has been Unbanned.`;
       bot.sendMessage(chatId, respo, { parse_mode: 'HTML' });
     } catch (error) {
       console.error('Error banning user:', error.message);
