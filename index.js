@@ -1104,7 +1104,6 @@ bot.onText(/\/unban (.+)/, async (msg, match) => {
       const userUsername = userStatus.user.username ? ` (@${userStatus.user.username})` : '';
       const respo = `The user <a href="tg://user?id=${userIdToUnban}">${userFullName}</a> ${userUsername} is not banned.`;
       bot.sendMessage(chatId, respo, { parse_mode: 'HTML' });
-      return;
     }
 
     // Proceed to unban the user only if they are banned
