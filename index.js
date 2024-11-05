@@ -977,9 +977,8 @@ bot.onText(/\/ban (.+)/, async (msg, match) => {
       console.error('Error banning user:', error.message);
       const userFullName = userToBan.first_name + (userToBan.last_name ? ' ' + userToBan.last_name : '');
       const userUsername = userToBan.username ? ` (@${userToBan.username})` : '';
-      const respo = `Failed to Ban User <a href="tg://user?id=${userIdToBan}">${userFullName}</a> ${userUsername}`;
+      const respo = `Failed to Ban User <a href="tg://user?id=${userIdToBan}">${userFullName}</a> ${userUsername}  ${error.message}`;
       bot.sendMessage(chatId, respo, { parse_mode: 'HTML' });
-      bot.sendMessage(chatId, `Failed to ban user ${userIdOrUsernameToBan} error.message`);
     }
   } catch (error) {
     console.error('Error handling /ban command:', error.message);
