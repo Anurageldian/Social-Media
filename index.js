@@ -793,9 +793,12 @@ bot.onText(/\/promote (\S+)(?:\s+(.+))?/, async (msg, match) => {
       can_invite_users: true,
       can_restrict_members: true,
       can_pin_messages: true,
-      can_manage_video_chats: true,
-      can_manage_topics: true,
-      can_promote_members: false
+      can_post_stories: true,
+      can_edit_stories: true,
+      can_delete_stories: true,
+      can_manage_video_chats:true,
+      can_manage_topics:true,
+      can_promote_members: false // Set as needed
     });
 
     // Set the custom title if provided
@@ -822,7 +825,7 @@ bot.onText(/\/promote (\S+)(?:\s+(.+))?/, async (msg, match) => {
 
 
 //full promote
-bot.onText(/\/(fullpromote|fpromote) (\S+)(?:\s+(.+))?/, async (msg, match) => {
+bot.onText(/\/fullpromote (\S+)(?:\s+(.+))?/, async (msg, match) => {
   const chatId = msg.chat.id;
   const userIdOrUsernameToPromote = match[1].trim();
   const customTitle = match[2] ? match[2].trim() : '';  // Capture custom title if provided
@@ -887,9 +890,12 @@ bot.onText(/\/(fullpromote|fpromote) (\S+)(?:\s+(.+))?/, async (msg, match) => {
       can_invite_users: true,
       can_restrict_members: true,
       can_pin_messages: true,
-      can_manage_video_chats: true,
-      can_manage_topics: true,
-      can_promote_members: true
+      can_post_stories: true,
+      can_edit_stories: true,
+      can_delete_stories: true,
+      can_manage_video_chats:true,
+      can_manage_topics:true,
+      can_promote_members: true // Set as needed
     });
 
     // Set the custom title if provided
