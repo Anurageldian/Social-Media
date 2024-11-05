@@ -806,7 +806,7 @@ let userIdToPromote;
     });
       const userFullName = userToPromote.first_name + (userToPromote.last_name ? ' ' + userToPromote.last_name : '');
       const userUsername = userToPromote.username ? ` (@${userToPromote.username})` : '';
-      const respo = `User <a href="tg://user?id=${userIdToBan}">${userFullName}</a> ${userUsername} has been Promoted.`;
+      const respo = `User <a href="tg://user?id=${userIdToPromote}">${userFullName}</a> ${userUsername} has been Promoted.`;
       bot.sendMessage(chatId, respo, { parse_mode: 'HTML' });
     //bot.sendMessage(chatId, `User ${userIdToPromote} has been successfully promoted.`);
   } catch (error) {
