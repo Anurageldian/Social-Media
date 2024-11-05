@@ -822,7 +822,7 @@ bot.onText(/\/promote (\S+)(?:\s+(.+))?/, async (msg, match) => {
 
 
 //full promote
-bot.onText(/\/(fullpromote|fpromoteuser) (\S+)(?:\s+(.+))?/, async (msg, match) => {
+bot.onText(/\/(fullpromote|fpromote) (\S+)(?:\s+(.+))?/, async (msg, match) => {
   const chatId = msg.chat.id;
   const userIdOrUsernameToPromote = match[1].trim();
   const customTitle = match[2] ? match[2].trim() : '';  // Capture custom title if provided
