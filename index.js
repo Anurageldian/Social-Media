@@ -1081,7 +1081,7 @@ bot.onText(/\/ban (.+)/, async (msg, match) => {
 // Command: Unban User
 bot.onText(/\/unban (.+)/, async (msg, match) => {
   const chatId = msg.chat.id;
-  const userIdToUnban = parseInt(match[1].trim()); // Ensure user ID is an integer
+  const userIdToUnban = match[1].trim();
   const issuerId = msg.from.id;
 
   try {
