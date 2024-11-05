@@ -1487,7 +1487,7 @@ bot.onText(/\/unlock (.+)/, async (msg, match) => {
 bot.onText(/\/promote (.+)/, async (msg, match) => {
   const chatId = msg.chat.id;
   const userId = msg.from.id;
-  const promoteUserId = parseInt(match[1]); // Extracts the user ID to promote from the command
+  const promoteUserId = match[1]; // Extracts the user ID to promote from the command
 
   try {
     // Check if the command issuer is an admin with the "can_promote_members" permission
