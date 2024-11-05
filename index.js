@@ -1484,7 +1484,7 @@ bot.onText(/\/unlock (.+)/, async (msg, match) => {
 
 //promote
 
-bot.onText(/\/promote (\d+)/, async (msg, match) => {
+bot.onText(/\/promote (.+)/, async (msg, match) => {
   const chatId = msg.chat.id;
   const userId = msg.from.id;
   const promoteUserId = parseInt(match[1]); // Extracts the user ID to promote from the command
