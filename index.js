@@ -1081,55 +1081,92 @@ bot.onText(/\/ban (.+)/, async (msg, match) => {
 // Command: Unban User
 bot.onText(/\/unban (.+)/, async (msg, match) => {
   const chatId = msg.chat.id;
-  const userIdToUnban = match[1].trim();
+  const userIdToUnban = parseInt(match[1].trim()); // Ensure user ID is an integer
   const issuerId = msg.from.id;
 
   try {
-    // Fetch the chat member status of the issuer
+    // Check if the issuer has permission to restrict members or is the chat creator
     const issuer = await bot.getChatMember(chatId, issuerId);
-
-    // Check if the issuer has the 'can_restrict_members' permission or is the chat creator
     if (issuer.status !== 'creator' && !issuer.can_restrict_members) {
-      bot.sendMessage(chatId, 'You need to have the "can restrict members" permission to ban users.');
+      bot.sendMessage(chatId, 'You need the "can restrict members" permission to unban users.');
       return;
     }
-    // Ban the user
-    try {
-      await bot.unbanChatMember(chatId, userIdToUnban);
 
-      const userFullName = userIdToUnban.first_name + (userIdToUnban.last_name ? ' ' + userIdToUnban.last_name : '');
-      const userUsername = userIdToUnban.username ? ` (@${userIdToUnban.username})` : '';
-      const respo = `<a href="tg://user?id=${userIdToUnban}">${userFullName}</a> ${userUsername} has been Unbanned.`;
-      bot.sendMessage(chatId, respo, { parse_mode: 'HTML' });
-    } catch (error) {
-      console.error('Error banning user:', error.message);
-      bot.sendMessage(chatId, `Failed to ban user ${userIdToUnban}.`);
+    // Check if the user is banned
+    const userStatus = await bot.getChatMember(chatId, userIdToUnban);
+
+    // If the user is still in the chat, inform the admin that the user is not banned
+    if (userStatus.status !== 'kicked') {
+      bot.sendMessage(chatId, `The user with ID ${userIdToUnban} is not banned.`);
+      return;
     }
+
+    // Proceed to unban the user only if they are banned
+    await bot.unbanChatMember(chatId, userIdToUnban);
+
+    // Send a success message with user details
+    const userFullName = userStatus.user.first_name + (userStatus.user.last_name ? ' ' + userStatus.user.last_name : '');
+    const userUsername = userStatus.user.username ? ` (@${userStatus.user.username})` : '';
+    const respo = `<a href="tg://user?id=${userIdToUnban}">${userFullName}</a> ${userUsername} has been unbanned.`;
+    bot.sendMessage(chatId, respo, { parse_mode: 'HTML' });
+    
   } catch (error) {
-    console.error('Error handling /ban command:', error.message);
-    bot.sendMessage(chatId, 'An error occurred while processing the ban command.');
+    console.error('Error unbanning user:', error);
+    bot.sendMessage(chatId, `An error occurred while processing the unban request for user ID ${userIdToUnban}.`);
   }
 });
 
-// Command: Kick User
-bot.onText(/\/kick (.+)/, (msg, match) => {
-  const chatId = msg.chat.id;
-  const userId = match[1];
+// bot.onText(/\/unban (.+)/, async (msg, match) => {
+//   const chatId = msg.chat.id;
+//   const userIdToUnban = match[1].trim();
+//   const issuerId = msg.from.id;
 
-  bot.kickChatMember(chatId, userId)
-    .then(() => bot.sendMessage(chatId, `User ${userId} kicked.`))
-    .catch(error => bot.sendMessage(chatId, `Failed to kick user: ${error}`));
-});
+//   try {
+//     // Fetch the chat member status of the issuer
+//     const issuer = await bot.getChatMember(chatId, issuerId);
 
-// Command: Change Group Picture
-bot.onText(/\/setgrouppic/, (msg) => {
-  const chatId = msg.chat.id;
-  const photo = msg.photo[msg.photo.length - 1].file_id; // Assume last photo is highest resolution
+//     // Check if the issuer has the 'can_restrict_members' permission or is the chat creator
+//     if (issuer.status !== 'creator' && !issuer.can_restrict_members) {
+//       bot.sendMessage(chatId, 'You need to have the "can restrict members" permission to ban users.');
+//       return;
+//     }
+//     // Ban the user
+//     try {
+//       await bot.unbanChatMember(chatId, userIdToUnban);
 
-  bot.setChatPhoto(chatId, photo)
-    .then(() => bot.sendMessage(chatId, `Group picture changed.`))
-    .catch(error => bot.sendMessage(chatId, `Failed to change group picture: ${error}`));
-});
+//       const userFullName = userIdToUnban.first_name + (userIdToUnban.last_name ? ' ' + userIdToUnban.last_name : '');
+//       const userUsername = userIdToUnban.username ? ` (@${userIdToUnban.username})` : '';
+//       const respo = `<a href="tg://user?id=${userIdToUnban}">${userFullName}</a> ${userUsername} has been Unbanned.`;
+//       bot.sendMessage(chatId, respo, { parse_mode: 'HTML' });
+//     } catch (error) {
+//       console.error('Error banning user:', error.message);
+//       bot.sendMessage(chatId, `Failed to ban user ${userIdToUnban}.`);
+//     }
+//   } catch (error) {
+//     console.error('Error handling /ban command:', error.message);
+//     bot.sendMessage(chatId, 'An error occurred while processing the ban command.');
+//   }
+// });
+
+// // Command: Kick User
+// bot.onText(/\/kick (.+)/, (msg, match) => {
+//   const chatId = msg.chat.id;
+//   const userId = match[1];
+
+//   bot.kickChatMember(chatId, userId)
+//     .then(() => bot.sendMessage(chatId, `User ${userId} kicked.`))
+//     .catch(error => bot.sendMessage(chatId, `Failed to kick user: ${error}`));
+// });
+
+// // Command: Change Group Picture
+// bot.onText(/\/setgrouppic/, (msg) => {
+//   const chatId = msg.chat.id;
+//   const photo = msg.photo[msg.photo.length - 1].file_id; // Assume last photo is highest resolution
+
+//   bot.setChatPhoto(chatId, photo)
+//     .then(() => bot.sendMessage(chatId, `Group picture changed.`))
+//     .catch(error => bot.sendMessage(chatId, `Failed to change group picture: ${error}`));
+// });
 
 //wihout username markdown xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 // Command: List Admins
