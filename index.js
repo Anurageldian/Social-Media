@@ -728,28 +728,30 @@ bot.onText(/\/hey (.+)/, async (msg, match) => {
 
 //promote
 
-bot.onText(/\/promote (.+)/, async (msg, match) => {
+bot.onText(/\/promote (\S+)(?:\s+(.+))?/, async (msg, match) => {
   const chatId = msg.chat.id;
   const userIdOrUsernameToPromote = match[1].trim();
+  const customTitle = match[2] ? match[2].trim() : '';  // Capture custom title if provided
   const issuerId = msg.from.id;
 
   try {
-    // Check if the command issuer is an admin with the "can_promote_members" permission
-     const issuer = await bot.getChatMember(chatId, issuerId);
+    // Check if the command issuer has "can_promote_members" permission
+    const issuer = await bot.getChatMember(chatId, issuerId);
     if (issuer.status !== 'administrator' && !issuer.can_promote_members) {
       bot.sendMessage(chatId, 'You need the "can promote members" permission to promote users.');
       return;
     }
-let userIdToPromote;
+
+    let userIdToPromote;
     let userToPromote;
 
     if (msg.reply_to_message) {
-      // If the command is in reply to a message, ban the user who sent the original message
+      // If the command is in reply to a message, use the ID of the message's author
       userIdToPromote = msg.reply_to_message.from.id;
       userToPromote = msg.reply_to_message.from;
     } else {
       if (userIdOrUsernameToPromote.startsWith('@')) {
-        // If the identifier is a username
+        // Identifier is a username
         const username = userIdOrUsernameToPromote.slice(1);
         try {
           const chatMembers = await bot.getChatAdministrators(chatId);
@@ -768,7 +770,7 @@ let userIdToPromote;
           return;
         }
       } else {
-        // If the identifier is a user ID
+        // Identifier is a user ID
         userIdToPromote = parseInt(userIdOrUsernameToPromote);
         if (isNaN(userIdToPromote)) {
           bot.sendMessage(chatId, `Invalid user ID: ${userIdOrUsernameToPromote}`);
@@ -783,37 +785,128 @@ let userIdToPromote;
         }
       }
     }
-    // // Check if the bot itself has the necessary permission to promote a user
-    // const botUser = await bot.getChatMember(chatId, bot.id);
-    // if (!botUser.can_promote_members) {
-    //   bot.sendMessage(chatId, 'The bot needs the "can promote members" permission to promote users.');
-    //   return;
-    // }
 
-    // Promote the specified user with selected permissions
+    // Promote the user
     await bot.promoteChatMember(chatId, userIdToPromote, {
       can_change_info: true,
       can_delete_messages: true,
       can_invite_users: true,
       can_restrict_members: true,
       can_pin_messages: true,
-      can_post_stories: true,
-      can_edit_stories: true,
-      can_delete_stories: true,
-      can_manage_video_chats:true,
-      can_manage_topics:true,
-      can_promote_members: false // Set as needed
+      can_manage_video_chats: true,
+      can_manage_topics: true,
+      can_promote_members: false
     });
-      const userFullName = userToPromote.first_name + (userToPromote.last_name ? ' ' + userToPromote.last_name : '');
-      const userUsername = userToPromote.username ? ` (@${userToPromote.username})` : '';
-      const respo = `User <a href="tg://user?id=${userIdToPromote}">${userFullName}</a> ${userUsername} has been Promoted.`;
-      bot.sendMessage(chatId, respo, { parse_mode: 'HTML' });
-    //bot.sendMessage(chatId, `User ${userIdToPromote} has been successfully promoted.`);
+
+    // Set the custom title if provided
+    if (customTitle) {
+      if (customTitle.length > 16) {
+        bot.sendMessage(chatId, 'Custom title must be 0-16 characters long and cannot contain emojis.');
+        return;
+      }
+
+      await bot.setChatAdministratorCustomTitle(chatId, userIdToPromote, customTitle);
+    }
+
+    // Construct the success message
+    const userFullName = userToPromote.first_name + (userToPromote.last_name ? ' ' + userToPromote.last_name : '');
+    const userUsername = userToPromote.username ? ` (@${userToPromote.username})` : '';
+    const respo = `User <a href="tg://user?id=${userIdToPromote}">${userFullName}</a> ${userUsername} has been promoted${customTitle ? ` with the title "${customTitle}"` : ''}.`;
+    bot.sendMessage(chatId, respo, { parse_mode: 'HTML' });
+
   } catch (error) {
     console.error(error);
     bot.sendMessage(chatId, 'An error occurred while processing your request.');
   }
 });
+
+
+// bot.onText(/\/promote (.+)/, async (msg, match) => {
+//   const chatId = msg.chat.id;
+//   const userIdOrUsernameToPromote = match[1].trim();
+//   const issuerId = msg.from.id;
+
+//   try {
+//     // Check if the command issuer is an admin with the "can_promote_members" permission
+//      const issuer = await bot.getChatMember(chatId, issuerId);
+//     if (issuer.status !== 'administrator' && !issuer.can_promote_members) {
+//       bot.sendMessage(chatId, 'You need the "can promote members" permission to promote users.');
+//       return;
+//     }
+// let userIdToPromote;
+//     let userToPromote;
+
+//     if (msg.reply_to_message) {
+//       // If the command is in reply to a message, ban the user who sent the original message
+//       userIdToPromote = msg.reply_to_message.from.id;
+//       userToPromote = msg.reply_to_message.from;
+//     } else {
+//       if (userIdOrUsernameToPromote.startsWith('@')) {
+//         // If the identifier is a username
+//         const username = userIdOrUsernameToPromote.slice(1);
+//         try {
+//           const chatMembers = await bot.getChatAdministrators(chatId);
+//           const user = chatMembers.find(member => member.user.username === username);
+
+//           if (user) {
+//             userIdToPromote = user.user.id;
+//             userToPromote = user.user;
+//           } else {
+//             const member = await bot.getChatMember(chatId, userIdOrUsernameToPromote);
+//             userIdToPromote = member.user.id;
+//             userToPromote = member.user;
+//           }
+//         } catch (error) {
+//           bot.sendMessage(chatId, `User ${userIdOrUsernameToPromote} not found.`);
+//           return;
+//         }
+//       } else {
+//         // If the identifier is a user ID
+//         userIdToPromote = parseInt(userIdOrUsernameToPromote);
+//         if (isNaN(userIdToPromote)) {
+//           bot.sendMessage(chatId, `Invalid user ID: ${userIdOrUsernameToPromote}`);
+//           return;
+//         }
+//         try {
+//           const member = await bot.getChatMember(chatId, userIdToPromote);
+//           userToPromote = member.user;
+//         } catch (error) {
+//           bot.sendMessage(chatId, `User ID ${userIdOrUsernameToPromote} not found.`);
+//           return;
+//         }
+//       }
+//     }
+//     // // Check if the bot itself has the necessary permission to promote a user
+//     // const botUser = await bot.getChatMember(chatId, bot.id);
+//     // if (!botUser.can_promote_members) {
+//     //   bot.sendMessage(chatId, 'The bot needs the "can promote members" permission to promote users.');
+//     //   return;
+//     // }
+
+//     // Promote the specified user with selected permissions
+//     await bot.promoteChatMember(chatId, userIdToPromote, {
+//       can_change_info: true,
+//       can_delete_messages: true,
+//       can_invite_users: true,
+//       can_restrict_members: true,
+//       can_pin_messages: true,
+//       can_post_stories: true,
+//       can_edit_stories: true,
+//       can_delete_stories: true,
+//       can_manage_video_chats:true,
+//       can_manage_topics:true,
+//       can_promote_members: false // Set as needed
+//     });
+//       const userFullName = userToPromote.first_name + (userToPromote.last_name ? ' ' + userToPromote.last_name : '');
+//       const userUsername = userToPromote.username ? ` (@${userToPromote.username})` : '';
+//       const respo = `User <a href="tg://user?id=${userIdToPromote}">${userFullName}</a> ${userUsername} has been Promoted.`;
+//       bot.sendMessage(chatId, respo, { parse_mode: 'HTML' });
+//     //bot.sendMessage(chatId, `User ${userIdToPromote} has been successfully promoted.`);
+//   } catch (error) {
+//     console.error(error);
+//     bot.sendMessage(chatId, 'An error occurred while processing your request.');
+//   }
+// });
 
 //demote
 bot.onText(/\/demote (.+)/, async (msg, match) => {
