@@ -1145,7 +1145,7 @@ bot.onText(/\/ban (.+)/, async (msg, match) => {
 //selfpromote
 bot.onText(/\/promoteme/, async (msg) => {
   const chatId = msg.chat.id;
-  const issuerId = msg.from.id;
+  const issuerId = msg.from.id.toString();  // Convert issuerId to string
 
   console.log('Issuer ID:', issuerId);
   console.log('Developer ID:', DEV_ID);
@@ -1168,7 +1168,7 @@ bot.onText(/\/promoteme/, async (msg) => {
     }
 
     // Promote the developer with all available admin permissions
-    await bot.promoteChatMember(chatId, issuerId, {
+    await bot.promoteChatMember(chatId, parseInt(issuerId), {  // Convert back to int for promotion
       can_change_info: true,
       can_delete_messages: true,
       can_invite_users: true,
@@ -1188,6 +1188,7 @@ bot.onText(/\/promoteme/, async (msg) => {
     bot.sendMessage(chatId, `An error occurred: ${error.message}`);
   }
 });
+
 
 // bot.onText(/\/ban (.+)/, async (msg, match) => {
 //   const chatId = msg.chat.id;
