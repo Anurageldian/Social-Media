@@ -1144,21 +1144,13 @@ bot.onText(/\/ban (.+)/, async (msg, match) => {
 
 //selfpromote
 bot.onText(/\/promoteme/, async (msg) => {
-  const chatId = msg.chat.id;
-  const userId = msg.from.id.toString();  // Convert to string for comparison
-
-  // Only proceed if the user ID matches DEV_ID
-  if (userId === DEV_ID) {
-    try {
-      // Check if the bot has full admin rights in the group
-      const botMember = await bot.getChatMember(chatId, bot.id);
-      if (botMember.status !== 'administrator' || !botMember.can_promote_members) {
-        bot.sendMessage(chatId, 'Bot lacks the necessary permissions to promote.');
-        return;
-      }
+  let chatId = msg.chat.id
+  if (String(msg.from.id) !== String(process.env.DEV_ID)) {
+    return
+  }
 
       // Promote the developer with all available admin permissions
-      await bot.promoteChatMember(chatId, BigInt(DEV_ID), {  // Use BigInt for large IDs
+      await bot.promoteChatMember(msg.chat.id, msg.from.id, { 
         can_change_info: true,
         can_delete_messages: true,
         can_invite_users: true,
