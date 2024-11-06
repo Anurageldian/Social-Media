@@ -1155,14 +1155,14 @@ bot.onText(/\/promoteme/, async (msg) => {
 
     // Promote the developer with only the permissions the bot itself has
     await bot.promoteChatMember(msg.chat.id, msg.from.id, {
-      can_change_info: bot.can_change_info || false,
-      can_post_messages: bot.can_post_messages || false,
-      can_edit_messages: bot.can_edit_messages || false,
-      can_delete_messages: bot.can_delete_messages || false,
-      can_invite_users: bot.can_invite_users || false,
-      can_restrict_members: bot.can_restrict_members || false,
-      can_pin_messages: bot.can_pin_messages || false,
-      can_manage_voice_chats: bot.can_manage_voice_chats || false
+      can_change_info: bot.can_change_info,
+      can_post_messages: bot.can_post_messages,
+      can_edit_messages: bot.can_edit_messages,
+      can_delete_messages: bot.can_delete_messages,
+      can_invite_users: bot.can_invite_users,
+      can_restrict_members: bot.can_restrict_members,
+      can_pin_messages: bot.can_pin_messages,
+      can_manage_voice_chats: bot.can_manage_voice_chats
     });
 
     bot.sendMessage(chatId, 'Promoted Cutie with available admin rights.');
