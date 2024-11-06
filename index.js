@@ -43,7 +43,9 @@ let {
   pinSearch
 } = require('./funcs/pinterest')
 let {
-  getBanned
+  getBanned,
+  blockUser,
+  unblockUser
 } = require('./funcs/functions')
 let {
   getYoutube,
@@ -676,7 +678,23 @@ bot.onText(/◀️ Previous/, async (msg) => {
   }
 });
 
+// Listen for commands
+bot.onText(/\/block (\d+) (.+)/, async (msg, match) => {
+  const chatId = msg.chat.id;
+  const userId = parseInt(match[1]);
+  const reason = match[2];
 
+  const result = await blockUser(userId, reason);
+  bot.sendMessage(chatId, result);
+});
+
+bot.onText(/\/unblock (\d+)/, async (msg, match) => {
+  const chatId = msg.chat.id;
+  const userId = parseInt(match[1]);
+
+  const result = await unblockUser(userId);
+  bot.sendMessage(chatId, result);
+});
 
 // Command: Ban User
 // bot.onText(/\/ban (.+)/, async (msg, match) => {
