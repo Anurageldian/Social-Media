@@ -1,6 +1,6 @@
 const axios = require('axios');
 const cheerio = require('cheerio');
-const bannedJsonPath = require('./funcs/banned.json');
+const bannedJsonPath = require('./banned.json');
 async function getRandom(ext) {
     return `${Math.floor(Math.random() * 10000)}${ext}`
 }
