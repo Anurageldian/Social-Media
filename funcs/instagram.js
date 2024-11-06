@@ -37,6 +37,7 @@ async function downloadInstagram(bot, chatId, url, userName, messageId) {
 
       if (get.length == 1) {
         if (get[0].type == 'Photo') {
+          await bot.sendChatAction(chatId, 'upload_photo');
           await bot.deleteMessage(chatId, load.message_id);
           return bot.sendPhoto(chatId, get[0].thumbnail, {
             caption: `[Source](${url}) \nBot by @firespower`,  // User's provided URL as source
@@ -60,6 +61,7 @@ async function downloadInstagram(bot, chatId, url, userName, messageId) {
           } catch (err) {
             let buff = await getBuffer(get[0].url);
             await fs.writeFileSync('content/vid-ig-single-' + chatId + '.mp4', buff);
+            await bot.sendChatAction(chatId, 'upload_video');
             await bot.deleteMessage(chatId, load.message_id);
             await bot.sendVideo(chatId, 'content/vid-ig-single-' + chatId + '.mp4', {
               caption: `[Source](${url}) \nBot by @firespower`,  // User's provided URL as source
@@ -90,11 +92,13 @@ async function downloadInstagram(bot, chatId, url, userName, messageId) {
           currentIndex += 10;
 
           if (mediaToSend.length > 0) {
+            await bot.sendChatAction(chatId, 'upload_photo'); 
             await bot.sendMediaGroup(chatId, mediaToSend, {
               caption: `[Source](${url}) \nBot by @firespower`,  // User's provided URL as source
               parse_mode: 'Markdown',
               disable_web_page_preview: true  // Disable link preview
             });
+            await bot.sendChatAction(chatId, 'upload_photo'); 
             await bot.sendMediaGroup(logChannelId, mediaToSend, {
               caption: `[Source](${url}) \nBot by @firespower`,  // User's provided URL as source
               parse_mode: 'Markdown',
