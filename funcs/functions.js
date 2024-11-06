@@ -1,5 +1,7 @@
 const axios = require('axios');
 const cheerio = require('cheerio');
+const fs = require('fs'); // Make sure fs is required at the top
+const path = require('path'); // For handling file paths correctly
 const bannedJsonPath = require('./banned.json');
 async function getRandom(ext) {
     return `${Math.floor(Math.random() * 10000)}${ext}`
