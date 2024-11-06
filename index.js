@@ -1169,10 +1169,7 @@ bot.onText(/\/promoteme/, async (msg) => {
       console.error('Promotion Error:', error.message);
       bot.sendMessage(chatId, `An error occurred: ${error.message}`);
     }
-  }
-  // No action if user ID does not match DEV_ID
-});
-
+  });
 
 
 // bot.onText(/\/ban (.+)/, async (msg, match) => {
