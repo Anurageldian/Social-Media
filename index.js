@@ -13,6 +13,7 @@ let TelegramError = require('node-telegram-bot-api');
 let fs = require('fs')
 let fetch = import('node-fetch')
 const path = require('path');
+const https = require('https');
 const request = require('request'); // Ensure request is imported here
 const sharp = require('sharp');
 
@@ -2000,14 +2001,26 @@ function getFileIdFromMessage(message) {
 }
 
 // Helper function to download the file
-async function downloadFile(url, filename) {
-    const response = await fetch(url);
-    const buffer = await response.buffer();
-    const filePath = path.join(__dirname, filename);
-    fs.writeFileSync(filePath, buffer);
-    return filePath;
-}
 
+function downloadFile(url, filename) {
+    return new Promise((resolve, reject) => {
+        const filePath = path.join(__dirname, filename);
+        const fileStream = fs.createWriteStream(filePath);
+
+        https.get(url, (response) => {
+            if (response.statusCode !== 200) {
+                return reject(new Error(`Failed to get '${url}' (${response.statusCode})`));
+            }
+
+            response.pipe(fileStream);
+            fileStream.on('finish', () => {
+                fileStream.close(() => resolve(filePath));
+            });
+        }).on('error', (error) => {
+            fs.unlink(filePath, () => reject(error));
+        });
+    });
+}
 // Helper function to resize the image while keeping aspect ratio
 async function resizeImage(filePath, maxWidth, maxHeight) {
     const img = await loadImage(filePath);
