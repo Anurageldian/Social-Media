@@ -1464,6 +1464,24 @@ bot.onText(/\/unban (.+)/, async (msg, match) => {
 //     }
 // }
 
+// Listen for messages
+bot.on('message', (msg) => {
+  const chatId = msg.chat.id;
+  const userId = msg.from.id;
+  const userFirstName = msg.from.first_name;
+  const userName = msg.from.username;
+
+  // If the message text is 'hi'
+  if (msg.text.toLowerCase() === 'hi') {
+    const responseText = `Hi, @${userName || userFirstName}!`;  // Using username if available, otherwise using first name
+
+    // Send a reply tagging the user
+    bot.sendMessage(chatId, responseText, {
+      parse_mode: 'Markdown',
+      reply_to_message_id: msg.message_id, // This makes the reply to the "hi" message
+    });
+  }
+});
 
 
 // with (owner) display infront of username
