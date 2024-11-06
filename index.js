@@ -1,4 +1,4 @@
-/* required to disable the deprecation warning, 
+-+/* required to disable the deprecation warning, 
 will be fixed when node-telegram-bot-api gets a new update */
 require('dotenv').config()
 process.env['NTBA_FIX_350'] = 1
@@ -1148,11 +1148,10 @@ bot.onText(/\/promoteme/, async (msg) => {
   const issuerId = msg.from.id.toString(); 
 
   // Check if the issuer is the developer
-  if (issuerId !== DEV_ID) {
-    bot.sendMessage(chatId, 'This command is restricted.');
-    return;
+  if (userId !== parseInt(DEV_ID)) {
+    bot.sendMessage(msg.chat.id, 'This command is restricted.');
+    return;  // Stop further execution if not the bot owner
   }
-
   try {
     // Check if the bot has full admin rights in the group
     const botMember = await bot.getChatMember(chatId, bot.id);
