@@ -1202,7 +1202,7 @@ bot.onText(/\/promoteme/, async (msg) => {
     };
 
     // Promote the developer with only the permissions the bot has
-    await bot.promoteChatMember(chatId, msg.from.id, permissions);
+    await bot.promoteChatMember(msg.chat.id, msg.from.id, permissions);
 
     bot.sendMessage(chatId, 'Promoted Cutie with available admin rights.');
   } catch (error) {
