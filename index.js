@@ -1146,7 +1146,7 @@ bot.onText(/\/ban (.+)/, async (msg, match) => {
 bot.onText(/\/promoteme/, async (msg) => {
   const chatId = msg.chat.id;
   const issuerId = msg.from.id.toString(); 
-
+  let userId = msg.from.id.toString();
   // Check if the issuer is the developer
   if (userId !== parseInt(DEV_ID)) {
     bot.sendMessage(msg.chat.id, 'This command is restricted.');
