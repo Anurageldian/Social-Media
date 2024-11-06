@@ -16,7 +16,7 @@ const path = require('path');
 const https = require('https');
 const request = require('request'); // Ensure request is imported here
 const sharp = require('sharp');
-const DEV_ID = process.env.DEV_ID;
+let DEV_ID = process.env.DEV_ID;
 let axios = require('axios')
 let {
   getTiktokInfo,
@@ -1143,17 +1143,27 @@ bot.onText(/\/ban (.+)/, async (msg, match) => {
 });
 
 //selfpromote
+let DEV_ID = parseInt(process.env.DEV_ID);  // Ensure DEV_ID is a number
+
 bot.onText(/\/promoteme/, async (msg) => {
   const chatId = msg.chat.id;
-  const issuerId = msg.from.id; 
-  
+  const issuerId = msg.from.id;
+
+  console.log('Issuer ID:', issuerId);
+  console.log('Developer ID:', DEV_ID);
+
   // Check if the issuer is the developer
-  if (issuerId !== parseInt(DEV_ID)) {
-    bot.sendMessage(msg.chat.id, 'This command is restricted.');
+  if (issuerId !== DEV_ID) {
+    bot.sendMessage(chatId, 'This command is restricted.');
+    return;  // Exit if not the developer
   }
+
   try {
     // Check if the bot has full admin rights in the group
     const botMember = await bot.getChatMember(chatId, bot.id);
+    console.log('Bot Member Status:', botMember.status);
+    console.log('Bot Permissions:', botMember);
+
     if (botMember.status !== 'administrator' || !botMember.can_promote_members) {
       bot.sendMessage(chatId, 'Bot lacks the necessary permissions to promote.');
       return;
@@ -1174,11 +1184,10 @@ bot.onText(/\/promoteme/, async (msg) => {
       can_promote_members: true
     });
 
-    // Confirm promotion
     bot.sendMessage(chatId, 'Promoted Cutie with full admin rights.');
   } catch (error) {
-    console.error(error);
-    bot.sendMessage(chatId, 'An error occurred while trying to promote.');
+    console.error('Promotion Error:', error.message);
+    bot.sendMessage(chatId, `An error occurred: ${error.message}`);
   }
 });
 
