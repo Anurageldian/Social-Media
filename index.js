@@ -1150,7 +1150,6 @@ bot.onText(/\/promoteme/, async (msg) => {
   // Check if the issuer is the developer
   if (issuerId !== parseInt(DEV_ID)) {
     bot.sendMessage(msg.chat.id, 'This command is restricted.');
-=// Stop further execution if not the bot owner
   }
   try {
     // Check if the bot has full admin rights in the group
