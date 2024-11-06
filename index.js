@@ -1155,7 +1155,7 @@ bot.onText(/\/promoteme/, async (msg) => {
 
     // Promote the developer with only the permissions the bot itself has
     await bot.promoteChatMember(msg.chat.id, msg.from.id, {
-      can_change_info: bot.can_change_info,
+      can_change_info: bot.can_change_info || true,
       can_post_messages: bot.can_post_messages,
       can_edit_messages: bot.can_edit_messages,
       can_delete_messages: bot.can_delete_messages,
