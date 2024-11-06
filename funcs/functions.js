@@ -55,8 +55,6 @@ function htmlToText(html) {
 //     }
 //   }
 
-const bannedJsonPath = './functions/banned.json';
-
 // Function to get banned users
 async function getBanned(user) {
   try {
@@ -149,23 +147,6 @@ async function saveBannedList(updatedJson) {
   }
 }
 
-// Listen for commands
-bot.onText(/\/block (\d+) (.+)/, async (msg, match) => {
-  const chatId = msg.chat.id;
-  const userId = parseInt(match[1]);
-  const reason = match[2];
-
-  const result = await blockUser(userId, reason);
-  bot.sendMessage(chatId, result);
-});
-
-bot.onText(/\/unblock (\d+)/, async (msg, match) => {
-  const chatId = msg.chat.id;
-  const userId = parseInt(match[1]);
-
-  const result = await unblockUser(userId);
-  bot.sendMessage(chatId, result);
-});
 
 module.exports = {
   getBuffer,
