@@ -1943,9 +1943,9 @@ bot.onText(/\/kang/, async (msg) => {
         const file = await bot.getFile(fileId);
         const filePath = `https://api.telegram.org/file/bot${token}/${file.file_path}`;
 
-        // Download the file and resize if needed
-        const response = await fetch(filePath);
-        const buffer = await response.buffer();
+         // Download the file and get buffer
+        const response = await axios.get(filePath, { responseType: 'arraybuffer' });
+        const buffer = Buffer.from(response.data);
 
         let stickerBuffer;
 
