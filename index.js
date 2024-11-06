@@ -16,7 +16,7 @@ const path = require('path');
 const https = require('https');
 const request = require('request'); // Ensure request is imported here
 const sharp = require('sharp');
-
+const DEV_ID = process.env.DEV_ID;
 let axios = require('axios')
 let {
   getTiktokInfo,
