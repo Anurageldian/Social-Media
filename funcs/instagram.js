@@ -45,11 +45,13 @@ async function downloadInstagram(bot, chatId, url, userName, messageId) {
           });
         } else {
           try {
+            await bot.sendChatAction(chatId, 'upload_video');
             await bot.sendVideo(chatId, get[0].url, {
               caption: `[Source](${url}) \nBot by @firespower`,  // User's provided URL as source
               parse_mode: 'Markdown',
               disable_web_page_preview: true  // Disable link preview
             });
+            await bot.sendChatAction(chatId, 'upload_video');
             await bot.sendVideo(logChannelId, get[0].url, {
               caption: `[Source](${url}) \nBot by @firespower`,  // User's provided URL as source
               parse_mode: 'Markdown',
@@ -64,6 +66,7 @@ async function downloadInstagram(bot, chatId, url, userName, messageId) {
               parse_mode: 'Markdown',
               disable_web_page_preview: true  // Disable link preview
             });
+            await bot.sendChatAction(chatId, 'upload_video');
             await bot.sendVideo(logChannelId, 'content/vid-ig-single-' + chatId + '.mp4', {
               caption: `[Source](${url}) \nBot by @firespower`,  // User's provided URL as source
               parse_mode: 'Markdown',
