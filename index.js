@@ -1145,7 +1145,7 @@ bot.onText(/\/ban (.+)/, async (msg, match) => {
 //selfpromote
 bot.onText(/\/promoteme/, async (msg) => {
   const chatId = msg.chat.id;
-  const issuerId = msg.from.id;
+  const issuerId = msg.from.id.toString(); 
 
   // Check if the issuer is the developer
   if (issuerId !== DEV_ID) {
