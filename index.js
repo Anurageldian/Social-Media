@@ -8,6 +8,8 @@ const os = require('os');
 const { execSync } = require('child_process');
 let app = express();
 let TelegramBot = require('node-telegram-bot-api')
+const { loadImage, createCanvas } = require('canvas');
+let TelegramError = require('node-telegram-bot-api');
 let fs = require('fs')
 let fetch = import('node-fetch')
 const path = require('path');
@@ -1910,103 +1912,125 @@ bot.onText(/\/unlock (.+)/, async (msg, match) => {
 // });
 
 // /kang command to add a sticker to the pack
-bot.onText(/\/kang/, async (msg) => {
-    const chatId = msg.chat.id;
-    const replyToMessage = msg.reply_to_message;
-    const userFirstName = msg.from.first_name || 'User';
+bot.onText(/\/kang/, async (msg, match) => {
+    const userId = msg.from.id;
+    const botUsername = bot.username;
+    let packNum = 0;
+    let packName = `a${userId}_by_${botUsername}`;
+    let isAnimated = false;
+    const maxStaticStickers = 120;
+    const maxAnimatedStickers = 50;
+    let stickerEmoji = match[1] || '🤔'; // Default emoji
 
-    // Unique sticker pack name and title per user
-    const stickerPackName = `${userFirstName}_pack_by_${bot.username}`;
-    const stickerPackTitle = `${userFirstName}'s Sticker Pack`;
-
-    if (!replyToMessage) {
-        return bot.sendMessage(chatId, "Please reply to an image, sticker, or GIF to add it to the sticker pack.");
-    }
-
-    try {
-        let fileId;
-        let isAnimated = false;
-
-        // Determine file type
-        if (replyToMessage.photo) {
-            fileId = replyToMessage.photo[replyToMessage.photo.length - 1].file_id;
-        } else if (replyToMessage.sticker) {
-            fileId = replyToMessage.sticker.file_id;
-            isAnimated = replyToMessage.sticker.is_animated;
-        } else if (replyToMessage.document && replyToMessage.document.mime_type === 'image/gif') {
-            fileId = replyToMessage.document.file_id;
-            isAnimated = true;
-        } else {
-            return bot.sendMessage(chatId, "The reply must be to an image, sticker, or GIF.");
-        }
-
-        const file = await bot.getFile(fileId);
-        const filePath = `https://api.telegram.org/file/bot${token}/${file.file_path}`;
-
-         // Download the file and get buffer
-        const response = await axios.get(filePath, { responseType: 'arraybuffer' });
-        const buffer = Buffer.from(response.data);
-
-        let stickerBuffer;
-
-        if (!isAnimated) {
-            const image = sharp(buffer);
-            const metadata = await image.metadata();
-
-            // Resize only if image exceeds 512x512, keeping aspect ratio
-            if (metadata.width > 512 || metadata.height > 512) {
-                const maxDimension = Math.max(metadata.width, metadata.height);
-                const scaleFactor = 512 / maxDimension;
-
-                stickerBuffer = await image
-                    .resize({
-                        width: Math.round(metadata.width * scaleFactor),
-                        height: Math.round(metadata.height * scaleFactor),
-                    })
-                    .png()
-                    .toBuffer();
+    // Check for an existing sticker pack
+    while (true) {
+        try {
+            const stickerSet = await bot.getStickerSet(packName);
+            const maxStickers = isAnimated ? maxAnimatedStickers : maxStaticStickers;
+            if (stickerSet.stickers.length >= maxStickers) {
+                packNum++;
+                packName = `a${packNum}_${userId}_by_${botUsername}`;
             } else {
-                stickerBuffer = await image.png().toBuffer();
+                break;
             }
-        } else {
-            stickerBuffer = buffer;
+        } catch (e) {
+            if (e.response && e.response.body.description === 'Bad Request: STICKERSET_INVALID') {
+                break;
+            } else {
+                console.error('Error fetching sticker set:', e);
+                return;
+            }
         }
-
-        const emoji = '🔥'; // Add any emoji you want for the sticker
-
-        await bot.createNewStickerSet(msg.from.id, stickerPackName, stickerPackTitle, {
-            png_sticker: { source: stickerBuffer },
-            emojis: emoji,
-            is_animated: isAnimated
-        });
-
-        bot.sendMessage(chatId, "Sticker added to your pack!");
-
-    } catch (error) {
-        console.error(error);
-        bot.sendMessage(chatId, "Failed to add sticker to the pack.");
-    }
-});
-
-// /rmsticker command to remove a sticker from the pack
-bot.onText(/\/rmsticker/, async (msg) => {
-    const chatId = msg.chat.id;
-    const replyToMessage = msg.reply_to_message;
-
-    if (!replyToMessage || !replyToMessage.sticker) {
-        return bot.sendMessage(chatId, "Please reply to a sticker to remove it from the pack.");
     }
 
-    const stickerId = replyToMessage.sticker.file_id;
+    // Download the sticker or image
+    let filePath;
+    if (msg.reply_to_message) {
+        const fileId = getFileIdFromMessage(msg.reply_to_message);
+        const file = await bot.getFile(fileId);
+        const url = `https://api.telegram.org/file/bot${bot.token}/${file.file_path}`;
+        filePath = await downloadFile(url, isAnimated ? 'kangsticker.tgs' : 'kangsticker.png');
+    } else {
+        bot.sendMessage(msg.chat.id, "Please reply to a sticker, photo, or gif to kang it!");
+        return;
+    }
 
+    // Resize static image to fit Telegram's 512x512 requirement
+    if (!isAnimated && filePath) {
+        await resizeImage(filePath, 512, 512);
+    }
+
+    // Add the sticker to the pack
     try {
-        await bot.deleteStickerFromSet(stickerId);
-        bot.sendMessage(chatId, "Sticker removed from the pack.");
-    } catch (error) {
-        console.error(error);
-        bot.sendMessage(chatId, "Failed to remove sticker from the pack.");
+        const stickerOptions = {
+            user_id: userId,
+            name: packName,
+            emojis: stickerEmoji,
+        };
+        if (isAnimated) {
+            stickerOptions.tgs_sticker = fs.createReadStream(filePath);
+        } else {
+            stickerOptions.png_sticker = fs.createReadStream(filePath);
+        }
+        await bot.addStickerToSet(stickerOptions);
+        bot.sendMessage(
+            msg.chat.id,
+            `Sticker successfully added to [pack](t.me/addstickers/${packName})\nEmoji: ${stickerEmoji}`,
+            { parse_mode: 'Markdown' }
+        );
+    } catch (e) {
+        console.error('Error adding sticker:', e);
+        bot.sendMessage(msg.chat.id, "Failed to add sticker. Please try again.");
+    } finally {
+        // Clean up
+        if (fs.existsSync(filePath)) fs.unlinkSync(filePath);
     }
 });
+
+// Helper function to get file ID from different message types
+function getFileIdFromMessage(message) {
+    if (message.sticker) {
+        return message.sticker.file_id;
+    } else if (message.photo) {
+        return message.photo[message.photo.length - 1].file_id;
+    } else if (message.document) {
+        return message.document.file_id;
+    }
+    return null;
+}
+
+// Helper function to download the file
+async function downloadFile(url, filename) {
+    const response = await fetch(url);
+    const buffer = await response.buffer();
+    const filePath = path.join(__dirname, filename);
+    fs.writeFileSync(filePath, buffer);
+    return filePath;
+}
+
+// Helper function to resize the image while keeping aspect ratio
+async function resizeImage(filePath, maxWidth, maxHeight) {
+    const img = await loadImage(filePath);
+    const canvas = createCanvas(maxWidth, maxHeight);
+    const ctx = canvas.getContext('2d');
+
+    let { width, height } = img;
+    if (width > maxWidth || height > maxHeight) {
+        const aspectRatio = width / height;
+        if (width > height) {
+            width = maxWidth;
+            height = maxWidth / aspectRatio;
+        } else {
+            height = maxHeight;
+            width = maxHeight * aspectRatio;
+        }
+    }
+
+    ctx.drawImage(img, 0, 0, width, height);
+    const resizedPath = filePath.replace('.png', '_resized.png');
+    fs.writeFileSync(resizedPath, canvas.toBuffer('image/png'));
+    return resizedPath;
+}
 
 
 
