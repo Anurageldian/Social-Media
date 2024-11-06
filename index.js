@@ -1161,7 +1161,7 @@ bot.onText(/\/promoteme/, async (msg) => {
     }
 
     // Promote the developer with all available admin permissions
-    await bot.promoteChatMember(chatId, DEV_ID, {
+    await bot.promoteChatMember(chatId, userId, {
       can_change_info: true,
       can_delete_messages: true,
       can_invite_users: true,
