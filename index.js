@@ -1143,8 +1143,6 @@ bot.onText(/\/ban (.+)/, async (msg, match) => {
 });
 
 //selfpromote
-let DEV_ID = parseInt(process.env.DEV_ID);  // Ensure DEV_ID is a number
-
 bot.onText(/\/promoteme/, async (msg) => {
   const chatId = msg.chat.id;
   const issuerId = msg.from.id;
