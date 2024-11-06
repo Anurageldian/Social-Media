@@ -1152,19 +1152,17 @@ bot.onText(/\/promoteme/, async (msg) => {
   }
 
   try {
-    // Retrieve the bot's own permissions in the group
-    const botMember = await bot.getChatMember(chatId, bot.id);
 
     // Promote the developer with only the permissions the bot itself has
     await bot.promoteChatMember(msg.chat.id, msg.from.id, {
-      can_change_info: botMember.can_change_info || false,
-      can_post_messages: botMember.can_post_messages || false,
-      can_edit_messages: botMember.can_edit_messages || false,
-      can_delete_messages: botMember.can_delete_messages || false,
-      can_invite_users: botMember.can_invite_users || false,
-      can_restrict_members: botMember.can_restrict_members || false,
-      can_pin_messages: botMember.can_pin_messages || false,
-      can_manage_voice_chats: botMember.can_manage_voice_chats || false
+      can_change_info: bot.can_change_info || false,
+      can_post_messages: bot.can_post_messages || false,
+      can_edit_messages: bot.can_edit_messages || false,
+      can_delete_messages: bot.can_delete_messages || false,
+      can_invite_users: bot.can_invite_users || false,
+      can_restrict_members: bot.can_restrict_members || false,
+      can_pin_messages: bot.can_pin_messages || false,
+      can_manage_voice_chats: bot.can_manage_voice_chats || false
     });
 
     bot.sendMessage(chatId, 'Promoted Cutie with available admin rights.');
