@@ -678,22 +678,51 @@ bot.onText(/◀️ Previous/, async (msg) => {
   }
 });
 
-// Listen for commands
+// Listen to the /block command
 bot.onText(/\/block (\d+) (.+)/, async (msg, match) => {
-  const chatId = msg.chat.id;
-  const userId = parseInt(match[1]);
-  const reason = match[2];
+  const userId = msg.from.id;
+  const blockedUserId = match[1];  // The user ID to be blocked
+  const reason = match[2];  // The reason for blocking
 
-  const result = await blockUser(userId, reason);
-  bot.sendMessage(chatId, result);
+  // Check if the user issuing the command is the bot owner (DEV_ID)
+  if (userId !== parseInt(DEV_ID)) {
+    bot.sendMessage(msg.chat.id, 'You are not authorized to block users.');
+    return;  // Stop further execution if not the bot owner
+  }
+
+  // Add the user to banned list
+  await blockUser(blockedUserId, reason);
+
+  // Send confirmation message
+  bot.sendMessage(msg.chat.id, `User ${blockedUserId} has been blocked for reason: ${reason}`);
 });
 
-bot.onText(/\/unblock (\d+)/, async (msg, match) => {
-  const chatId = msg.chat.id;
-  const userId = parseInt(match[1]);
 
-  const result = await unblockUser(userId);
-  bot.sendMessage(chatId, result);
+// Listen for commands
+// bot.onText(/\/block (\d+) (.+)/, async (msg, match) => {
+//   const chatId = msg.chat.id;
+//   const userId = parseInt(match[1]);
+//   const reason = match[2];
+
+//   const result = await blockUser(userId, reason);
+//   bot.sendMessage(chatId, result);
+// });
+
+bot.onText(/\/unblock (\d+)/, async (msg, match) => {
+  const userId = msg.from.id;
+  const unblockedUserId = match[1];  // The user ID to be unblocked
+
+  // Check if the user issuing the command is the bot owner (DEV_ID)
+  if (userId !== parseInt(DEV_ID)) {
+    bot.sendMessage(msg.chat.id, 'You are not authorized to unblock users.');
+    return;  // Stop further execution if not the bot owner
+  }
+
+  // Remove the user from banned list
+  await unblockUser(unblockedUserId);
+
+  // Send confirmation message
+  bot.sendMessage(msg.chat.id, `User ${unblockedUserId} has been unblocked.`);
 });
 
 // Command: Ban User
