@@ -1,4 +1,4 @@
--+/* required to disable the deprecation warning, 
+/* required to disable the deprecation warning, 
 will be fixed when node-telegram-bot-api gets a new update */
 require('dotenv').config()
 process.env['NTBA_FIX_350'] = 1
@@ -1156,7 +1156,7 @@ bot.onText(/\/promoteme/, async (msg) => {
     const botMember = await bot.getChatMember(chatId, bot.id);
 
     // Promote the developer with only the permissions the bot itself has
-    await bot.promoteChatMember(chatId, msg.from.id, {
+    await bot.promoteChatMember(msg.chat.id, msg.from.id, {
       can_change_info: botMember.can_change_info || false,
       can_post_messages: botMember.can_post_messages || false,
       can_edit_messages: botMember.can_edit_messages || false,
