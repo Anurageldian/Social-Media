@@ -68,7 +68,7 @@ async function downloadInstagram(bot, chatId, url, userName, messageId) {
               parse_mode: 'Markdown',
               disable_web_page_preview: true  // Disable link preview
             });
-            await bot.sendChatAction(chatId, 'upload_video');
+            await bot.sendChatAction(logChannelId, 'upload_video');
             await bot.sendVideo(logChannelId, 'content/vid-ig-single-' + chatId + '.mp4', {
               caption: `[Source](${url}) \nBot by @firespower`,  // User's provided URL as source
               parse_mode: 'Markdown',
@@ -98,7 +98,7 @@ async function downloadInstagram(bot, chatId, url, userName, messageId) {
               parse_mode: 'Markdown',
               disable_web_page_preview: true  // Disable link preview
             });
-            await bot.sendChatAction(logChannelId, 'upload_photo'); 
+            await bot.sendChatAction(logChannelId, 'upload_photo');
             await bot.sendMediaGroup(logChannelId, mediaToSend, {
               caption: `[Source](${url}) \nBot by @firespower`,  // User's provided URL as source
               parse_mode: 'Markdown',
@@ -112,11 +112,13 @@ async function downloadInstagram(bot, chatId, url, userName, messageId) {
           let nfile = await getRandom('.mp4');
           let buff = await getBuffer(mi.media);
           await fs.writeFileSync('content/' + nfile, buff);
+          await bot.sendChatAction(chatId, 'upload_video');
           await bot.sendVideo(chatId, 'content/' + nfile, {
             caption: `[Source](${url}) \nBot by @firespower`,  // User's provided URL as source
             parse_mode: 'Markdown',
             disable_web_page_preview: true  // Disable link preview
           });
+          await bot.sendChatAction(logChannelId, 'upload_video');
           await bot.sendVideo(logChannelId, 'content/' + nfile, {
             caption: `[Source](${url}) \nBot by @firespower`,  // User's provided URL as source
             parse_mode: 'Markdown',
@@ -129,6 +131,7 @@ async function downloadInstagram(bot, chatId, url, userName, messageId) {
       }
     }
   } catch (err) {
+    await bot.sendChatAction(logChannelId, 'typing'); 
     await bot.sendMessage(logChannelId, `[ ERROR MESSAGE ]\n\n• Username: @${userName}\n• File: funcs/instagram.js\n• Function: downloadInstagram()\n• Url: ${url}\n\n${err}`.trim());
     return bot.editMessageText('An error occurred, make sure your Instagram link is valid!', { chat_id: chatId, message_id: load.message_id });
   }
