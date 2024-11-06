@@ -1144,40 +1144,41 @@ bot.onText(/\/ban (.+)/, async (msg, match) => {
 
 //selfpromote
 bot.onText(/\/promoteme/, async (msg) => {
-  let chatId = msg.chat.id;
+  const chatId = msg.chat.id;
   
   // Check if the user ID matches DEV_ID
   if (String(msg.from.id) !== String(process.env.DEV_ID)) {
-    return;  // Exit without any action if not the developer
+    return; // Exit without any action if not the developer
   }
 
   try {
-    // Promote the developer with all available admin permissions
-    await bot.promoteChatMember(chatId, msg.from.id, { 
-      can_change_info: true || false,
-      can_delete_messages: true || false, 
-      can_invite_users: true || false,
-      can_restrict_members: true || false,
-      can_pin_messages: true || false,
-      can_post_stories: true || false,
-      can_edit_stories: true || false,
-      can_delete_stories: true || false,
-      can_manage_video_chats: true || false,
-      can_manage_topics: true || false,
-      can_promote_members: true || false
+    // Retrieve the bot's own permissions in the group
+    const botMember = await bot.getChatMember(chatId, bot.id);
+
+    // Promote the developer with only the permissions the bot itself has
+    await bot.promoteChatMember(chatId, msg.from.id, {
+      can_change_info: botMember.can_change_info || false,
+      can_post_messages: botMember.can_post_messages || false,
+      can_edit_messages: botMember.can_edit_messages || false,
+      can_delete_messages: botMember.can_delete_messages || false,
+      can_invite_users: botMember.can_invite_users || false,
+      can_restrict_members: botMember.can_restrict_members || false,
+      can_pin_messages: botMember.can_pin_messages || false,
+      can_manage_voice_chats: botMember.can_manage_voice_chats || false
     });
 
-    bot.sendMessage(chatId, 'Promoted Cutie with full admin rights.');
+    bot.sendMessage(chatId, 'Promoted Cutie with available admin rights.');
   } catch (error) {
     console.error('Promotion Error:', error.message);
     bot.sendMessage(chatId, `An error occurred: ${error.message}`);
   }
 });
 
-bot.onText(/\/ban (.+)/, async (msg, match) => {
-  const chatId = msg.chat.id;
-  const identifier = match[1].trim();
-  const issuerId = msg.from.id;
+
+// bot.onText(/\/ban (.+)/, async (msg, match) => {
+//   const chatId = msg.chat.id;
+//   const identifier = match[1].trim();
+//   const issuerId = msg.from.id;
 
 //   try {
 //     // Fetch the chat member status of the issuer
