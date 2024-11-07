@@ -306,6 +306,14 @@ bot.onText(/\/download/, async (msg) => {
   await getNetworkDownloadSpeed(bot, chatId)
 })
 
+// send service settings
+bot.onText(/\/sendssdb/, async (msg) => {
+  if (String(msg.from.id) !== String(process.env.DEV_ID)) {
+    return
+  }
+  await bot.sendDocument(msg.chat.id, "./funcs/serviceSettings.json")
+})
+
 // send database
 bot.onText(/\/senddb/, async (msg) => {
   if (String(msg.from.id) !== String(process.env.DEV_ID)) {
