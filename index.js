@@ -628,7 +628,6 @@ bot.onText(/\/id/, (msg) => {
 });
 
 
-
 const serviceSettingsPath = path.join(__dirname, 'serviceSettings.json');
 // Load settings from JSON file
 let serviceSettings = [];
@@ -643,16 +642,16 @@ function saveSettings() {
 
 // Helper function to get the group service setting
 function getGroupSetting(groupId) {
-  const group = serviceSettings.find(item => item.groupid === groupId);
-  return group ? group.service : null;
+  return serviceSettings.find(item => item.groupid === groupId);
 }
 
-// Handle /cleanservice command
+// Command to add services to a group
 bot.onText(/\/cleanservice (.+)/, async (msg, match) => {
   const chatId = msg.chat.id;
   const userId = msg.from.id;
-  const setting = match[1].trim().toLowerCase();
-  const allowedSettings = ['all', 'join', 'pin', 'title', 'videochat', 'off'];
+  const services = match[1].trim().split(',').map(service => service.trim());
+
+  const allowedServices = ['all', 'join', 'leave', 'pin', 'title', 'videochat'];
 
   // Check if user is an admin
   const user = await bot.getChatMember(chatId, userId);
@@ -660,27 +659,76 @@ bot.onText(/\/cleanservice (.+)/, async (msg, match) => {
     return bot.sendMessage(chatId, 'Only admins can use this command.');
   }
 
-  if (!allowedSettings.includes(setting)) {
-    return bot.sendMessage(chatId, `Invalid setting. Please use one of the following: ${allowedSettings.join(', ')}`);
+  // Validate services
+  for (const service of services) {
+    if (!allowedServices.includes(service)) {
+      return bot.sendMessage(chatId, `Invalid service: "${service}". Please use one of the following: ${allowedServices.join(', ')}`);
+    }
   }
 
-  // Update or add setting for the group
-  const existingGroupSetting = serviceSettings.find(item => item.groupid === chatId);
-  if (existingGroupSetting) {
-    existingGroupSetting.service = setting;
-  } else {
-    serviceSettings.push({ groupid: chatId, service: setting });
+  // Get or create group service settings
+  let groupSetting = getGroupSetting(chatId);
+  if (!groupSetting) {
+    groupSetting = { groupid: chatId, services: [] };
+    serviceSettings.push(groupSetting);
   }
+
+  // Add services to the group
+  services.forEach(service => {
+    if (!groupSetting.services.includes(service)) {
+      groupSetting.services.push(service);
+    }
+  });
+
   saveSettings();
-  bot.sendMessage(chatId, `Service message cleaning set to "${setting}" for this group.`);
+  bot.sendMessage(chatId, `Added services: ${services.join(', ')} to this group.`);
+});
+
+// Command to remove services from a group
+bot.onText(/\/removeservice (.+)/, async (msg, match) => {
+  const chatId = msg.chat.id;
+  const userId = msg.from.id;
+  const services = match[1].trim().split(',').map(service => service.trim());
+
+  const allowedServices = ['all', 'join', 'leave', 'pin', 'title', 'videochat'];
+
+  // Check if user is an admin
+  const user = await bot.getChatMember(chatId, userId);
+  if (user.status !== 'administrator' && user.status !== 'creator') {
+    return bot.sendMessage(chatId, 'Only admins can use this command.');
+  }
+
+  // Validate services
+  for (const service of services) {
+    if (!allowedServices.includes(service)) {
+      return bot.sendMessage(chatId, `Invalid service: "${service}". Please use one of the following: ${allowedServices.join(', ')}`);
+    }
+  }
+
+  // Get group service settings
+  let groupSetting = getGroupSetting(chatId);
+  if (!groupSetting) {
+    return bot.sendMessage(chatId, 'No services are set for this group.');
+  }
+
+  // Remove services from the group
+  services.forEach(service => {
+    const index = groupSetting.services.indexOf(service);
+    if (index !== -1) {
+      groupSetting.services.splice(index, 1);
+    }
+  });
+
+  saveSettings();
+  bot.sendMessage(chatId, `Removed services: ${services.join(', ')} from this group.`);
 });
 
 // Monitor and delete service messages based on settings
 bot.on('message', async (msg) => {
   const chatId = msg.chat.id;
-  const setting = getGroupSetting(chatId);
+  const groupSetting = getGroupSetting(chatId);
 
-  if (!setting || setting === 'off') return;
+  if (!groupSetting || groupSetting.services.includes('off')) return;
 
   // Conditions for each service message type
   const isJoinMessage = msg.new_chat_members;
@@ -689,22 +737,108 @@ bot.on('message', async (msg) => {
   const isTitleChange = msg.group_chat_created || msg.supergroup_chat_created || msg.migrate_to_chat_id || msg.migrate_from_chat_id;
   const isVideoChatMessage = msg.video_chat_started || msg.video_chat_ended || msg.video_chat_scheduled || msg.video_chat_participants_invited;
 
+  // Check if it's a service message and delete it
   try {
-    if (
-      (setting === 'all') ||
-      (setting === 'join' && isJoinMessage) ||
-      (setting === 'pin' && isPinnedMessage) ||
-      (setting === 'title' && isTitleChange) ||
-      (setting === 'videochat' && isVideoChatMessage)
-    ) {
-      if (!msg.photo) {
-        await bot.deleteMessage(chatId, msg.message_id);
+    // Only delete service messages that match the group setting
+    groupSetting.services.forEach(service => {
+      if (
+        service === 'all' ||
+        (service === 'join' && isJoinMessage) ||
+        (service === 'leave' && isLeaveMessage) ||
+        (service === 'pin' && isPinnedMessage) ||
+        (service === 'title' && isTitleChange) ||
+        (service === 'videochat' && isVideoChatMessage)
+      ) {
+        // Ensure it's not a regular user-uploaded photo message
+        if (!msg.photo) {
+          bot.deleteMessage(chatId, msg.message_id);
+        }
       }
-    }
+    });
   } catch (error) {
     console.error('Error deleting service message:', error);
   }
 });
+
+
+
+
+// const serviceSettingsPath = path.join(__dirname, 'serviceSettings.json');
+// // Load settings from JSON file
+// let serviceSettings = [];
+// if (fs.existsSync(serviceSettingsPath)) {
+//   serviceSettings = JSON.parse(fs.readFileSync(serviceSettingsPath, 'utf8'));
+// }
+
+// // Helper function to save settings
+// function saveSettings() {
+//   fs.writeFileSync(serviceSettingsPath, JSON.stringify(serviceSettings, null, 2));
+// }
+
+// // Helper function to get the group service setting
+// function getGroupSetting(groupId) {
+//   const group = serviceSettings.find(item => item.groupid === groupId);
+//   return group ? group.service : null;
+// }
+
+// // Handle /cleanservice command
+// bot.onText(/\/cleanservice (.+)/, async (msg, match) => {
+//   const chatId = msg.chat.id;
+//   const userId = msg.from.id;
+//   const setting = match[1].trim().toLowerCase();
+//   const allowedSettings = ['all', 'join', 'pin', 'title', 'videochat', 'off'];
+
+//   // Check if user is an admin
+//   const user = await bot.getChatMember(chatId, userId);
+//   if (user.status !== 'administrator' && user.status !== 'creator') {
+//     return bot.sendMessage(chatId, 'Only admins can use this command.');
+//   }
+
+//   if (!allowedSettings.includes(setting)) {
+//     return bot.sendMessage(chatId, `Invalid setting. Please use one of the following: ${allowedSettings.join(', ')}`);
+//   }
+
+//   // Update or add setting for the group
+//   const existingGroupSetting = serviceSettings.find(item => item.groupid === chatId);
+//   if (existingGroupSetting) {
+//     existingGroupSetting.service = setting;
+//   } else {
+//     serviceSettings.push({ groupid: chatId, service: setting });
+//   }
+//   saveSettings();
+//   bot.sendMessage(chatId, `Service message cleaning set to "${setting}" for this group.`);
+// });
+
+// // Monitor and delete service messages based on settings
+// bot.on('message', async (msg) => {
+//   const chatId = msg.chat.id;
+//   const setting = getGroupSetting(chatId);
+
+//   if (!setting || setting === 'off') return;
+
+//   // Conditions for each service message type
+//   const isJoinMessage = msg.new_chat_members;
+//   const isLeaveMessage = msg.left_chat_member;
+//   const isPinnedMessage = msg.pinned_message;
+//   const isTitleChange = msg.group_chat_created || msg.supergroup_chat_created || msg.migrate_to_chat_id || msg.migrate_from_chat_id;
+//   const isVideoChatMessage = msg.video_chat_started || msg.video_chat_ended || msg.video_chat_scheduled || msg.video_chat_participants_invited;
+
+//   try {
+//     if (
+//       (setting === 'all') ||
+//       (setting === 'join' && isJoinMessage) ||
+//       (setting === 'pin' && isPinnedMessage) ||
+//       (setting === 'title' && isTitleChange) ||
+//       (setting === 'videochat' && isVideoChatMessage)
+//     ) {
+//       if (!msg.photo) {
+//         await bot.deleteMessage(chatId, msg.message_id);
+//       }
+//     }
+//   } catch (error) {
+//     console.error('Error deleting service message:', error);
+//   }
+// });
 
 
 
