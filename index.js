@@ -907,7 +907,8 @@ bot.on('message', async (msg) => {
   }
 });
 
-//settings for /lock user
+// /lock users
+// Path to JSON file to store lock settings for groups
 const lockSettingsPath = path.join(__dirname, 'lockSettings.json');
 let lockSettings = [];
 
@@ -925,7 +926,6 @@ function saveLockSettings() {
 function getLockSetting(groupId) {
   return lockSettings.find(setting => setting.groupid === groupId);
 }
-
 
 // Command to lock user permissions for new users
 bot.onText(/\/lock users/, async (msg) => {
@@ -967,7 +967,13 @@ bot.onText(/\/free(?:\s+(\d+))?/, async (msg, match) => {
     return bot.sendMessage(chatId, 'Please reply to a user’s message or provide a user ID.');
   }
 
-  // Update restrictions for user
+  // Get group lock setting
+  let groupSetting = getLockSetting(chatId);
+  if (!groupSetting || !groupSetting.restrictedUsers.includes(userId)) {
+    return bot.sendMessage(chatId, `User ${userId} is not restricted.`);
+  }
+
+  // Free the user and update the lock settings
   try {
     await bot.restrictChatMember(chatId, userId, {
       can_send_messages: true,
@@ -979,14 +985,11 @@ bot.onText(/\/free(?:\s+(\d+))?/, async (msg, match) => {
       can_invite_users: true,
       can_pin_messages: true,
     });
-    
-    // Update lock settings to remove from restricted users list
-    const groupSetting = getLockSetting(chatId);
-    if (groupSetting) {
-      groupSetting.restrictedUsers = groupSetting.restrictedUsers.filter(id => id !== userId);
-      saveLockSettings();
-    }
-    
+
+    // Remove user from the restricted list in JSON
+    groupSetting.restrictedUsers = groupSetting.restrictedUsers.filter(id => id !== userId);
+    saveLockSettings();
+
     bot.sendMessage(chatId, `User ${userId} has been freed.`);
   } catch (error) {
     console.error('Error freeing user:', error);
@@ -1003,7 +1006,7 @@ bot.on('new_chat_members', async (msg) => {
     msg.new_chat_members.forEach(async (member) => {
       try {
         await bot.restrictChatMember(chatId, member.id, {
-          can_send_messages: true,
+          can_send_messages: false,
           can_send_media_messages: false,
           can_send_polls: false,
           can_send_other_messages: false,
@@ -1014,9 +1017,11 @@ bot.on('new_chat_members', async (msg) => {
         });
         
         // Add user to restricted list
-        groupSetting.restrictedUsers.push(member.id);
-        saveLockSettings();
-        
+        if (groupSetting) {
+          groupSetting.restrictedUsers.push(member.id);
+          saveLockSettings();
+        }
+
         bot.sendMessage(chatId, `User ${member.id} has been restricted. Use /free to allow permissions.`);
       } catch (error) {
         console.error('Error restricting new user:', error);
