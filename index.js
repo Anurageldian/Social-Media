@@ -626,6 +626,30 @@ bot.onText(/\/id/, (msg) => {
     // bot.sendMessage(chatId, `Your User ID: ${userId}`, replyOptions);
   }
 });
+
+// Delete message command
+bot.onText(/\/del/, async (msg) => {
+  const chatId = msg.chat.id;
+  const messageIdToDelete = msg.reply_to_message?.message_id;
+
+  // Ensure the command is a reply to another message
+  if (!messageIdToDelete) {
+    return bot.sendMessage(chatId, 'Please reply to the message you want to delete with the /del command.');
+  }
+
+  try {
+    // Attempt to delete the replied-to message
+    await bot.deleteMessage(chatId, messageIdToDelete);
+    // Optionally, you can delete the /del command message itself to keep the chat clean
+    await bot.deleteMessage(chatId, msg.message_id);
+  } catch (error) {
+    console.error('Error deleting message:', error);
+    bot.sendMessage(chatId, 'I was unable to delete the message. Ensure I have permission to delete messages.');
+  }
+});
+
+
+
 // clean services
 
 const serviceSettingsPath = path.join(__dirname, 'serviceSettings.json');
