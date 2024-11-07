@@ -603,7 +603,7 @@ bot.onText(/\/id/, (msg) => {
   // Reply to the command message with user and group IDs (if applicable)
   const replyOptions = {
     reply_to_message_id: msg.message_id,
-    parse_mode: 'HTMML'
+    parse_mode: 'HTML'
   };
 
   // Check if the chat is a group or private chat
