@@ -1,0 +1,11 @@
+[
+  {
+    "groupid": -1002235227787,
+    "services": ["videochat", "join"]
+  },
+  {
+    "groupid": -1001234567890,
+    "services": ["pin", "title"]
+  }
+]
+
