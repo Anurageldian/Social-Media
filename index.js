@@ -620,6 +620,8 @@ bot.onText(/\/id/, (msg) => {
 });
 
 
+
+
 // Command to set group profile picture
 bot.onText(/\/setgcpic/, async (msg) => {
   const chatId = msg.chat.id;
@@ -641,6 +643,18 @@ bot.onText(/\/setgcpic/, async (msg) => {
     const botMember = await bot.getChatMember(chatId, bot.id);
     if (botMember.status !== 'administrator' && botMember.status !== 'creator') {
       return bot.sendMessage(chatId, 'The bot needs to be an admin to change the group profile picture.');
+    }
+
+    // Check if the bot has the "Change Group Info" permission
+    const botPermissions = await bot.getChatPermissions(chatId, bot.id);
+    if (!botPermissions.can_change_info) {
+      return bot.sendMessage(chatId, 'The bot does not have permission to change group info.');
+    }
+
+    // Check if the admin who issued the command has the "Change Group Info" permission
+    const adminPermissions = await bot.getChatPermissions(chatId, userId);
+    if (!adminPermissions.can_change_info) {
+      return bot.sendMessage(chatId, 'You do not have permission to change group info.');
     }
 
     // Get the highest resolution photo
