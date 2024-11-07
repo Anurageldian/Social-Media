@@ -977,7 +977,8 @@ bot.on('new_chat_members', (msg) => {
       bot.restrictChatMember(chatId, member.id, {
         can_send_messages: true,
       });
-      bot.sendMessage(chatId, `${member.username || member.first_name} perms has been limited by default until freed.`);
+      const perms = `<a href="tg://user?id=${userIdToPromote}">${userFullName}</a> ${userUsername} has been limited by default until freed.`;
+      bot.sendMessage(chatId, perms, { parse_mode: 'HTML' });
     });
   }
 });
