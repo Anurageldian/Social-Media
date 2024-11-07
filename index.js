@@ -639,7 +639,7 @@ bot.onText(/\/id/, (msg) => {
     const replyOptions = {
       reply_to_message_id: msg.message_id,
       parse_mode: 'HTML'
-    };
+   
 
     // Construct the message
     const message = `User <a href="tg://user?id=${msg.reply_to_message.from.id}">${msg.reply_to_message.from.first_name}</a> 's ID: <code>${repliedUserId}</code>\nYour User ID: <code>${userId}</code>\nThis Chat's ID: <code>${chatId}</code>`;
