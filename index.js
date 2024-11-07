@@ -642,10 +642,13 @@ bot.onText(/\/id/, (msg) => {
     };
 
     // Construct the message
-    const message = `Replied User <a href="tg://user?id=${msg.reply_to_message.from.id}">${msg.reply_to_message.from.first_name}</a>ID: <code>${repliedUserId}</code>\nYour User ID: <code>${userId}</code>\nThis Chat's ID: <code>${chatId}</code>`;
+    const message = `User <a href="tg://user?id=${msg.reply_to_message.from.id}">${msg.reply_to_message.from.first_name}</a> 's ID: <code>${repliedUserId}</code>\nYour User ID: <code>${userId}</code>\nThis Chat's ID: <code>${chatId}</code>`;
     bot.sendMessage(chatId, message, replyOptions);
-  } else {
-    bot.sendMessage(chatId, 'Please reply to a message to get the user IDs.');
+  } else (msg.chat.type === 'private') {
+    // Private chat: respond with user ID
+    let iduser = `Your User ID: <code>${userId}</code>`;
+    bot.sendMessage(chatId, iduser, replyOptions, { parse_mode: 'Markdown' });
+    // bot.sendMessage(chatId, id, replyOptions);
   }
 });
 
