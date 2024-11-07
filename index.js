@@ -744,7 +744,7 @@ bot.onText(/\/purge/, async (msg) => {
 //   }
 // });
 
-
+const serviceSettingsPath = path.join(__dirname, 'serviceSettings.json');
 let serviceSettings = [];
 // Load settings from JSON file
 if (fs.existsSync(serviceSettingsPath)) {
@@ -905,8 +905,6 @@ bot.on('message', async (msg) => {
 });
 
 // /lock users
-const serviceSettingsPath = path.join(__dirname, 'serviceSettings.json');
-let serviceSettings = [];
 
 // Load settings from JSON file
 if (fs.existsSync(serviceSettingsPath)) {
