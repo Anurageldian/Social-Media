@@ -605,7 +605,6 @@ bot.onText(/\/id/, (msg) => {
     reply_to_message_id: msg.message_id,
     parse_mode: 'HTML'
   };
-
   // Check if the chat is a group or private chat
   if (msg.chat.type === 'private') {
     // Private chat: respond with user ID
@@ -619,6 +618,46 @@ bot.onText(/\/id/, (msg) => {
     // bot.sendMessage(chatId, `Your User ID: ${userId}`, replyOptions);
   }
 });
+
+
+// Command to set group profile picture
+bot.onText(/\/setgcpic/, async (msg) => {
+  const chatId = msg.chat.id;
+  const userId = msg.from.id;
+
+  // Ensure the message is a reply to a photo
+  if (!msg.reply_to_message || !msg.reply_to_message.photo) {
+    return bot.sendMessage(chatId, 'Please reply to a photo message with /setgcpic to set the group profile picture.');
+  }
+
+  try {
+    // Check if the user issuing the command is an admin or creator
+    const user = await bot.getChatMember(chatId, userId);
+    if (user.status !== 'administrator' && user.status !== 'creator') {
+      return bot.sendMessage(chatId, 'You need to be an admin or creator to set the group profile picture.');
+    }
+
+    // Check if the bot is an admin or creator
+    const botMember = await bot.getChatMember(chatId, bot.id);
+    if (botMember.status !== 'administrator' && botMember.status !== 'creator') {
+      return bot.sendMessage(chatId, 'The bot needs to be an admin to change the group profile picture.');
+    }
+
+    // Get the highest resolution photo
+    const photo = msg.reply_to_message.photo.pop();
+    const fileId = photo.file_id;
+
+    // Set the group profile picture
+    await bot.setChatPhoto(chatId, fileId);
+    return bot.sendMessage(chatId, 'Group profile picture has been updated successfully!');
+
+  } catch (error) {
+    console.error('Error setting group profile picture:', error);
+    return bot.sendMessage(chatId, 'An error occurred while trying to set the group profile picture.');
+  }
+});
+
+
 // Function to fetch stickers based on search term and page number
 async function fetchStickers(searchTerm, page) {
   try {
