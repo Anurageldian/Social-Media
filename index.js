@@ -609,12 +609,12 @@ bot.onText(/\/id/, (msg) => {
   if (msg.chat.type === 'private') {
     // Private chat: respond with user ID
     let iduser = `Your User ID: <code>${userId}</code>`;
-    bot.sendMessage(chatId, iduser, replyOptions, { parse_mode: 'HTML' });
+    bot.sendMessage(chatId, iduser, replyOptions, { parse_mode: 'Markdown' });
     // bot.sendMessage(chatId, id, replyOptions);
   } else {
     // Group chat: respond with both user ID and group ID
     let idusergc = `Your User ID: <code>${userId}</code>\nGroup ID: <code>${chatId}</code>`;
-    bot.sendMessage(chatId, idusergc, replyOptions, { parse_mode: 'HTML' });
+    bot.sendMessage(chatId, idusergc, replyOptions, { parse_mode: 'Markdown' });
     // bot.sendMessage(chatId, `Your User ID: ${userId}`, replyOptions);
   }
 });
