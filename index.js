@@ -649,6 +649,7 @@ bot.onText(/\/del/, async (msg) => {
 });
 
 //purge 
+
 // Command to purge messages
 bot.onText(/\/purge/, async (msg) => {
   const chatId = msg.chat.id;
@@ -695,6 +696,53 @@ bot.onText(/\/purge/, async (msg) => {
     bot.sendMessage(chatId, "An error occurred while purging messages.");
   }
 });
+
+// // Command to purge messages
+// bot.onText(/\/purge/, async (msg) => {
+//   const chatId = msg.chat.id;
+//   const purgeEndMessageId = msg.message_id;
+//   const userId = msg.from.id;
+
+//   // Ensure the /purge command is a reply to another message
+//   if (!msg.reply_to_message) {
+//     return bot.sendMessage(chatId, "Please reply to the message you want to start purging from.");
+//   }
+
+//   // Get the starting message ID from the reply
+//   const purgeStartMessageId = msg.reply_to_message.message_id;
+
+//   // Check if the user has admin privileges
+//   const user = await bot.getChatMember(chatId, userId);
+//   if (user.status !== 'administrator' && user.status !== 'creator') {
+//     return bot.sendMessage(chatId, "Only admins can use the /purge command.");
+//   }
+
+//   // Initialize a counter for deleted messages
+//   let deletedCount = 0;
+
+//   // Purge messages from purgeStartMessageId to purgeEndMessageId
+//   try {
+//     for (let messageId = purgeStartMessageId; messageId <= purgeEndMessageId; messageId++) {
+//       try {
+//         // Attempt to delete each message
+//         await bot.deleteMessage(chatId, messageId);
+//         deletedCount++;
+//       } catch (error) {
+//         if (error.response && error.response.body && error.response.body.description.includes("message to delete not found")) {
+//           // Ignore error if message is already deleted
+//           continue;
+//         }
+//         console.error("Error deleting message:", error);
+//       }
+//     }
+    
+//     // Confirm purge completion with the number of deleted messages
+//     bot.sendMessage(chatId, `I have purged ${deletedCount} messages.`);
+//   } catch (error) {
+//     console.error("Error during purge operation:", error);
+//     bot.sendMessage(chatId, "An error occurred while purging messages.");
+//   }
+// });
 
 
 
