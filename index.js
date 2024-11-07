@@ -626,11 +626,12 @@ bot.onText(/\/id/, (msg) => {
     // bot.sendMessage(chatId, `Your User ID: ${userId}`, replyOptions);
   }
 });
-
+// clean services
 
 const serviceSettingsPath = path.join(__dirname, 'serviceSettings.json');
-// Load settings from JSON file
 let serviceSettings = [];
+
+// Load settings from JSON file
 if (fs.existsSync(serviceSettingsPath)) {
   serviceSettings = JSON.parse(fs.readFileSync(serviceSettingsPath, 'utf8'));
 }
@@ -645,18 +646,25 @@ function getGroupSetting(groupId) {
   return serviceSettings.find(item => item.groupid === groupId);
 }
 
+const allowedServices = ['all', 'join', 'leave', 'pin', 'title', 'videochat'];
+
 // Command to add services to a group
-bot.onText(/\/cleanservice (.+)/, async (msg, match) => {
+bot.onText(/\/cleanservice ?(.*)/, async (msg, match) => {
   const chatId = msg.chat.id;
   const userId = msg.from.id;
-  const services = match[1].trim().split(',').map(service => service.trim());
-
-  const allowedServices = ['all', 'join', 'leave', 'pin', 'title', 'videochat'];
+  const services = match[1].trim() ? match[1].trim().split(',').map(service => service.trim()) : [];
 
   // Check if user is an admin
   const user = await bot.getChatMember(chatId, userId);
   if (user.status !== 'administrator' && user.status !== 'creator') {
     return bot.sendMessage(chatId, 'Only admins can use this command.');
+  }
+
+  // If no service specified, list the current active services
+  if (services.length === 0) {
+    const groupSetting = getGroupSetting(chatId);
+    const activeServices = groupSetting ? groupSetting.services.join(', ') : 'No services enabled';
+    return bot.sendMessage(chatId, `Active services in this chat: ${activeServices}`);
   }
 
   // Validate services
@@ -685,17 +693,22 @@ bot.onText(/\/cleanservice (.+)/, async (msg, match) => {
 });
 
 // Command to remove services from a group
-bot.onText(/\/removeservice (.+)/, async (msg, match) => {
+bot.onText(/\/removeservice ?(.*)/, async (msg, match) => {
   const chatId = msg.chat.id;
   const userId = msg.from.id;
-  const services = match[1].trim().split(',').map(service => service.trim());
-
-  const allowedServices = ['all', 'join', 'leave', 'pin', 'title', 'videochat'];
+  const services = match[1].trim() ? match[1].trim().split(',').map(service => service.trim()) : [];
 
   // Check if user is an admin
   const user = await bot.getChatMember(chatId, userId);
   if (user.status !== 'administrator' && user.status !== 'creator') {
     return bot.sendMessage(chatId, 'Only admins can use this command.');
+  }
+
+  // If no service specified, list the current active services
+  if (services.length === 0) {
+    const groupSetting = getGroupSetting(chatId);
+    const activeServices = groupSetting ? groupSetting.services.join(', ') : 'No services enabled';
+    return bot.sendMessage(chatId, `Active services in this chat: ${activeServices}`);
   }
 
   // Validate services
