@@ -924,8 +924,6 @@ function getLockSetting(groupId) {
   return lockSettings.find(setting => setting.groupid === groupId);
 }
 
-// Initialize the bot
-const bot = new TelegramBot("YOUR_BOT_TOKEN", { polling: true });
 
 // Command to lock user permissions for new users
 bot.onText(/\/lock users/, async (msg) => {
