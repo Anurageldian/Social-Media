@@ -621,55 +621,59 @@ bot.onText(/\/id/, (msg) => {
 
 
 
-
 // Command to set group profile picture
 bot.onText(/\/setgcpic/, async (msg) => {
   const chatId = msg.chat.id;
   const userId = msg.from.id;
 
-  // Ensure the message is a reply to a photo
+  // Ensure the command is a reply to a message containing a photo
   if (!msg.reply_to_message || !msg.reply_to_message.photo) {
     return bot.sendMessage(chatId, 'Please reply to a photo message with /setgcpic to set the group profile picture.');
   }
 
   try {
-    // Check if the user issuing the command is an admin or creator
-    const user = await bot.getChatMember(msg.chat.id, msg.from.id);
+    // Check if the user issuing the command is an admin with the right permissions
+    const user = await bot.getChatMember(chatId, userId);
     if (user.status !== 'administrator' && user.status !== 'creator') {
-      return bot.sendMessage(chatId, 'You need to be an admin or creator to set the group profile picture.');
+      return bot.sendMessage(chatId, 'You need to be an admin to set the group profile picture.');
+    }
+    if (!user.can_change_info) {
+      return bot.sendMessage(chatId, 'You need the "Change Group Info" permission to set the group profile picture.');
     }
 
-    // Check if the bot is an admin or creator
-    const botMember = await bot.getChatMember(msg.chat.id, bot.id);
+    // Check if the bot is an admin with the right permissions
+    const botMember = await bot.getChatMember(chatId, bot.id);
     if (botMember.status !== 'administrator' && botMember.status !== 'creator') {
-      return bot.sendMessage(msg.chat.id, 'The bot needs to be an admin to change the group profile picture.');
+      return bot.sendMessage(chatId, 'The bot needs to be an admin to change the group profile picture.');
     }
-
-    // Check if the bot has the "Change Group Info" permission
-    const botPermissions = await bot.getChatPermissions(msg.chat.id, bot.id);
-    if (!botPermissions.can_change_info) {
-      return bot.sendMessage(msg.chat.id, 'The bot does not have permission to change group info.');
-    }
-
-    // Check if the admin who issued the command has the "Change Group Info" permission
-    const adminPermissions = await bot.getChatPermissions(msg.chat.id, msg.from.id);
-    if (!adminPermissions.can_change_info) {
-      return bot.sendMessage(msg.chat.id, 'You do not have permission to change group info.');
+    if (!botMember.can_change_info) {
+      return bot.sendMessage(chatId, 'The bot needs the "Change Group Info" permission to change the group profile picture.');
     }
 
     // Get the highest resolution photo
     const photo = msg.reply_to_message.photo.pop();
     const fileId = photo.file_id;
 
-    // Set the group profile picture
-    await bot.setChatPhoto(msg.chat.id, photo.file_id);
-    return bot.sendMessage(msg.chat.id, 'Group profile picture has been updated successfully!');
+    // Fetch the file link and download the file
+    const fileLink = await bot.getFileLink(fileId);
+    const response = await fetch(fileLink);
+    const buffer = await response.buffer();
 
+    // Prepare the photo as an input file
+    const inputFile = {
+      source: buffer,
+      filename: 'group-profile-picture.jpg'
+    };
+
+    // Set the group profile picture
+    await bot.setChatPhoto(chatId, inputFile);
+    bot.sendMessage(chatId, 'Group profile picture has been updated successfully!');
   } catch (error) {
     console.error('Error setting group profile picture:', error);
-    return bot.sendMessage(chatId, 'An error occurred while trying to set the group profile picture.');
+    bot.sendMessage(chatId, 'An error occurred while trying to set the group profile picture.');
   }
 });
+
 
 
 // Function to fetch stickers based on search term and page number
