@@ -667,6 +667,19 @@ bot.onText(/\/cleanservice ?(.*)/, async (msg, match) => {
     return bot.sendMessage(chatId, `Active services in this chat: ${activeServices}`);
   }
 
+  // Handle the "off" service separately
+  if (services.includes('off')) {
+    // Set only "off" in the group settings and remove any other active services
+    let groupSetting = getGroupSetting(chatId);
+    if (!groupSetting) {
+      groupSetting = { groupid: chatId, services: [] };
+      serviceSettings.push(groupSetting);
+    }
+    groupSetting.services = ['off'];  // Disable all services by setting "off"
+    saveSettings();
+    return bot.sendMessage(chatId, `All service message deletions have been disabled for this group.`);
+  }
+
   // Validate services
   for (const service of services) {
     if (!allowedServices.includes(service)) {
@@ -681,7 +694,8 @@ bot.onText(/\/cleanservice ?(.*)/, async (msg, match) => {
     serviceSettings.push(groupSetting);
   }
 
-  // Add services to the group
+  // Add services to the group (remove "off" if enabling specific services)
+  groupSetting.services = groupSetting.services.filter(service => service !== 'off');
   services.forEach(service => {
     if (!groupSetting.services.includes(service)) {
       groupSetting.services.push(service);
@@ -691,6 +705,7 @@ bot.onText(/\/cleanservice ?(.*)/, async (msg, match) => {
   saveSettings();
   bot.sendMessage(chatId, `Added services: ${services.join(', ')} to this group.`);
 });
+
 
 // Command to remove services from a group
 bot.onText(/\/removeservice ?(.*)/, async (msg, match) => {
