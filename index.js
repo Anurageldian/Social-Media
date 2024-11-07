@@ -621,6 +621,83 @@ bot.onText(/\/id/, (msg) => {
 
 
 
+const serviceSettingsPath = path.join(__dirname, 'serviceSettings.json');
+// Load settings from JSON file
+let serviceSettings = [];
+if (fs.existsSync(serviceSettingsPath)) {
+  serviceSettings = JSON.parse(fs.readFileSync(serviceSettingsPath, 'utf8'));
+}
+
+// Helper function to save settings
+function saveSettings() {
+  fs.writeFileSync(serviceSettingsPath, JSON.stringify(serviceSettings, null, 2));
+}
+
+// Helper function to get the group service setting
+function getGroupSetting(groupId) {
+  const group = serviceSettings.find(item => item.groupid === groupId);
+  return group ? group.service : null;
+}
+
+// Handle /cleanservice command
+bot.onText(/\/cleanservice (.+)/, async (msg, match) => {
+  const chatId = msg.chat.id;
+  const userId = msg.from.id;
+  const setting = match[1].trim().toLowerCase();
+  const allowedSettings = ['all', 'join', 'pin', 'title', 'videochat', 'off'];
+
+  // Check if user is an admin
+  const user = await bot.getChatMember(chatId, userId);
+  if (user.status !== 'administrator' && user.status !== 'creator') {
+    return bot.sendMessage(chatId, 'Only admins can use this command.');
+  }
+
+  if (!allowedSettings.includes(setting)) {
+    return bot.sendMessage(chatId, `Invalid setting. Please use one of the following: ${allowedSettings.join(', ')}`);
+  }
+
+  // Update or add setting for the group
+  const existingGroupSetting = serviceSettings.find(item => item.groupid === chatId);
+  if (existingGroupSetting) {
+    existingGroupSetting.service = setting;
+  } else {
+    serviceSettings.push({ groupid: chatId, service: setting });
+  }
+  saveSettings();
+  bot.sendMessage(chatId, `Service message cleaning set to "${setting}" for this group.`);
+});
+
+// Monitor and delete service messages based on settings
+bot.on('message', async (msg) => {
+  const chatId = msg.chat.id;
+  const setting = getGroupSetting(chatId);
+
+  if (!setting || setting === 'off') return;
+
+  // Conditions for each service message type
+  const isJoinMessage = msg.new_chat_members;
+  const isLeaveMessage = msg.left_chat_member;
+  const isPinnedMessage = msg.pinned_message;
+  const isTitleChange = msg.group_chat_created || msg.supergroup_chat_created || msg.migrate_to_chat_id || msg.migrate_from_chat_id;
+  const isVideoChatMessage = msg.video_chat_started || msg.video_chat_ended || msg.video_chat_scheduled || msg.video_chat_participants_invited;
+
+  try {
+    if (
+      (setting === 'all') ||
+      (setting === 'join' && isJoinMessage) ||
+      (setting === 'pin' && isPinnedMessage) ||
+      (setting === 'title' && isTitleChange) ||
+      (setting === 'videochat' && isVideoChatMessage)
+    ) {
+      await bot.deleteMessage(chatId, msg.message_id);
+    }
+  } catch (error) {
+    console.error('Error deleting service message:', error);
+  }
+});
+
+
+
 // Command to set group profile picture
 bot.onText(/\/setgcpic/, async (msg) => {
   const chatId = msg.chat.id;
