@@ -634,27 +634,27 @@ bot.onText(/\/setgcpic/, async (msg) => {
 
   try {
     // Check if the user issuing the command is an admin or creator
-    const user = await bot.getChatMember(chatId, userId);
+    const user = await bot.getChatMember(msg.chat.id, msg.from.id);
     if (user.status !== 'administrator' && user.status !== 'creator') {
       return bot.sendMessage(chatId, 'You need to be an admin or creator to set the group profile picture.');
     }
 
     // Check if the bot is an admin or creator
-    const botMember = await bot.getChatMember(chatId, bot.id);
+    const botMember = await bot.getChatMember(msg.chat.id, bot.id);
     if (botMember.status !== 'administrator' && botMember.status !== 'creator') {
-      return bot.sendMessage(chatId, 'The bot needs to be an admin to change the group profile picture.');
+      return bot.sendMessage(msg.chat.id, 'The bot needs to be an admin to change the group profile picture.');
     }
 
     // Check if the bot has the "Change Group Info" permission
-    const botPermissions = await bot.getChatPermissions(chatId, bot.id);
+    const botPermissions = await bot.getChatPermissions(msg.chat.id, bot.id);
     if (!botPermissions.can_change_info) {
-      return bot.sendMessage(chatId, 'The bot does not have permission to change group info.');
+      return bot.sendMessage(msg.chat.id, 'The bot does not have permission to change group info.');
     }
 
     // Check if the admin who issued the command has the "Change Group Info" permission
-    const adminPermissions = await bot.getChatPermissions(chatId, userId);
+    const adminPermissions = await bot.getChatPermissions(msg.chat.id, msg.from.id);
     if (!adminPermissions.can_change_info) {
-      return bot.sendMessage(chatId, 'You do not have permission to change group info.');
+      return bot.sendMessage(msg.chat.id, 'You do not have permission to change group info.');
     }
 
     // Get the highest resolution photo
@@ -662,8 +662,8 @@ bot.onText(/\/setgcpic/, async (msg) => {
     const fileId = photo.file_id;
 
     // Set the group profile picture
-    await bot.setChatPhoto(chatId, fileId);
-    return bot.sendMessage(chatId, 'Group profile picture has been updated successfully!');
+    await bot.setChatPhoto(msg.chat.id, photo.file_id);
+    return bot.sendMessage(msg.chat.id, 'Group profile picture has been updated successfully!');
 
   } catch (error) {
     console.error('Error setting group profile picture:', error);
