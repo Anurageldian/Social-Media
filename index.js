@@ -627,7 +627,7 @@ bot.onText(/\/setgcpic/, async (msg) => {
 
   // Ensure command is a reply and the message contains a photo
   if (!msg.reply_to_message.photo) {
-    return bot.sendMessage(chatId, 'Please reply to a photo message with /setgcpic to set the group profile picture.');
+    return;
   }
 
   try {
