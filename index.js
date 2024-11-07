@@ -604,51 +604,32 @@ bot.onText(/(?:https|git)(?::\/\/|@)github\.com[\/:]([^\/:]+)\/(.+)/i, async (ms
 })
 
 //to generate user id in chat or private
-// bot.onText(/\/id/, (msg) => {
-//   const chatId = msg.chat.id;
-//   const userId = msg.from.id;
-
-//   // Reply to the command message with user and group IDs (if applicable)
-//   const replyOptions = {
-//     reply_to_message_id: msg.message_id,
-//     parse_mode: 'HTML'
-//   };
-//   // Check if the chat is a group or private chat
-//   if (msg.chat.type === 'private') {
-//     // Private chat: respond with user ID
-//     let iduser = `Your User ID: <code>${userId}</code>`;
-//     bot.sendMessage(chatId, iduser, replyOptions, { parse_mode: 'Markdown' });
-//     // bot.sendMessage(chatId, id, replyOptions);
-//   } else {
-//     // Group chat: respond with both user ID and group ID
-//     let idusergc = `Your User ID: <code>${userId}</code>\nThis chat's ID: <code>${chatId}</code>`;
-//     bot.sendMessage(chatId, idusergc, replyOptions, { parse_mode: 'Markdown' });
-//     // bot.sendMessage(chatId, `Your User ID: ${userId}`, replyOptions);
-//   }
-// });
 bot.onText(/\/id/, (msg) => {
   const chatId = msg.chat.id;
   const userId = msg.from.id;
 
-  // Check if the message is a reply to another message
-  if (msg.reply_to_message) {
-    const repliedUserId = msg.reply_to_message.from.id;  // The ID of the user being replied to
-    const repliedUserName = msg.reply_to_message.from.username || `${msg.reply_to_message.from.first_name} ${msg.reply_to_message.from.last_name}`;
+  // Check if the message is sent in a group or private chat
+  if (msg.chat.type === 'private') {
+    // Private chat: only show user ID
+    const myidpriv = `Your User ID: <code>${userId}</code>`;
+    bot.sendMessage(chatId, myidpriv, { parse_mode: 'HTML' });
+  } else {
+    // Group chat: Check if the message is a reply to another user
+    if (msg.reply_to_message) {
+      const repliedUserId = msg.reply_to_message.from.id;  // The ID of the user being replied to
+      const repliedUserName = msg.reply_to_message.from.first_name || 'Unknown User';
 
-    // Respond with both the replied user ID, the user ID of the one replying, and the group ID
-    const replyOptions = {
-      reply_to_message_id: msg.message_id,
-      parse_mode: 'HTML'
-   
-
-    // Construct the message
-    const message = `User <a href="tg://user?id=${msg.reply_to_message.from.id}">${msg.reply_to_message.from.first_name}</a> 's ID: <code>${repliedUserId}</code>\nYour User ID: <code>${userId}</code>\nThis Chat's ID: <code>${chatId}</code>`;
-    bot.sendMessage(chatId, message, replyOptions);
-  } else (msg.chat.type === 'private') {
-    // Private chat: respond with user ID
-    let iduser = `Your User ID: <code>${userId}</code>`;
-    bot.sendMessage(chatId, iduser, replyOptions, { parse_mode: 'Markdown' });
-    // bot.sendMessage(chatId, id, replyOptions);
+      // Construct the reply message with replied user and IDs
+      const rplyuser = `User <a href="tg://user?id=${repliedUserId}">${repliedUserName}</a>'s ID: <code>${repliedUserId}</code>\nYour User ID: <code>${userId}</code>\nThis Chat's ID: <code>${chatId}</code>`;
+      bot.sendMessage(chatId, rplyuser, { parse_mode: 'HTML' });
+    } else {
+      // If not a reply, show only the user's and chat's ID
+      const usergc = `
+        Your User ID: <code>${userId}</code>\n
+        This Chat's ID: <code>${chatId}</code>
+      `;
+      bot.sendMessage(chatId, usergc, { parse_mode: 'HTML' });
+    }
   }
 });
 
