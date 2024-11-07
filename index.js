@@ -907,9 +907,115 @@ bot.on('message', async (msg) => {
   }
 });
 
+//settings for /lock users
 
+const serviceSettingsPath = path.join(__dirname, 'serviceSettings.json');
+let serviceSettings = [];
 
+// Load settings from JSON file
+if (fs.existsSync(serviceSettingsPath)) {
+  serviceSettings = JSON.parse(fs.readFileSync(serviceSettingsPath, 'utf8'));
+}
 
+// Helper function to save settings
+function saveSettings() {
+  fs.writeFileSync(serviceSettingsPath, JSON.stringify(serviceSettings, null, 2));
+}
+
+// Helper function to get the group setting
+function getGroupSetting(groupId) {
+  return serviceSettings.find(item => item.groupid === groupId);
+}
+
+// Command to lock new users in a group
+bot.onText(/\/lock users/, async (msg) => {
+  const chatId = msg.chat.id;
+  const userId = msg.from.id;
+
+  // Check if the user is an admin
+  const user = await bot.getChatMember(chatId, userId);
+  if (user.status !== 'administrator' && user.status !== 'creator') {
+    return bot.sendMessage(chatId, 'Only admins can use this command.');
+  }
+
+  // Enable user restriction for new members
+  let groupSetting = getGroupSetting(chatId);
+  if (!groupSetting) {
+    groupSetting = { groupid: chatId, services: ['users'] };
+    serviceSettings.push(groupSetting);
+  } else {
+    if (!groupSetting.services.includes('users')) {
+      groupSetting.services.push('users');
+    }
+  }
+
+  saveSettings();
+  bot.sendMessage(chatId, 'New users will be muted until unmuted.');
+});
+
+// Command to unlock users, allowing them to chat
+bot.onText(/\/unlock users/, async (msg) => {
+  const chatId = msg.chat.id;
+  const userId = msg.from.id;
+
+  // Check if the user is an admin
+  const user = await bot.getChatMember(chatId, userId);
+  if (user.status !== 'administrator' && user.status !== 'creator') {
+    return bot.sendMessage(chatId, 'Only admins can use this command.');
+  }
+
+  // Disable user restriction for new members
+  let groupSetting = getGroupSetting(chatId);
+  if (groupSetting && groupSetting.services.includes('users')) {
+    groupSetting.services = groupSetting.services.filter(service => service !== 'users');
+    saveSettings();
+    bot.sendMessage(chatId, 'New users will no longer be muted.');
+  }
+});
+
+// Listen to new members and restrict them if the 'users' service is enabled
+bot.on('new_chat_members', (msg) => {
+  const chatId = msg.chat.id;
+  const groupSetting = getGroupSetting(chatId);
+
+  if (groupSetting && groupSetting.services.includes('users')) {
+    msg.new_chat_members.forEach((member) => {
+      bot.restrictChatMember(chatId, member.id, {
+        can_send_messages: false,
+      });
+      bot.sendMessage(chatId, `${member.username || member.first_name} has been muted until unlocked.`);
+    });
+  }
+});
+
+// Command to unlock a specific user by admin
+bot.onText(/\/free (\d+)/, async (msg, match) => {
+  const chatId = msg.chat.id;
+  const userId = msg.from.id;
+  const targetUserId = match[1];
+
+  // Check if the user is an admin
+  const user = await bot.getChatMember(chatId, userId);
+  if (user.status !== 'administrator' && user.status !== 'creator') {
+    return bot.sendMessage(chatId, 'Only admins can use this command.');
+  }
+
+  // Unmute the user
+  bot.restrictChatMember(chatId, targetUserId, {
+    can_send_messages: true,
+  });
+
+  bot.sendMessage(chatId, `User ${targetUserId} has been unlocked.`);
+});
+
+// // Helper function to load the current service settings on bot startup
+// function loadServiceSettings() {
+//   if (fs.existsSync(serviceSettingsPath)) {
+//     serviceSettings = JSON.parse(fs.readFileSync(serviceSettingsPath, 'utf8'));
+//   } else {
+//     serviceSettings = [];
+//   }
+// }
 
 
 // const serviceSettingsPath = path.join(__dirname, 'serviceSettings.json');
