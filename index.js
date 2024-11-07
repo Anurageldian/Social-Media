@@ -908,6 +908,8 @@ bot.on('message', async (msg) => {
 });
 
 //settings for /lock user
+const lockSettingsPath = path.join(__dirname, 'lockSettings.json');
+let lockSettings = [];
 
 // Load lock settings from JSON file if it exists
 if (fs.existsSync(lockSettingsPath)) {
