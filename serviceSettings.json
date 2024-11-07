@@ -1,7 +1,7 @@
 [
   {
     "groupid": -1002235227787,
-    "services": ["videochat", "join"]
+    "services": ["videochat", "join", "users"]
   },
   {
     "groupid": -1001604985005,
