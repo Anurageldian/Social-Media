@@ -311,7 +311,7 @@ bot.onText(/\/sendssdb/, async (msg) => {
   if (String(msg.from.id) !== String(process.env.DEV_ID)) {
     return
   }
-  await bot.sendDocument(msg.chat.id, "./funcs/serviceSettings.json")
+  await bot.sendDocument(msg.chat.id, "./serviceSettings.json")
 })
 
 // send database
