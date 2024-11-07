@@ -689,13 +689,6 @@ bot.onText(/\/cleanservice ?(.*)/, async (msg, match) => {
     return bot.sendMessage(chatId, `Active services in this chat: ${activeServices}`);
   }
 
-  // Validate services
-  for (const service of services) {
-    if (!allowedServices.includes(service)) {
-      return bot.sendMessage(chatId, `Invalid service: "${service}". Please use one of the following: ${allowedServices.join(', ')}`);
-    }
-  }
-
   // Get or create group service settings
   let groupSetting = getGroupSetting(chatId);
   if (!groupSetting) {
@@ -703,22 +696,34 @@ bot.onText(/\/cleanservice ?(.*)/, async (msg, match) => {
     serviceSettings.push(groupSetting);
   }
 
-  // Remove "off" if other services are being activated
-  if (services.some(service => service !== 'off') && groupSetting.services.includes('off')) {
-    const index = groupSetting.services.indexOf('off');
-    groupSetting.services.splice(index, 1);
+  // Handle the "off" command specifically
+  if (services.includes('off')) {
+    // Clear all other services and set only "off"
+    groupSetting.services = ['off'];
+    saveSettings();
+    return bot.sendMessage(chatId, 'All services have been turned off for this group.');
   }
 
-  // Add services to the group
-  services.forEach(service => {
+  // Remove "off" if other services are being activated
+  const offIndex = groupSetting.services.indexOf('off');
+  if (offIndex !== -1) {
+    groupSetting.services.splice(offIndex, 1);
+  }
+
+  // Validate and add services
+  for (const service of services) {
+    if (!allowedServices.includes(service)) {
+      return bot.sendMessage(chatId, `Invalid service: "${service}". Please use one of the following: ${allowedServices.join(', ')}`);
+    }
     if (!groupSetting.services.includes(service)) {
       groupSetting.services.push(service);
     }
-  });
+  }
 
   saveSettings();
   bot.sendMessage(chatId, `Added services: ${services.join(', ')} to this group.`);
 });
+
 
 // Command to remove services from a group
 bot.onText(/\/removeservice ?(.*)/, async (msg, match) => {
