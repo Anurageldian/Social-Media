@@ -649,9 +649,6 @@ bot.onText(/\/del/, async (msg) => {
 });
 
 
-
-// clean services
-
 const serviceSettingsPath = path.join(__dirname, 'serviceSettings.json');
 let serviceSettings = [];
 
@@ -691,19 +688,6 @@ bot.onText(/\/cleanservice ?(.*)/, async (msg, match) => {
     return bot.sendMessage(chatId, `Active services in this chat: ${activeServices}`);
   }
 
-  // Handle the "off" service separately
-  if (services.includes('off')) {
-    // Set only "off" in the group settings and remove any other active services
-    let groupSetting = getGroupSetting(chatId);
-    if (!groupSetting) {
-      groupSetting = { groupid: chatId, services: [] };
-      serviceSettings.push(groupSetting);
-    }
-    groupSetting.services = ['off'];  // Disable all services by setting "off"
-    saveSettings();
-    return bot.sendMessage(chatId, `All service message deletions have been disabled for this group.`);
-  }
-
   // Validate services
   for (const service of services) {
     if (!allowedServices.includes(service)) {
@@ -718,8 +702,7 @@ bot.onText(/\/cleanservice ?(.*)/, async (msg, match) => {
     serviceSettings.push(groupSetting);
   }
 
-  // Add services to the group (remove "off" if enabling specific services)
-  groupSetting.services = groupSetting.services.filter(service => service !== 'off');
+  // Add services to the group
   services.forEach(service => {
     if (!groupSetting.services.includes(service)) {
       groupSetting.services.push(service);
@@ -729,7 +712,6 @@ bot.onText(/\/cleanservice ?(.*)/, async (msg, match) => {
   saveSettings();
   bot.sendMessage(chatId, `Added services: ${services.join(', ')} to this group.`);
 });
-
 
 // Command to remove services from a group
 bot.onText(/\/removeservice ?(.*)/, async (msg, match) => {
@@ -789,9 +771,8 @@ bot.on('message', async (msg) => {
   const isTitleChange = msg.group_chat_created || msg.supergroup_chat_created || msg.migrate_to_chat_id || msg.migrate_from_chat_id;
   const isVideoChatMessage = msg.video_chat_started || msg.video_chat_ended || msg.video_chat_scheduled || msg.video_chat_participants_invited;
 
-  // Check if it's a service message and delete it
+  // Only delete service messages that match the group setting
   try {
-    // Only delete service messages that match the group setting
     groupSetting.services.forEach(service => {
       if (
         service === 'all' ||
@@ -801,8 +782,14 @@ bot.on('message', async (msg) => {
         (service === 'title' && isTitleChange) ||
         (service === 'videochat' && isVideoChatMessage)
       ) {
-        // Ensure it's not a regular user-uploaded photo message
-        if (!msg.photo) {
+        if (
+          (service === 'all' && (isJoinMessage || isLeaveMessage || isPinnedMessage || isTitleChange || isVideoChatMessage)) ||
+          (service === 'join' && isJoinMessage) ||
+          (service === 'leave' && isLeaveMessage) ||
+          (service === 'pin' && isPinnedMessage) ||
+          (service === 'title' && isTitleChange) ||
+          (service === 'videochat' && isVideoChatMessage)
+        ) {
           bot.deleteMessage(chatId, msg.message_id);
         }
       }
@@ -811,6 +798,7 @@ bot.on('message', async (msg) => {
     console.error('Error deleting service message:', error);
   }
 });
+
 
 
 
