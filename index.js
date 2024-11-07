@@ -624,48 +624,45 @@ bot.onText(/\/id/, (msg) => {
 // Command to set group profile picture
 bot.onText(/\/setgcpic/, async (msg) => {
   const chatId = msg.chat.id;
-  const userId = msg.from.id;
 
-  // Ensure the command is a reply to a message containing a photo
+  // Ensure command is a reply and the message contains a photo
   if (!msg.reply_to_message || !msg.reply_to_message.photo) {
     return bot.sendMessage(chatId, 'Please reply to a photo message with /setgcpic to set the group profile picture.');
   }
 
   try {
-    // Check if the user issuing the command is an admin with the right permissions
+    // Check if the user and bot are admins with "Change Group Info" permission
+    const userId = msg.from?.id;
+    if (!userId) {
+      return bot.sendMessage(chatId, 'Error: User ID not found.');
+    }
+
     const user = await bot.getChatMember(chatId, userId);
-    if (user.status !== 'administrator' && user.status !== 'creator') {
+    if (!user || (user.status !== 'administrator' && user.status !== 'creator')) {
       return bot.sendMessage(chatId, 'You need to be an admin to set the group profile picture.');
     }
+
     if (!user.can_change_info) {
       return bot.sendMessage(chatId, 'You need the "Change Group Info" permission to set the group profile picture.');
     }
 
-    // Check if the bot is an admin with the right permissions
     const botMember = await bot.getChatMember(chatId, bot.id);
-    if (botMember.status !== 'administrator' && botMember.status !== 'creator') {
+    if (!botMember || (botMember.status !== 'administrator' && botMember.status !== 'creator')) {
       return bot.sendMessage(chatId, 'The bot needs to be an admin to change the group profile picture.');
     }
+
     if (!botMember.can_change_info) {
       return bot.sendMessage(chatId, 'The bot needs the "Change Group Info" permission to change the group profile picture.');
     }
 
-    // Get the highest resolution photo
+    // Proceed to set the profile picture if all checks pass
     const photo = msg.reply_to_message.photo.pop();
     const fileId = photo.file_id;
-
-    // Fetch the file link and download the file
     const fileLink = await bot.getFileLink(fileId);
     const response = await fetch(fileLink);
     const buffer = await response.buffer();
 
-    // Prepare the photo as an input file
-    const inputFile = {
-      source: buffer,
-      filename: 'group-profile-picture.jpg'
-    };
-
-    // Set the group profile picture
+    const inputFile = { source: buffer, filename: 'group-profile-picture.jpg' };
     await bot.setChatPhoto(chatId, inputFile);
     bot.sendMessage(chatId, 'Group profile picture has been updated successfully!');
   } catch (error) {
