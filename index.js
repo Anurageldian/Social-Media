@@ -603,16 +603,18 @@ bot.onText(/(?:https|git)(?::\/\/|@)github\.com[\/:]([^\/:]+)\/(.+)/i, async (ms
   }
 })
 
-//to generate user id in chat or private
 bot.onText(/\/id/, (msg) => {
   const chatId = msg.chat.id;
   const userId = msg.from.id;
+  
+  // Tag the user always using <a> link
+  const userTag = `<a href="tg://user?id=${userId}">${msg.from.first_name}</a>`;
 
   // Check if the message is sent in a group or private chat
   if (msg.chat.type === 'private') {
     // Private chat: only show user ID
-    const myidpriv = `Your User ID: <code>${userId}</code>`;
-    bot.sendMessage(chatId, myidpriv, { parse_mode: 'HTML' });
+    const message = `${userTag}'s User ID: <code>${userId}</code>`;
+    bot.sendMessage(chatId, message, { parse_mode: 'HTML' });
   } else {
     // Group chat: Check if the message is a reply to another user
     if (msg.reply_to_message) {
@@ -620,18 +622,52 @@ bot.onText(/\/id/, (msg) => {
       const repliedUserName = msg.reply_to_message.from.first_name || 'Unknown User';
 
       // Construct the reply message with replied user and IDs
-      const rplyuser = `User <a href="tg://user?id=${repliedUserId}">${repliedUserName}</a>'s ID: <code>${repliedUserId}</code>\nYour User ID: <code>${userId}</code>\nThis Chat's ID: <code>${chatId}</code>`;
-      bot.sendMessage(chatId, rplyuser, { parse_mode: 'HTML' });
-    } else {
-      // If not a reply, show only the user's and chat's ID
-      const usergc = `
-        Your User ID: <code>${userId}</code>\n
+      const message = `
+        User <a href="tg://user?id=${repliedUserId}">${repliedUserName}</a>'s ID: <code>${repliedUserId}</code>\n
+        ${userTag}'s User ID: <code>${userId}</code>\n
         This Chat's ID: <code>${chatId}</code>
       `;
-      bot.sendMessage(chatId, usergc, { parse_mode: 'HTML' });
+      bot.sendMessage(chatId, message, { parse_mode: 'HTML' });
+    } else {
+      // If not a reply, show only the user's and chat's ID with user tag
+      const message = `
+        ${userTag}'s User ID: <code>${userId}</code>\n
+        This Chat's ID: <code>${chatId}</code>
+      `;
+      bot.sendMessage(chatId, message, { parse_mode: 'HTML' });
     }
   }
 });
+
+// //to generate user id in chat or private
+// bot.onText(/\/id/, (msg) => {
+//   const chatId = msg.chat.id;
+//   const userId = msg.from.id;
+
+//   // Check if the message is sent in a group or private chat
+//   if (msg.chat.type === 'private') {
+//     // Private chat: only show user ID
+//     const myidpriv = `Your User ID: <code>${userId}</code>`;
+//     bot.sendMessage(chatId, myidpriv, { parse_mode: 'HTML' });
+//   } else {
+//     // Group chat: Check if the message is a reply to another user
+//     if (msg.reply_to_message) {
+//       const repliedUserId = msg.reply_to_message.from.id;  // The ID of the user being replied to
+//       const repliedUserName = msg.reply_to_message.from.first_name || 'Unknown User';
+
+//       // Construct the reply message with replied user and IDs
+//       const rplyuser = `User <a href="tg://user?id=${repliedUserId}">${repliedUserName}</a>'s ID: <code>${repliedUserId}</code>\nYour User ID: <code>${userId}</code>\nThis Chat's ID: <code>${chatId}</code>`;
+//       bot.sendMessage(chatId, rplyuser, { parse_mode: 'HTML' });
+//     } else {
+//       // If not a reply, show only the user's and chat's ID
+//       const usergc = `
+//         Your User ID: <code>${userId}</code>\n
+//         This Chat's ID: <code>${chatId}</code>
+//       `;
+//       bot.sendMessage(chatId, usergc, { parse_mode: 'HTML' });
+//     }
+//   }
+// });
 
 
 // Delete message command
