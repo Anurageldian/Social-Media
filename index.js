@@ -908,127 +908,137 @@ bot.on('message', async (msg) => {
 });
 
 // /lock users
-// Path to JSON file to store lock settings for groups
-const lockSettingsPath = path.join(__dirname, 'lockSettings.json');
-let lockSettings = [];
+const serviceSettingsPath = path.join(__dirname, 'serviceSettings.json');
+let serviceSettings = [];
 
-// Load lock settings from JSON file if it exists
-if (fs.existsSync(lockSettingsPath)) {
-  lockSettings = JSON.parse(fs.readFileSync(lockSettingsPath, 'utf8'));
+// Load settings from JSON file
+if (fs.existsSync(serviceSettingsPath)) {
+  serviceSettings = JSON.parse(fs.readFileSync(serviceSettingsPath, 'utf8'));
 }
 
-// Save lock settings to file
-function saveLockSettings() {
-  fs.writeFileSync(lockSettingsPath, JSON.stringify(lockSettings, null, 2));
+// Helper function to save settings
+function saveSettings() {
+  fs.writeFileSync(serviceSettingsPath, JSON.stringify(serviceSettings, null, 2));
 }
 
-// Get the lock setting for a group
-function getLockSetting(groupId) {
-  return lockSettings.find(setting => setting.groupid === groupId);
+// Helper function to get the group setting
+function getGroupSetting(groupId) {
+  return serviceSettings.find(item => item.groupid === groupId);
 }
 
-// Command to lock user permissions for new users
+// Command to lock new users in a group
 bot.onText(/\/lock users/, async (msg) => {
   const chatId = msg.chat.id;
   const userId = msg.from.id;
 
-  // Check if user is an admin
+  // Check if the user is an admin
   const user = await bot.getChatMember(chatId, userId);
   if (user.status !== 'administrator' && user.status !== 'creator') {
     return bot.sendMessage(chatId, 'Only admins can use this command.');
   }
 
-  // Update lock setting for this group
-  let groupSetting = getLockSetting(chatId);
+  // Enable user restriction for new members
+  let groupSetting = getGroupSetting(chatId);
   if (!groupSetting) {
-    groupSetting = { groupid: chatId, restrictedUsers: [] };
-    lockSettings.push(groupSetting);
+    groupSetting = { groupid: chatId, services: ['users'] };
+    serviceSettings.push(groupSetting);
+  } else {
+    if (!groupSetting.services.includes('users')) {
+      groupSetting.services.push('users');
+    }
   }
-  
-  // Add "users" lock setting
-  groupSetting.restrictNewUsers = true;
-  saveLockSettings();
-  bot.sendMessage(chatId, "New users will be restricted until freed.");
+
+  saveSettings();
+  bot.sendMessage(chatId, 'New users will be muted until unmuted.');
 });
 
-// Command to free a specific user, by reply or by user ID
+// Command to unlock users, allowing them to chat
+bot.onText(/\/unlock users/, async (msg) => {
+  const chatId = msg.chat.id;
+  const userId = msg.from.id;
+
+  // Check if the user is an admin
+  const user = await bot.getChatMember(chatId, userId);
+  if (user.status !== 'administrator' && user.status !== 'creator') {
+    return bot.sendMessage(chatId, 'Only admins can use this command.');
+  }
+
+  // Disable user restriction for new members
+  let groupSetting = getGroupSetting(chatId);
+  if (groupSetting && groupSetting.services.includes('users')) {
+    groupSetting.services = groupSetting.services.filter(service => service !== 'users');
+    saveSettings();
+    bot.sendMessage(chatId, 'New users will no longer be muted.');
+  }
+});
+
+// Listen to new members and restrict them if the 'users' service is enabled
+bot.on('new_chat_members', (msg) => {
+  const chatId = msg.chat.id;
+  const groupSetting = getGroupSetting(chatId);
+
+  if (groupSetting && groupSetting.services.includes('users')) {
+    msg.new_chat_members.forEach((member) => {
+      bot.restrictChatMember(chatId, member.id, {
+        can_send_messages: true,
+      });
+      bot.sendMessage(chatId, `${member.username || member.first_name} perms has been limited by default until freed.`);
+    });
+  }
+});
+
+// Command to unlock a specific user by admin
+// Command to unlock a specific user by admin, either by replying to the user's message or using user ID
 bot.onText(/\/free(?:\s+(\d+))?/, async (msg, match) => {
   const chatId = msg.chat.id;
-  const userId = match[1] ? parseInt(match[1]) : msg.reply_to_message?.from.id;
-  
-  // Check if user is an admin
-  const admin = await bot.getChatMember(chatId, msg.from.id);
-  if (admin.status !== 'administrator' && admin.status !== 'creator') {
-    return bot.sendMessage(chatId, 'Only admins can free users.');
+  const userId = msg.from.id;
+
+  // Check if the user is an admin
+  const user = await bot.getChatMember(chatId, userId);
+  if (user.status !== 'administrator' && user.status !== 'creator') {
+    return bot.sendMessage(chatId, 'Only admins can use this command.');
   }
 
-  // If no user ID found, reply with error
-  if (!userId) {
-    return bot.sendMessage(chatId, 'Please reply to a user’s message or provide a user ID.');
+  let targetUserId;
+
+  // Check if the bot is replying to a user message
+  if (msg.reply_to_message) {
+    targetUserId = msg.reply_to_message.from.id;  // Get the user ID of the person being replied to
+  } else if (match[1]) {
+    // If a user ID is provided in the command
+    targetUserId = match[1];
+  } else {
+    // If neither is provided, let the admin know they need to reply to a message or provide a user ID
+    return bot.sendMessage(chatId, 'Please reply to a user message or provide a user ID.');
   }
 
-  // Get group lock setting
-  let groupSetting = getLockSetting(chatId);
-  if (!groupSetting || !groupSetting.restrictedUsers.includes(userId)) {
-    return bot.sendMessage(chatId, `User ${userId} is not restricted.`);
-  }
+  // Unmute the user
+  bot.restrictChatMember(chatId, targetUserId, {
+        can_send_messages: true,
+        can_send_media_messages: true,
+        can_send_polls: true,
+        can_send_other_messages: true,
+        can_add_web_page_previews: true,
+        can_change_info: true,
+        can_invite_users: true,
+        can_pin_messages: true
+  });
 
-  // Free the user and update the lock settings
-  try {
-    await bot.restrictChatMember(chatId, userId, {
-      can_send_messages: true,
-      can_send_media_messages: true,
-      can_send_polls: true,
-      can_send_other_messages: true,
-      can_add_web_page_previews: true,
-      can_change_info: true,
-      can_invite_users: true,
-      can_pin_messages: true,
-    });
-
-    // Remove user from the restricted list in JSON
-    groupSetting.restrictedUsers = groupSetting.restrictedUsers.filter(id => id !== userId);
-    saveLockSettings();
-
-    bot.sendMessage(chatId, `User ${userId} has been freed.`);
-  } catch (error) {
-    console.error('Error freeing user:', error);
-    bot.sendMessage(chatId, 'Failed to free the user.');
-  }
+  bot.sendMessage(chatId, `User ${targetUserId} has been unlocked.`);
 });
 
-// Automatically restrict new users if "lock users" is active for the group
-bot.on('new_chat_members', async (msg) => {
-  const chatId = msg.chat.id;
-  const groupSetting = getLockSetting(chatId);
 
-  if (groupSetting?.restrictNewUsers) {
-    msg.new_chat_members.forEach(async (member) => {
-      try {
-        await bot.restrictChatMember(chatId, member.id, {
-          can_send_messages: false,
-          can_send_media_messages: false,
-          can_send_polls: false,
-          can_send_other_messages: false,
-          can_add_web_page_previews: false,
-          can_change_info: false,
-          can_invite_users: false,
-          can_pin_messages: false,
-        });
-        
-        // Add user to restricted list
-        if (groupSetting) {
-          groupSetting.restrictedUsers.push(member.id);
-          saveLockSettings();
-        }
+// Helper function to load the current service settings on bot startup
+// function loadServiceSettings() {
+//   if (fs.existsSync(serviceSettingsPath)) {
+//     serviceSettings = JSON.parse(fs.readFileSync(serviceSettingsPath, 'utf8'));
+//   } else {
+//     serviceSettings = [];
+//   }
+// }
 
-        bot.sendMessage(chatId, `User ${member.id} has been restricted. Use /free to allow permissions.`);
-      } catch (error) {
-        console.error('Error restricting new user:', error);
-      }
-    });
-  }
-});
+// // Reload service settings when the bot starts
+// loadServiceSettings();
 
 // // Helper function to load the current service settings on bot startup
 // function loadServiceSettings() {
