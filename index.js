@@ -909,8 +909,8 @@ bot.on('message', async (msg) => {
 
 //settings for /lock users
 
-const serviceSettingsPath = path.join(__dirname, 'serviceSettings.json');
-let serviceSettings = [];
+// const serviceSettingsPath = path.join(__dirname, 'serviceSettings.json');
+// let serviceSettings = [];
 
 // Load settings from JSON file
 if (fs.existsSync(serviceSettingsPath)) {
