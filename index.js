@@ -623,14 +623,15 @@ bot.onText(/\/id/, (msg) => {
     // Construct the response for a reply to /id
     const rplyuser = `User <a href="tg://user?id=${repliedUserId}">${repliedUserName}</a>'s ID: <code>${repliedUserId}</code>\nYour User ID: <code>${userId}</code>\nThis Chat's ID: <code>${chatId}</code>`;
     bot.sendMessage(chatId, rplyuser, { parse_mode: 'HTML' });
-  } else {
+  } else (msg.chat.type === 'private') {
     // If no reply, show only user and chat IDs
-    const message = `
-      Your User ID: <code>${userId}</code>\n
-      This Chat's ID: <code>${chatId}</code>
-    `;
-    bot.sendMessage(chatId, message, replyOptions);  // Reply to the /id message itself
-  }
+    const myidpriv = `Your User ID: <code>${userId}</code>`;
+    bot.sendMessage(chatId, myidpriv, replyOptions);  // Reply to the /id message itself
+  } else {
+      // If not a reply, show only the user's and chat's ID
+      const usergc = `Your User ID: <code>${userId}</code>\nThis Chat's ID: <code>${chatId}</code>`;
+      bot.sendMessage(chatId, usergc, replyOptions);
+    }
 });
 
 
