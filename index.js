@@ -981,7 +981,7 @@ bot.on('new_chat_members', (msg) => {
   if (groupSetting && groupSetting.services.includes('users')) {
     msg.new_chat_members.forEach((member) => {
       bot.restrictChatMember(chatId, member.id, {
-        can_send_messages: false,
+        can_send_messages: true,
       });
       bot.sendMessage(chatId, `${member.username || member.first_name} has been muted until unlocked.`);
     });
