@@ -595,6 +595,25 @@ bot.onText(/(?:https|git)(?::\/\/|@)github\.com[\/:]([^\/:]+)\/(.+)/i, async (ms
   }
 })
 
+
+bot.onText(/\/id/, (msg) => {
+  const chatId = msg.chat.id;
+  const userId = msg.from.id;
+
+  // Reply to the command message with user and group IDs (if applicable)
+  const replyOptions = {
+    reply_to_message_id: msg.message_id
+  };
+
+  // Check if the chat is a group or private chat
+  if (msg.chat.type === 'private') {
+    // Private chat: respond with user ID
+    bot.sendMessage(chatId, `Your User ID: ${userId}`, replyOptions);
+  } else {
+    // Group chat: respond with both user ID and group ID
+    bot.sendMessage(chatId, `Your User ID: ${userId}\nGroup ID: ${chatId}`, replyOptions);
+  }
+});
 // Function to fetch stickers based on search term and page number
 async function fetchStickers(searchTerm, page) {
   try {
