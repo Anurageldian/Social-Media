@@ -649,6 +649,7 @@ bot.onText(/\/del/, async (msg) => {
 });
 
 
+
 const serviceSettingsPath = path.join(__dirname, 'serviceSettings.json');
 let serviceSettings = [];
 
@@ -667,7 +668,7 @@ function getGroupSetting(groupId) {
   return serviceSettings.find(item => item.groupid === groupId);
 }
 
-const allowedServices = ['all', 'join', 'leave', 'pin', 'title', 'videochat'];
+const allowedServices = ['all', 'join', 'leave', 'pin', 'title', 'videochat', 'off'];
 
 // Command to add services to a group
 bot.onText(/\/cleanservice ?(.*)/, async (msg, match) => {
@@ -700,6 +701,12 @@ bot.onText(/\/cleanservice ?(.*)/, async (msg, match) => {
   if (!groupSetting) {
     groupSetting = { groupid: chatId, services: [] };
     serviceSettings.push(groupSetting);
+  }
+
+  // Remove "off" if other services are being activated
+  if (services.some(service => service !== 'off') && groupSetting.services.includes('off')) {
+    const index = groupSetting.services.indexOf('off');
+    groupSetting.services.splice(index, 1);
   }
 
   // Add services to the group
@@ -798,6 +805,7 @@ bot.on('message', async (msg) => {
     console.error('Error deleting service message:', error);
   }
 });
+
 
 
 
