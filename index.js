@@ -642,11 +642,7 @@ bot.onText(/\/id/, (msg) => {
     };
 
     // Construct the message
-    const message = `
-      Replied User: @${repliedUserName} (User ID: <code>${repliedUserId}</code>)\n
-      Your User ID: <code>${userId}</code>\n
-      This Chat's ID: <code>${chatId}</code>
-    `;
+    const message = `Replied User <a href="tg://user?id=${msg.reply_to_message.from.id}">${msg.reply_to_message.from.first_name}</a>ID: <code>${repliedUserId}</code>\nYour User ID: <code>${userId}</code>\nThis Chat's ID: <code>${chatId}</code>`;
     bot.sendMessage(chatId, message, replyOptions);
   } else {
     bot.sendMessage(chatId, 'Please reply to a message to get the user IDs.');
