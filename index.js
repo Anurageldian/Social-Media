@@ -626,6 +626,49 @@ bot.onText(/\/id/, (msg) => {
     // bot.sendMessage(chatId, `Your User ID: ${userId}`, replyOptions);
   }
 });
+// startvc
+// Command to start the voice chat (voice stream)
+bot.onText(/\/startvc/, async (msg) => {
+  const chatId = msg.chat.id;
+  const userId = msg.from.id;
+
+  // Check if the user is an admin
+  const user = await bot.getChatMember(chatId, userId);
+  if (user.status !== 'administrator' && user.status !== 'creator') {
+    return bot.sendMessage(chatId, 'Only admins can start a voice chat.');
+  }
+
+  try {
+    // Start the voice chat
+    await bot.startVoiceChat(chatId);
+    bot.sendMessage(chatId, 'Voice chat has started!');
+
+  } catch (error) {
+    console.error('Error starting voice chat:', error);
+    bot.sendMessage(chatId, 'Failed to start the voice chat. Please try again later.');
+  }
+});
+
+// Command to stop the voice chat
+bot.onText(/\/stopvc/, async (msg) => {
+  const chatId = msg.chat.id;
+  const userId = msg.from.id;
+
+  // Check if the user is an admin
+  const user = await bot.getChatMember(chatId, userId);
+  if (user.status !== 'administrator' && user.status !== 'creator') {
+    return bot.sendMessage(chatId, 'Only admins can stop the voice chat.');
+  }
+
+  try {
+    // Stop the voice chat
+    await bot.stopVoiceChat(chatId);
+    bot.sendMessage(chatId, 'Voice chat has been stopped.');
+  } catch (error) {
+    console.error('Error stopping voice chat:', error);
+    bot.sendMessage(chatId, 'Failed to stop the voice chat. Please try again later.');
+  }
+});
 
 // Delete message command
 bot.onText(/\/del/, async (msg) => {
