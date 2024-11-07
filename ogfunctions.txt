@@ -1,5 +1,58 @@
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+//userd id /id
+// bot.onText(/\/id/, (msg) => {
+//   const chatId = msg.chat.id;
+//   const userId = msg.from.id;
+
+//   // Reply to the command message with user and group IDs (if applicable)
+//   const replyOptions = {
+//     reply_to_message_id: msg.message_id,
+//     parse_mode: 'HTML'
+//   };
+//   // Check if the chat is a group or private chat
+//   if (msg.chat.type === 'private') {
+//     // Private chat: respond with user ID
+//     let iduser = `Your User ID: <code>${userId}</code>`;
+//     bot.sendMessage(chatId, iduser, replyOptions, { parse_mode: 'Markdown' });
+//     // bot.sendMessage(chatId, id, replyOptions);
+//   } else {
+//     // Group chat: respond with both user ID and group ID
+//     let idusergc = `Your User ID: <code>${userId}</code>\nThis chat's ID: <code>${chatId}</code>`;
+//     bot.sendMessage(chatId, idusergc, replyOptions, { parse_mode: 'Markdown' });
+//     // bot.sendMessage(chatId, `Your User ID: ${userId}`, replyOptions);
+//   }
+// // });
+// bot.onText(/\/id/, (msg) => {
+//   const chatId = msg.chat.id;
+//   const userId = msg.from.id;
+
+//   // Check if the message is a reply to another message
+//   if (msg.reply_to_message) {
+//     const repliedUserId = msg.reply_to_message.from.id;  // The ID of the user being replied to
+//     const repliedUserName = msg.reply_to_message.from.username || `${msg.reply_to_message.from.first_name} ${msg.reply_to_message.from.last_name}`;
+
+//     // Respond with both the replied user ID, the user ID of the one replying, and the group ID
+//     const replyOptions = {
+//       reply_to_message_id: msg.message_id,
+//       parse_mode: 'HTML'
+   
+
+//     // Construct the message
+//     const message = `User <a href="tg://user?id=${msg.reply_to_message.from.id}">${msg.reply_to_message.from.first_name}</a> 's ID: <code>${repliedUserId}</code>\nYour User ID: <code>${userId}</code>\nThis Chat's ID: <code>${chatId}</code>`;
+//     bot.sendMessage(chatId, message, replyOptions);
+//   } else (msg.chat.type === 'private') {
+//     // Private chat: respond with user ID
+//     let iduser = `Your User ID: <code>${userId}</code>`;
+//     bot.sendMessage(chatId, iduser, replyOptions, { parse_mode: 'Markdown' });
+//     // bot.sendMessage(chatId, id, replyOptions);
+//   }
+// });
+
+
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+//cleanservices
 const fs = require('fs');
 const path = require('path');
 const TelegramBot = require('node-telegram-bot-api');
