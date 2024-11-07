@@ -688,9 +688,9 @@ bot.on('message', async (msg) => {
       (setting === 'pin' && isPinnedMessage) ||
       (setting === 'title' && isTitleChange) ||
       (setting === 'videochat' && isVideoChatMessage)
-    ) {
-      await bot.deleteMessage(chatId, msg.message_id);
-    }
+    // ) {
+    //   await bot.deleteMessage(chatId, msg.message_id);
+    // }
   } catch (error) {
     console.error('Error deleting service message:', error);
   }
