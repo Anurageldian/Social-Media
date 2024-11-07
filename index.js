@@ -745,7 +745,7 @@ bot.onText(/\/purge/, async (msg) => {
 // });
 
 
-
+let serviceSettings = [];
 // Load settings from JSON file
 if (fs.existsSync(serviceSettingsPath)) {
   serviceSettings = JSON.parse(fs.readFileSync(serviceSettingsPath, 'utf8'));
