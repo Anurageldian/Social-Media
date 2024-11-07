@@ -595,7 +595,7 @@ bot.onText(/(?:https|git)(?::\/\/|@)github\.com[\/:]([^\/:]+)\/(.+)/i, async (ms
   }
 })
 
-
+//to generate user id in chat or private
 bot.onText(/\/id/, (msg) => {
   const chatId = msg.chat.id;
   const userId = msg.from.id;
@@ -614,7 +614,7 @@ bot.onText(/\/id/, (msg) => {
     // bot.sendMessage(chatId, id, replyOptions);
   } else {
     // Group chat: respond with both user ID and group ID
-    let idusergc = `Your User ID: <code>${userId}</code>\nGroup ID: <code>${chatId}</code>`;
+    let idusergc = `Your User ID: <code>${userId}</code>\nThis chat's ID: <code>${chatId}</code>`;
     bot.sendMessage(chatId, idusergc, replyOptions, { parse_mode: 'Markdown' });
     // bot.sendMessage(chatId, `Your User ID: ${userId}`, replyOptions);
   }
