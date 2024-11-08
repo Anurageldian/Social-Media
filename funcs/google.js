@@ -15,16 +15,19 @@ async function googleSearch(bot, chatId, query, userName) {
     const browser = await puppeteer.launch();
     const page = await browser.newPage();
 
+    // Set a custom user-agent (optional, to prevent bot detection)
+    await page.setUserAgent('Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36');
+
     // Navigate to Bing and search for the query
     await page.goto(`https://www.bing.com/search?q=${encodeURIComponent(query)}`, { waitUntil: 'load' });
 
-    // Wait for the search results to load (check for the presence of a result container)
-    await page.waitForSelector('.b_algo', { timeout: 60000 }); // Increase timeout if necessary
+    // Wait for a more general results container
+    await page.waitForSelector('.b_results', { timeout: 60000 });
 
     // Extract the search results
     const searchResults = await page.evaluate(() => {
       const results = [];
-      const items = document.querySelectorAll('.b_algo');
+      const items = document.querySelectorAll('.b_results .b_algo');
       items.forEach((item) => {
         const title = item.querySelector('h2')?.innerText;
         const url = item.querySelector('a')?.href;
@@ -36,6 +39,7 @@ async function googleSearch(bot, chatId, query, userName) {
       return results;
     });
 
+    // Close the browser
     await browser.close();
 
     // Log the results for debugging
@@ -63,6 +67,7 @@ async function googleSearch(bot, chatId, query, userName) {
 module.exports = {
   googleSearch
 };
+
 
 
 
