@@ -22,9 +22,9 @@
 //   googleSearch
 // }
 require('dotenv').config();
-const { search } = require('duck-duck-scrape');  // Updated package import
+const axios = require('axios');
+const cheerio = require('cheerio');
 const logChannelId = process.env.LOGC_ID;
-const delay = (ms) => new Promise(resolve => setTimeout(resolve, ms));
 
 async function googleSearch(bot, chatId, query, userName) {
   if (!query) {
@@ -33,18 +33,30 @@ async function googleSearch(bot, chatId, query, userName) {
   bot.sendChatAction(chatId, 'typing');
 
   try {
-    // Adding a delay to avoid rate limits (adjust ms as needed)
-    await delay(1000);
+    // Build the Bing search URL
+    const bingUrl = `https://www.bing.com/search?q=${encodeURIComponent(query)}`;
 
-    const searchResults = await search(query);
+    // Get the search results HTML page
+    const { data } = await axios.get(bingUrl);
+    
+    // Load the HTML into cheerio
+    const $ = cheerio.load(data);
 
-    console.log("Raw Search Results:", searchResults);
+    // Find all search result elements
+    const searchResults = [];
+    $('li.b_algo').each((index, element) => {
+      const title = $(element).find('h2').text();
+      const url = $(element).find('a').attr('href');
+      const description = $(element).find('p').text();
 
-    if (!Array.isArray(searchResults) || searchResults.length === 0) {
-      throw new Error("No results found or unexpected result format");
+      searchResults.push({ title, url, description });
+    });
+
+    if (searchResults.length === 0) {
+      return bot.sendMessage(chatId, 'No results found.');
     }
 
-    let resultS = `DUCKDUCKGO SEARCH\n\n`;
+    let resultS = `BING SEARCH RESULTS\n\n`;
     for (let i = 0; i < Math.min(5, searchResults.length); i++) {
       const result = searchResults[i];
       resultS += `• Title: ${result.title}\n• Link: ${result.url}\n• Description: ${result.description}\n\n`;
@@ -58,6 +70,7 @@ async function googleSearch(bot, chatId, query, userName) {
     return bot.sendMessage(chatId, 'An error occurred!');
   }
 }
+
 module.exports = {
   googleSearch
 };
