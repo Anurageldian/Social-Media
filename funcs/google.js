@@ -22,7 +22,7 @@
 //   googleSearch
 // }
 require('dotenv').config();
-const { search } = require('node-duckduckgo');
+const { search } = require('duck-duck-scrape');  // Updated package import
 const logChannelId = process.env.LOGC_ID;
 
 async function googleSearch(bot, chatId, query, userName) {
@@ -32,12 +32,10 @@ async function googleSearch(bot, chatId, query, userName) {
   bot.sendChatAction(chatId, 'typing');
 
   try {
-    const searchResults = await search(query);
+    const searchResults = await search(query);  // Adjusted to new package's syntax
 
-    // Log the raw search results to see if they're being returned
-    console.log("Raw Search Results:", searchResults);
+    console.log("Raw Search Results:", searchResults);  // Check the output structure
 
-    // Additional check for results
     if (!Array.isArray(searchResults) || searchResults.length === 0) {
       throw new Error("No results found or unexpected result format");
     }
@@ -45,14 +43,12 @@ async function googleSearch(bot, chatId, query, userName) {
     let resultS = `DUCKDUCKGO SEARCH\n\n`;
     for (let i = 0; i < Math.min(5, searchResults.length); i++) {
       const result = searchResults[i];
-      resultS += `• Title: ${result.title}\n• Link: ${result.url}\n• Description: ${result.snippet}\n\n`;
+      resultS += `• Title: ${result.title}\n• Link: ${result.url}\n• Description: ${result.description}\n\n`;
     }
 
     return bot.sendMessage(chatId, resultS);
   } catch (err) {
-    // Log the error and content of searchResults for debugging
     console.error("Search Error:", err);
-    console.error("Search Results Structure:", searchResults);
 
     await bot.sendMessage(logChannelId, `[ ERROR MESSAGE ]\n\n• Username: @${userName}\n• File: funcs/google.js\n• Function: googleSearch()\n• Input: ${query}\n\n${err}`.trim());
     return bot.sendMessage(chatId, 'An error occurred!');
@@ -62,3 +58,4 @@ async function googleSearch(bot, chatId, query, userName) {
 module.exports = {
   googleSearch
 };
+
