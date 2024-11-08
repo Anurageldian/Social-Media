@@ -58,3 +58,6 @@ async function googleSearch(bot, chatId, query, userName) {
     return bot.sendMessage(chatId, 'An error occurred!');
   }
 }
+module.exports = {
+  googleSearch
+};
