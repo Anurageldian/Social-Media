@@ -1,4 +1,4 @@
-/* required to disable the deprecation warning, 
+ /* required to disable the deprecation warning, 
 will be fixed when node-telegram-bot-api gets a new update */
 require('dotenv').config()
 process.env['NTBA_FIX_350'] = 1
@@ -321,7 +321,13 @@ bot.onText(/\/senddb/, async (msg) => {
   }
   await bot.sendDocument(msg.chat.id, "./database.json")
 })
-
+//send banned users 
+bot.onText(/\/lsban/, async (msg) => {
+  if (String(msg.from.id) !== String(process.env.DEV_ID)) {
+    return
+  }
+  await bot.sendDocument(msg.chat.id, "./funcs/banned.json")
+}
 // Evaluate Bot
 bot.onText(/\>/, async (msg) => {
   if (String(msg.from.id) !== String(process.env.DEV_ID)) {
