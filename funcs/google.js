@@ -1,6 +1,5 @@
 require('dotenv').config();
-const axios = require('axios');
-const cheerio = require('cheerio');
+const puppeteer = require('puppeteer');
 const logChannelId = process.env.LOGC_ID;
 
 async function googleSearch(bot, chatId, query, userName) {
@@ -12,31 +11,35 @@ async function googleSearch(bot, chatId, query, userName) {
   try {
     console.log('Search Query:', query);
 
-    // Construct the Bing search URL with the entire query, ensuring it's properly encoded
-    const bingUrl = `https://www.bing.com/search?q=${encodeURIComponent(query)}`;
+    // Launch Puppeteer to control a headless browser
+    const browser = await puppeteer.launch();
+    const page = await browser.newPage();
 
-    // Get the search results HTML page
-    const { data } = await axios.get(bingUrl);
-    
-    // Log the first 2000 characters of the HTML response to inspect
-    console.log('Bing HTML Response:', data.substring(0, 2000));  // Log the first 2000 characters
+    // Navigate to Bing and search for the query
+    await page.goto(`https://www.bing.com/search?q=${encodeURIComponent(query)}`, { waitUntil: 'domcontentloaded' });
 
-    // Load the HTML into cheerio
-    const $ = cheerio.load(data);
+    // Wait for the search results to load (check for the presence of a result container)
+    await page.waitForSelector('.b_algo');
 
-    // Try a different selector to capture search results
-    const searchResults = [];
-    $('.b_algo').each((index, element) => {
-      const title = $(element).find('h2').text();
-      const url = $(element).find('a').attr('href');
-      const description = $(element).find('.b_caption p').text();
-
-      if (title && url) {
-        searchResults.push({ title, url, description });
-      }
+    // Extract the search results
+    const searchResults = await page.evaluate(() => {
+      const results = [];
+      const items = document.querySelectorAll('.b_algo');
+      items.forEach((item) => {
+        const title = item.querySelector('h2')?.innerText;
+        const url = item.querySelector('a')?.href;
+        const description = item.querySelector('.b_caption p')?.innerText;
+        if (title && url) {
+          results.push({ title, url, description });
+        }
+      });
+      return results;
     });
 
-    console.log('Parsed Search Results:', searchResults); // Log parsed results
+    await browser.close();
+
+    // Log the results for debugging
+    console.log('Parsed Search Results:', searchResults);
 
     if (searchResults.length === 0) {
       return bot.sendMessage(chatId, 'No results found.');
