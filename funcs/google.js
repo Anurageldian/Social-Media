@@ -24,6 +24,7 @@
 require('dotenv').config();
 const { search } = require('duck-duck-scrape');  // Updated package import
 const logChannelId = process.env.LOGC_ID;
+const delay = (ms) => new Promise(resolve => setTimeout(resolve, ms));
 
 async function googleSearch(bot, chatId, query, userName) {
   if (!query) {
@@ -32,9 +33,12 @@ async function googleSearch(bot, chatId, query, userName) {
   bot.sendChatAction(chatId, 'typing');
 
   try {
-    const searchResults = await search(query);  // Adjusted to new package's syntax
+    // Adding a delay to avoid rate limits (adjust ms as needed)
+    await delay(1000);
 
-    console.log("Raw Search Results:", searchResults);  // Check the output structure
+    const searchResults = await search(query);
+
+    console.log("Raw Search Results:", searchResults);
 
     if (!Array.isArray(searchResults) || searchResults.length === 0) {
       throw new Error("No results found or unexpected result format");
@@ -54,8 +58,3 @@ async function googleSearch(bot, chatId, query, userName) {
     return bot.sendMessage(chatId, 'An error occurred!');
   }
 }
-
-module.exports = {
-  googleSearch
-};
-
