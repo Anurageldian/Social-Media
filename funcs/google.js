@@ -10,7 +10,6 @@ async function googleSearch(bot, chatId, query, userName) {
   bot.sendChatAction(chatId, 'typing');
 
   try {
-    // Log the search query to ensure it's passed correctly
     console.log('Search Query:', query);
 
     // Construct the Bing search URL with the entire query, ensuring it's properly encoded
@@ -19,26 +18,25 @@ async function googleSearch(bot, chatId, query, userName) {
     // Get the search results HTML page
     const { data } = await axios.get(bingUrl);
     
-    // Log the first 1000 characters of the response HTML for debugging (more content for better inspection)
-    console.log('Bing HTML Response:', data.substring(0, 1000));  // Log the first 1000 characters
+    // Log the first 2000 characters of the HTML response to inspect
+    console.log('Bing HTML Response:', data.substring(0, 2000));  // Log the first 2000 characters
 
     // Load the HTML into cheerio
     const $ = cheerio.load(data);
 
-    // Find all search result elements with alternative selectors for Bing
+    // Try a different selector to capture search results
     const searchResults = [];
-    $('li.b_algo').each((index, element) => {
+    $('.b_algo').each((index, element) => {
       const title = $(element).find('h2').text();
       const url = $(element).find('a').attr('href');
-      const description = $(element).find('p').text();
+      const description = $(element).find('.b_caption p').text();
 
       if (title && url) {
         searchResults.push({ title, url, description });
       }
     });
 
-    // Log the parsed results for debugging
-    console.log('Parsed Search Results:', searchResults);
+    console.log('Parsed Search Results:', searchResults); // Log parsed results
 
     if (searchResults.length === 0) {
       return bot.sendMessage(chatId, 'No results found.');
