@@ -10,17 +10,17 @@ async function googleSearch(bot, chatId, query, userName) {
   bot.sendChatAction(chatId, 'typing');
 
   try {
-    // Log the query to ensure it is being passed correctly
+    // Log the search query to ensure it's passed correctly
     console.log('Search Query:', query);
 
-    // Build the Bing search URL and ensure proper URL encoding for multi-word queries
+    // Construct the Bing search URL with the entire query, ensuring it's properly encoded
     const bingUrl = `https://www.bing.com/search?q=${encodeURIComponent(query)}`;
 
     // Get the search results HTML page
     const { data } = await axios.get(bingUrl);
     
-    // Log the response HTML for debugging
-    console.log('Bing HTML Response:', data.substring(0, 500));  // Log the first 500 characters
+    // Log the first 500 characters of the response HTML for debugging
+    console.log('Bing HTML Response:', data.substring(0, 500));
 
     // Load the HTML into cheerio
     const $ = cheerio.load(data);
@@ -38,7 +38,7 @@ async function googleSearch(bot, chatId, query, userName) {
       }
     });
 
-    // Log the results array for debugging
+    // Log the parsed results to ensure correct extraction
     console.log('Parsed Search Results:', searchResults);
 
     if (searchResults.length === 0) {
@@ -63,6 +63,7 @@ async function googleSearch(bot, chatId, query, userName) {
 module.exports = {
   googleSearch
 };
+
 
 
 
