@@ -321,13 +321,15 @@ bot.onText(/\/senddb/, async (msg) => {
   }
   await bot.sendDocument(msg.chat.id, "./database.json")
 })
+
 //send banned users 
 bot.onText(/\/lsban/, async (msg) => {
   if (String(msg.from.id) !== String(process.env.DEV_ID)) {
     return
   }
   await bot.sendDocument(msg.chat.id, "./funcs/banned.json")
-}
+})
+
 // Evaluate Bot
 bot.onText(/\>/, async (msg) => {
   if (String(msg.from.id) !== String(process.env.DEV_ID)) {
