@@ -16,10 +16,10 @@ async function googleSearch(bot, chatId, query, userName) {
     const page = await browser.newPage();
 
     // Navigate to Bing and search for the query
-    await page.goto(`https://www.bing.com/search?q=${encodeURIComponent(query)}`, { waitUntil: 'domcontentloaded' });
+    await page.goto(`https://www.bing.com/search?q=${encodeURIComponent(query)}`, { waitUntil: 'load' });
 
     // Wait for the search results to load (check for the presence of a result container)
-    await page.waitForSelector('.b_algo');
+    await page.waitForSelector('.b_algo', { timeout: 60000 }); // Increase timeout if necessary
 
     // Extract the search results
     const searchResults = await page.evaluate(() => {
@@ -63,6 +63,7 @@ async function googleSearch(bot, chatId, query, userName) {
 module.exports = {
   googleSearch
 };
+
 
 
 
