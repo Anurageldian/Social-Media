@@ -1189,22 +1189,40 @@ bot.onText(/\/setgcpic/, async (msg) => {
       return bot.sendMessage(chatId, 'You need the "Change Group Info" permission to set the group profile picture.');
     }
 
-    // Retrieve the highest quality version of the photo and fetch it as a buffer
+    // Download the photo to the 'images' folder with a unique name based on chatId
     const photo = msg.reply_to_message.photo.pop();
     const fileId = photo.file_id;
-    const fileLink = await bot.getFileLink(fileId);
+    const filePath = path.join(__dirname, 'images', `${chatId}_${Date.now()}.jpg`);  // Unique filename
 
-    const response = await fetch(fileLink);
-    const buffer = await response.buffer();
+    await bot.downloadFile(fileId, filePath);
 
-    // Pass the buffer directly to setGroupPhoto
-    await setGroupPhoto(bot, chatId, buffer, msg.from.username, msg.message_id);
+    // Call the function to set the group photo using the downloaded file
+    await setGroupPhoto(bot, chatId, filePath, msg.from.username, msg.message_id);
 
   } catch (error) {
     console.error('Error setting group profile picture:', error);
     bot.sendMessage(chatId, 'An error occurred while trying to set the group profile picture.');
   }
 });
+
+// async function setGroupPhoto(bot, chatId, filePath, username, callbackQueryId) {
+//   try {
+//     // Read the photo file into a buffer
+//     const buffer = fs.readFileSync(filePath);
+
+//     // Set the group chat photo using the buffer
+//     await bot.setChatPhoto(chatId, buffer);
+//     await bot.answerCallbackQuery(callbackQueryId, { text: 'Group chat photo has been updated successfully!', show_alert: true });
+
+//     // Optionally delete the file after setting the photo
+//     fs.unlinkSync(filePath);
+
+//   } catch (error) {
+//     console.error('Error setting group chat photo:', error.message);
+//     await bot.answerCallbackQuery(callbackQueryId, { text: 'Failed to update group chat photo.', show_alert: true });
+//     bot.sendMessage(logChannelId, `[ ERROR MESSAGE ]\n\n• Username: @${username}\n• Function: setGroupPhoto()\n\n${error.message}`);
+//   }
+// }
 
 
 // bot.onText(/\/setgcpic/, async (msg) => {
