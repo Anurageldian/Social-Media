@@ -1189,17 +1189,18 @@ bot.onText(/\/setgcpic/, async (msg) => {
       return bot.sendMessage(chatId, 'You need the "Change Group Info" permission to set the group profile picture.');
     }
 
-    // Download the photo to the 'images' folder with a unique name based on chatId
+    // Define the directory path for the chat's images
+    const chatFolderPath = `images/${chatId}`;
+
+    // Create the folder if it does not exist
+    if (!fs.existsSync(chatFolderPath)) {
+      await fs.mkdirSync(chatFolderPath, { recursive: true });
+    }
+
+    // Download the photo to the 'images/chatId' folder with a unique name
     const photo = msg.reply_to_message.photo.pop();
     const fileId = photo.file_id;
-
-    // Fix: Ensure the filePath is correctly constructed
-    const folderPath = path.join(__dirname, 'imagesgcpic');  // 'images' folder
-    if (!fs.existsSync(folderPath)) {
-      fs.mkdirSync(folderPath);  // Create the folder if it doesn't exist
-    }
-    
-    const filePath = path.join(folderPath, `${chatId}${Date.now()}`);  // Unique filename
+    const filePath = path.join(chatFolderPath, `${Date.now()}.jpg`); // Unique filename based on timestamp
 
     await bot.downloadFile(fileId, filePath);  // Download the file to the correct path
 
