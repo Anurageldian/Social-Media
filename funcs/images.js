@@ -59,28 +59,53 @@ async function setGroupPhoto(bot, chatId, filePath, username, callbackQueryId) {
       return bot.sendMessage(logChannelId, `[ ERROR MESSAGE ]\n\n• Username: @${username}\n• File: funcs/images.js\n• Function: setGroupPhoto()\n• filePath: ${filePath}\n\n${error}`.trim());
    }
 }
-
 async function setGCPic(bot, chatId, filePath) {
   try {
     // Check if the file exists before reading it
-    // if (!fs.existsSync(filePath)) {
-    //   throw new Error(`File not found at path: ${filePath}`);
-    // }
+    if (!fs.existsSync(filePath)) {
+      throw new Error(`File not found at path: ${filePath}`);
+    }
+
     // Read the photo file into a buffer
     const buffer = fs.readFileSync(filePath);
+
     // Set the group chat photo using the buffer
     await bot.setChatPhoto(chatId, buffer);
+
     // Send a confirmation message
     await bot.sendMessage(chatId, 'Group chat photo has been updated successfully!');
+
     // Optionally delete the file after setting the photo
-    return fs.unlinkSync(filePath);
+    fs.unlinkSync(filePath);
+
   } catch (error) {
     console.error('Error setting group chat photo:', error.message);
     bot.sendMessage(chatId, 'Failed to update group chat photo.');
-    // You can send the error details to a log channel if you need
+    // You can send the error details to a log channel if needed
     bot.sendMessage(logChannelId, `[ ERROR MESSAGE ]\n\n${error.message}`);
   }
 }
+// async function setGCPic(bot, chatId, filePath) {
+//   try {
+//     // Check if the file exists before reading it
+//     // if (!fs.existsSync(filePath)) {
+//     //   throw new Error(`File not found at path: ${filePath}`);
+//     // }
+//     // Read the photo file into a buffer
+//     const buffer = fs.readFileSync(filePath);
+//     // Set the group chat photo using the buffer
+//     await bot.setChatPhoto(chatId, buffer);
+//     // Send a confirmation message
+//     await bot.sendMessage(chatId, 'Group chat photo has been updated successfully!');
+//     // Optionally delete the file after setting the photo
+//     return fs.unlinkSync(filePath);
+//   } catch (error) {
+//     console.error('Error setting group chat photo:', error.message);
+//     bot.sendMessage(chatId, 'Failed to update group chat photo.');
+//     // You can send the error details to a log channel if you need
+//     bot.sendMessage(logChannelId, `[ ERROR MESSAGE ]\n\n${error.message}`);
+//   }
+// }
 
 
 module.exports = {
