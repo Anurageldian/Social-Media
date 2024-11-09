@@ -59,13 +59,9 @@ async function setGroupPhoto(bot, chatId, filePath, username, callbackQueryId) {
       return bot.sendMessage(logChannelId, `[ ERROR MESSAGE ]\n\n• Username: @${username}\n• File: funcs/images.js\n• Function: setGroupPhoto()\n• filePath: ${filePath}\n\n${error}`.trim());
    }
 }
+
 async function setGCPic(bot, chatId, filePath) {
   try {
-    // Check if the file exists before reading it
-    if (!fs.existsSync(filePath)) {
-      throw new Error(`File not found at path: ${filePath}`);
-    }
-
     // Read the photo file into a buffer
     const buffer = fs.readFileSync(filePath);
 
