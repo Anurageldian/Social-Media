@@ -1190,7 +1190,7 @@ bot.onText(/\/setgcpic/, async (msg) => {
     }
 
     // Define the directory path for the chat's images
-    const chatFolderPath = `images/${chatId}`;
+    const chatFolderPath = `imagesgcpic/${chatId}`;
 
     // Create the folder if it does not exist
     if (!fs.existsSync(chatFolderPath)) {
