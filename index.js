@@ -1692,7 +1692,7 @@ let userIdToDemote;
 });
 
 
-//ban
+//ban with uid
 
 // bot.onText(/\/ban (.+)/, async (msg, match) => {
 //   const chatId = msg.chat.id;
@@ -1775,7 +1775,7 @@ let userIdToDemote;
 // });
 
 
-
+// ban command with reply and uid username?
 
 bot.onText(/\/ban(?: (.+))?/, async (msg, match) => {
   const chatId = msg.chat.id;
@@ -1988,10 +1988,51 @@ bot.onText(/\/promoteme/, async (msg) => {
 
 
 // Command: Unban User
-bot.onText(/\/unban (.+)/, async (msg, match) => {
+// bot.onText(/\/unban (.+)/, async (msg, match) => {
+//   const chatId = msg.chat.id;
+//   const userIdToUnban = match[1].trim();
+//   const issuerId = msg.from.id;
+
+//   try {
+//     // Check if the issuer has permission to restrict members or is the chat creator
+//     const issuer = await bot.getChatMember(chatId, issuerId);
+//     if (issuer.status !== 'creator' && !issuer.can_restrict_members) {
+//       bot.sendMessage(chatId, 'You need the "can restrict members" permission to unban users.');
+//       return;
+//     }
+
+//     // Check if the user is banned
+//     const userStatus = await bot.getChatMember(chatId, userIdToUnban);
+
+//     // If the user is still in the chat, inform the admin that the user is not banned
+//     if (userStatus.status !== 'kicked') {
+//       const userFullName = userStatus.user.first_name + (userStatus.user.last_name ? ' ' + userStatus.user.last_name : '');
+//       const userUsername = userStatus.user.username ? ` (@${userStatus.user.username})` : '';
+//       const respo = `The user <a href="tg://user?id=${userIdToUnban}">${userFullName}</a> ${userUsername} is not banned.`;
+//       bot.sendMessage(chatId, respo, { parse_mode: 'HTML' });
+//     }
+
+//     // Proceed to unban the user only if they are banned
+//     await bot.unbanChatMember(chatId, userIdToUnban);
+
+//     // Send a success message with user details
+//     const userFullName = userStatus.user.first_name + (userStatus.user.last_name ? ' ' + userStatus.user.last_name : '');
+//     const userUsername = userStatus.user.username ? ` (@${userStatus.user.username})` : '';
+//     const respo = `<a href="tg://user?id=${userIdToUnban}">${userFullName}</a> ${userUsername} has been unbanned.`;
+//     bot.sendMessage(chatId, respo, { parse_mode: 'HTML' });
+    
+//   } catch (error) {
+//     console.error('Error unbanning user:', error);
+//     bot.sendMessage(chatId, `An error occurred while processing the unban request for user ID ${userIdToUnban}.`);
+//   }
+// });
+
+// unban by replying to user or uid username?
+
+bot.onText(/\/unban(?: (.+))?/, async (msg, match) => {
   const chatId = msg.chat.id;
-  const userIdToUnban = match[1].trim();
   const issuerId = msg.from.id;
+  const userIdOrUsernameToUnban = match[1] ? match[1].trim() : null;
 
   try {
     // Check if the issuer has permission to restrict members or is the chat creator
@@ -2001,31 +2042,73 @@ bot.onText(/\/unban (.+)/, async (msg, match) => {
       return;
     }
 
-    // Check if the user is banned
-    const userStatus = await bot.getChatMember(chatId, userIdToUnban);
+    let userIdToUnban;
+    let userToUnban;
 
-    // If the user is still in the chat, inform the admin that the user is not banned
-    if (userStatus.status !== 'kicked') {
-      const userFullName = userStatus.user.first_name + (userStatus.user.last_name ? ' ' + userStatus.user.last_name : '');
-      const userUsername = userStatus.user.username ? ` (@${userStatus.user.username})` : '';
-      const respo = `The user <a href="tg://user?id=${userIdToUnban}">${userFullName}</a> ${userUsername} is not banned.`;
-      bot.sendMessage(chatId, respo, { parse_mode: 'HTML' });
+    if (msg.reply_to_message) {
+      // If the command is in reply to a message, get the user who sent the original message
+      userIdToUnban = msg.reply_to_message.from.id;
+      userToUnban = msg.reply_to_message.from;
+    } else if (userIdOrUsernameToUnban) {
+      // If an identifier is provided as an argument (either username or user ID)
+      if (userIdOrUsernameToUnban.startsWith('@')) {
+        // If the identifier is a username
+        const username = userIdOrUsernameToUnban.slice(1);
+        try {
+          const chatMembers = await bot.getChatAdministrators(chatId);
+          const user = chatMembers.find(member => member.user.username === username);
+
+          if (user) {
+            userIdToUnban = user.user.id;
+            userToUnban = user.user;
+          } else {
+            const member = await bot.getChatMember(chatId, userIdOrUsernameToUnban);
+            userIdToUnban = member.user.id;
+            userToUnban = member.user;
+          }
+        } catch (error) {
+          bot.sendMessage(chatId, `User ${userIdOrUsernameToUnban} not found.`);
+          return;
+        }
+      } else {
+        // If the identifier is a user ID
+        userIdToUnban = parseInt(userIdOrUsernameToUnban);
+        if (isNaN(userIdToUnban)) {
+          bot.sendMessage(chatId, `Invalid user ID: ${userIdOrUsernameToUnban}`);
+          return;
+        }
+        try {
+          const member = await bot.getChatMember(chatId, userIdToUnban);
+          userToUnban = member.user;
+        } catch (error) {
+          bot.sendMessage(chatId, `User ID ${userIdOrUsernameToUnban} not found.`);
+          return;
+        }
+      }
+    } else {
+      bot.sendMessage(chatId, 'Please reply to a message or provide a username or user ID to unban.');
+      return;
     }
 
-    // Proceed to unban the user only if they are banned
+    // Unban the user
     await bot.unbanChatMember(chatId, userIdToUnban);
 
-    // Send a success message with user details
-    const userFullName = userStatus.user.first_name + (userStatus.user.last_name ? ' ' + userStatus.user.last_name : '');
-    const userUsername = userStatus.user.username ? ` (@${userStatus.user.username})` : '';
+    const userFullName = userToUnban.first_name + (userToUnban.last_name ? ' ' + userToUnban.last_name : '');
+    const userUsername = userToUnban.username ? ` (@${userToUnban.username})` : '';
     const respo = `<a href="tg://user?id=${userIdToUnban}">${userFullName}</a> ${userUsername} has been unbanned.`;
     bot.sendMessage(chatId, respo, { parse_mode: 'HTML' });
-    
+
   } catch (error) {
     console.error('Error unbanning user:', error);
-    bot.sendMessage(chatId, `An error occurred while processing the unban request for user ID ${userIdToUnban}.`);
+    bot.sendMessage(chatId, 'An error occurred while processing the unban request.');
   }
 });
+
+
+
+
+
+
 
 // bot.onText(/\/unban (.+)/, async (msg, match) => {
 //   const chatId = msg.chat.id;
