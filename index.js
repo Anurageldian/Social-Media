@@ -1211,19 +1211,74 @@ bot.onText(/\/setgcpic/, async (msg) => {
     // Retrieve the highest quality version of the photo
     const photo = msg.reply_to_message.photo.pop();
     const fileId = photo.file_id;
-    const fileLink = await bot.getFileLink(fileId);
-    
-    // Fetch the photo file and set as group picture
-    const response = await fetch(fileLink);
-    const buffer = await response.buffer();
-    await bot.setChatPhoto(chatId, { source: buffer });
 
-    bot.sendMessage(chatId, 'Group profile picture has been updated successfully!');
+    // Generate a unique filename with chatId and timestamp
+    const uniqueName = `images/${chatId}_${Date.now()}.jpg`;
+
+    // Download the photo file with the unique name
+    const write = await bot.downloadFile(fileId, uniqueName);
+
+    // Call the setGroupPhoto function to set it as the group profile picture
+    await setGroupPhoto(bot, chatId, write, msg.from.username, msg.id);
+
   } catch (error) {
     console.error('Error setting group profile picture:', error);
     bot.sendMessage(chatId, 'An error occurred while trying to set the group profile picture.');
   }
 });
+
+
+
+// bot.onText(/\/setgcpic/, async (msg) => {
+//   const chatId = msg.chat.id;
+
+//   // Ensure the command is a reply with a photo
+//   if (!msg.reply_to_message || !msg.reply_to_message.photo) {
+//     return bot.sendMessage(chatId, 'Please reply to a photo with the /setgcpic command to set it as the group profile picture.');
+//   }
+
+//   try {
+//     // Check if the user has permission to change group info
+//     const userId = msg.from?.id;
+//     if (!userId) {
+//       return bot.sendMessage(chatId, 'Error: User ID not found.');
+//     }
+
+//     const user = await bot.getChatMember(chatId, userId);
+//     if (user.status !== 'administrator' && user.status !== 'creator') {
+//       return bot.sendMessage(chatId, 'You need to be an admin to set the group profile picture.');
+//     }
+
+//     if (!user.can_change_info) {
+//       return bot.sendMessage(chatId, 'You need the "Change Group Info" permission to set the group profile picture.');
+//     }
+
+//     // Check if the bot has permission to change group info
+//     const botMember = await bot.getChatMember(chatId, bot.id);
+//     if (botMember.status !== 'administrator' && botMember.status !== 'creator') {
+//       return bot.sendMessage(chatId, 'The bot needs to be an admin to change the group profile picture.');
+//     }
+
+//     if (!botMember.can_change_info) {
+//       return bot.sendMessage(chatId, 'The bot needs the "Change Group Info" permission to change the group profile picture.');
+//     }
+
+//     // Retrieve the highest quality version of the photo
+//     const photo = msg.reply_to_message.photo.pop();
+//     const fileId = photo.file_id;
+//     const fileLink = await bot.getFileLink(fileId);
+    
+//     // Fetch the photo file and set as group picture
+//     const response = await fetch(fileLink);
+//     const buffer = await response.buffer();
+//     await bot.setChatPhoto(chatId, { source: buffer });
+
+//     bot.sendMessage(chatId, 'Group profile picture has been updated successfully!');
+//   } catch (error) {
+//     console.error('Error setting group profile picture:', error);
+//     bot.sendMessage(chatId, 'An error occurred while trying to set the group profile picture.');
+//   }
+// });
 
 // Command to set group profile picture
 // bot.onText(/\/setgcpic/, async (msg) => {
