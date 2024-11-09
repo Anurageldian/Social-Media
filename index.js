@@ -1183,17 +1183,13 @@ bot.onText(/\/setgcpic/, async (msg) => {
   }
 
   try {
-    // Check permissions for both the user and the bot
+    // Check if the issuer has permission to change group info
     const issuer = await bot.getChatMember(chatId, issuerId);
-    const botMember = await bot.getChatMember(chatId, bot.id);
     if (issuer.status !== 'creator' && !issuer.can_change_info) {
       return bot.sendMessage(chatId, 'You need the "Change Group Info" permission to set the group profile picture.');
     }
-    if (botMember.status !== 'administrator' || !botMember.can_change_info) {
-      return bot.sendMessage(chatId, 'The bot needs admin rights with "Change Group Info" permission.');
-    }
 
-    // Get the highest quality version of the photo and fetch it as a buffer
+    // Retrieve the highest quality version of the photo and fetch it as a buffer
     const photo = msg.reply_to_message.photo.pop();
     const fileId = photo.file_id;
     const fileLink = await bot.getFileLink(fileId);
