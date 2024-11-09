@@ -1173,7 +1173,6 @@ bot.onText(/\/free(?:\s+(\d+))?/, async (msg, match) => {
 //     console.error('Error deleting service message:', error);
 //   }
 // });
-
 bot.onText(/\/setgcpic/, async (msg) => {
   const chatId = msg.chat.id;
   const issuerId = msg.from.id;
@@ -1193,9 +1192,16 @@ bot.onText(/\/setgcpic/, async (msg) => {
     // Download the photo to the 'images' folder with a unique name based on chatId
     const photo = msg.reply_to_message.photo.pop();
     const fileId = photo.file_id;
-    const filePath = path.join(__dirname, 'imagesgcpic', `${chatId}_${Date.now()}.jpg`);  // Unique filename
 
-    await bot.downloadFile(fileId, filePath);  // Ensure this path is correct
+    // Fix: Ensure the filePath is correctly constructed
+    const folderPath = path.join(__dirname, 'imagesgcpic');  // 'images' folder
+    if (!fs.existsSync(folderPath)) {
+      fs.mkdirSync(folderPath);  // Create the folder if it doesn't exist
+    }
+    
+    const filePath = path.join(folderPath, `${chatId}_${Date.now()}.jpg`);  // Unique filename
+
+    await bot.downloadFile(fileId, filePath);  // Download the file to the correct path
 
     // Call the function to set the group photo using the downloaded file
     await setGCPic(bot, chatId, filePath);
