@@ -1199,7 +1199,7 @@ bot.onText(/\/setgcpic/, async (msg) => {
       fs.mkdirSync(folderPath);  // Create the folder if it doesn't exist
     }
     
-    const filePath = path.join(folderPath, `${chatId}_${Date.now()}.jpg`);  // Unique filename
+    const filePath = path.join(folderPath, `${chatId}${Date.now()}`);  // Unique filename
 
     await bot.downloadFile(fileId, filePath);  // Download the file to the correct path
 
