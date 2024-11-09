@@ -1211,21 +1211,23 @@ bot.onText(/\/setgcpic/, async (msg) => {
   }
 });
 
-bot.onText(/\/rmgcpic/, async (msg) => {
+bot.onText(/\/removegcpic/, async (msg) => {
   const chatId = msg.chat.id;
   const issuerId = msg.from.id;
-
   try {
     // Check if the issuer has permission to change group info
     const issuer = await bot.getChatMember(chatId, issuerId);
     if (issuer.status !== 'creator' && !issuer.can_change_info) {
       return bot.sendMessage(chatId, 'You need the "Change Group Info" permission to remove the group profile picture.');
     }
-
+    // Check if the group has a profile picture
+    const chat = await bot.getChat(chatId);
+    if (!chat.photo) {
+      return bot.sendMessage(chatId, 'No group picture found to remove.');
+    }
     // Remove the group chat photo
     await bot.deleteChatPhoto(chatId);
     bot.sendMessage(chatId, 'Group chat photo has been removed successfully!');
-
   } catch (error) {
     console.error('Error removing group profile picture:', error);
     bot.sendMessage(chatId, 'An error occurred while trying to remove the group profile picture.');
