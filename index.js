@@ -1173,6 +1173,9 @@ bot.onText(/\/free(?:\s+(\d+))?/, async (msg, match) => {
 //     console.error('Error deleting service message:', error);
 //   }
 // });
+const fs = require('fs');
+const path = require('path');
+
 bot.onText(/\/setgcpic/, async (msg) => {
   const chatId = msg.chat.id;
   const issuerId = msg.from.id;
@@ -1189,20 +1192,20 @@ bot.onText(/\/setgcpic/, async (msg) => {
       return bot.sendMessage(chatId, 'You need the "Change Group Info" permission to set the group profile picture.');
     }
 
-    // Define the directory path for the chat's images
-    const chatFolderPath = `imagesgcpic/${chatId}`;
-
     // Create the folder if it does not exist
-    if (!fs.existsSync(chatFolderPath)) {
-      await fs.mkdirSync(chatFolderPath, { recursive: true });
+    const folderPath = `imagesgcpic/${chatId}`;
+    if (!fs.existsSync(folderPath)) {
+      await fs.mkdirSync(folderPath, { recursive: true });
     }
 
-    // Download the photo to the 'images/chatId' folder with a unique name
+    // Get the last photo (highest quality) from the message
     const photo = msg.reply_to_message.photo.pop();
     const fileId = photo.file_id;
-    const filePath = path.join(chatFolderPath, `${Date.now()}.jpg`); // Unique filename based on timestamp
+    const fileName = `${Date.now()}.jpg`;  // Use a unique name based on the current timestamp
+    const filePath = path.join(folderPath, fileName);  // Full path for the file
 
-    await bot.downloadFile(fileId, filePath);  // Download the file to the correct path
+    // Download the photo and save it to the folder
+    await bot.downloadFile(fileId, filePath);
 
     // Call the function to set the group photo using the downloaded file
     await setGCPic(bot, chatId, filePath);
@@ -1212,6 +1215,9 @@ bot.onText(/\/setgcpic/, async (msg) => {
     bot.sendMessage(chatId, 'An error occurred while trying to set the group profile picture.');
   }
 });
+
+
+
 
 // async function setGroupPhoto(bot, chatId, filePath, username, callbackQueryId) {
 //   try {
