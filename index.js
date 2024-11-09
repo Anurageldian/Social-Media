@@ -1173,8 +1173,6 @@ bot.onText(/\/free(?:\s+(\d+))?/, async (msg, match) => {
 //     console.error('Error deleting service message:', error);
 //   }
 // });
-const fs = require('fs');
-const path = require('path');
 
 bot.onText(/\/setgcpic/, async (msg) => {
   const chatId = msg.chat.id;
