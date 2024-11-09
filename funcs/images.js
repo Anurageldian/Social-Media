@@ -47,17 +47,28 @@ async function Ocr(bot, chatId, filePath, username) {
    }
 }
 
-async function setGroupPhoto(bot, chatId, filePath, username, callbackQueryId) {
-   try {
-      const buffer = fs.readFileSync(filePath); // Read the photo file into a buffer
-      await bot.setChatPhoto(chatId, buffer);
-      await bot.answerCallbackQuery(callbackQueryId, { text: 'Group chat photo has been updated successfully!', show_alert: true });
-      return fs.unlinkSync(filePath);
-   } catch (error) {
-      console.error('Error setting group chat photo:', error.message);
-      await bot.answerCallbackQuery(callbackQueryId, { text: 'Failed to update group chat photo.', show_alert: true });
-      return bot.sendMessage(logChannelId, `[ ERROR MESSAGE ]\n\n• Username: @${username}\n• File: funcs/images.js\n• Function: setGroupPhoto()\n• filePath: ${filePath}\n\n${error}`.trim());
-   }
+// async function setGroupPhoto(bot, chatId, filePath, username, callbackQueryId) {
+//    try {
+//       const buffer = fs.readFileSync(filePath); // Read the photo file into a buffer
+//       await bot.setChatPhoto(chatId, buffer);
+//       await bot.answerCallbackQuery(callbackQueryId, { text: 'Group chat photo has been updated successfully!', show_alert: true });
+//       return fs.unlinkSync(filePath);
+//    } catch (error) {
+//       console.error('Error setting group chat photo:', error.message);
+//       await bot.answerCallbackQuery(callbackQueryId, { text: 'Failed to update group chat photo.', show_alert: true });
+//       return bot.sendMessage(logChannelId, `[ ERROR MESSAGE ]\n\n• Username: @${username}\n• File: funcs/images.js\n• Function: setGroupPhoto()\n• filePath: ${filePath}\n\n${error}`.trim());
+//    }
+// }
+async function setGroupPhoto(bot, chatId, buffer, username, callbackQueryId) {
+  try {
+    // Set the group chat photo using the buffer
+    await bot.setChatPhoto(chatId, buffer);
+    await bot.answerCallbackQuery(callbackQueryId, { text: 'Group chat photo has been updated successfully!', show_alert: true });
+  } catch (error) {
+    console.error('Error setting group chat photo:', error.message);
+    await bot.answerCallbackQuery(callbackQueryId, { text: 'Failed to update group chat photo.', show_alert: true });
+    bot.sendMessage(logChannelId, `[ ERROR MESSAGE ]\n\n• Username: @${username}\n• Function: setGroupPhoto()\n\n${error.message}`);
+  }
 }
 
 module.exports = {
