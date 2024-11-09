@@ -1193,16 +1193,15 @@ bot.onText(/\/setgcpic/, async (msg) => {
     // Create the folder if it does not exist
     const folderPath = `imagesgcpic/${chatId}`;
     if (!fs.existsSync(folderPath)) {
-      await fs.mkdirSync(folderPath, { recursive: true });
+      fs.mkdirSync(folderPath, { recursive: true });
     }
 
     // Get the last photo (highest quality) from the message
     const photo = msg.reply_to_message.photo.pop();
     const fileId = photo.file_id;
-    const fileName = `${Date.now()}.jpg`;  // Use a unique name based on the current timestamp
-    const filePath = path.join(folderPath, fileName);  // Full path for the file
+    const filePath = path.join(folderPath, `file_${fileId}.jpg`);  // Use file_id as the unique file name
 
-    // Download the photo and save it to the folder
+    // Download the photo to the specified path
     await bot.downloadFile(fileId, filePath);
 
     // Call the function to set the group photo using the downloaded file
@@ -1213,9 +1212,6 @@ bot.onText(/\/setgcpic/, async (msg) => {
     bot.sendMessage(chatId, 'An error occurred while trying to set the group profile picture.');
   }
 });
-
-
-
 
 // async function setGroupPhoto(bot, chatId, filePath, username, callbackQueryId) {
 //   try {
