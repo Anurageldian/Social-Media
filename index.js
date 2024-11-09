@@ -1196,16 +1196,14 @@ bot.onText(/\/setgcpic/, async (msg) => {
       fs.mkdirSync(folderPath, { recursive: true });
     }
 
-    // Get the last photo (highest quality) from the message
-    const photo = msg.reply_to_message.photo.pop();
-    const fileId = photo.file_id;
-    const filePath = path.join(folderPath, `file_${fileId}.jpg`);  // Use file_id as the unique file name
-
-    // Download the photo to the specified path
-    await bot.downloadFile(fileId, filePath);
+    // Download the photo to the specified folder, letting the bot determine the filename
+    const downloadedFilePath = await bot.downloadFile(
+      msg.reply_to_message.photo[msg.reply_to_message.photo.length - 1].file_id,
+      folderPath
+    );
 
     // Call the function to set the group photo using the downloaded file
-    await setGCPic(bot, chatId, filePath);
+    await setGCPic(bot, chatId, downloadedFilePath);
 
   } catch (error) {
     console.error('Error setting group profile picture:', error);
