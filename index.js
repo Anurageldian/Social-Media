@@ -1173,9 +1173,9 @@ bot.onText(/\/free(?:\s+(\d+))?/, async (msg, match) => {
 //   }
 // });
 
-
 bot.onText(/\/setgcpic/, async (msg) => {
   const chatId = msg.chat.id;
+  const issuerId = msg.from.id;
 
   // Ensure the command is a reply with a photo
   if (!msg.reply_to_message || !msg.reply_to_message.photo) {
@@ -1183,50 +1183,32 @@ bot.onText(/\/setgcpic/, async (msg) => {
   }
 
   try {
-    // Check if the user has permission to change group info
-    const userId = msg.from?.id;
-    if (!userId) {
-      return bot.sendMessage(chatId, 'Error: User ID not found.');
-    }
-
-    const user = await bot.getChatMember(chatId, userId);
-    if (user.status !== 'administrator' && user.status !== 'creator') {
-      return bot.sendMessage(chatId, 'You need to be an admin to set the group profile picture.');
-    }
-
-    if (!user.can_change_info) {
+    // Check permissions for both the user and the bot
+    const issuer = await bot.getChatMember(chatId, issuerId);
+    const botMember = await bot.getChatMember(chatId, bot.id);
+    if (issuer.status !== 'creator' && !issuer.can_change_info) {
       return bot.sendMessage(chatId, 'You need the "Change Group Info" permission to set the group profile picture.');
     }
-
-    // Check if the bot has permission to change group info
-    const botMember = await bot.getChatMember(chatId, bot.id);
-    if (botMember.status !== 'administrator' && botMember.status !== 'creator') {
-      return bot.sendMessage(chatId, 'The bot needs to be an admin to change the group profile picture.');
+    if (botMember.status !== 'administrator' || !botMember.can_change_info) {
+      return bot.sendMessage(chatId, 'The bot needs admin rights with "Change Group Info" permission.');
     }
 
-    if (!botMember.can_change_info) {
-      return bot.sendMessage(chatId, 'The bot needs the "Change Group Info" permission to change the group profile picture.');
-    }
-
-    // Retrieve the highest quality version of the photo
+    // Get the highest quality version of the photo and fetch it as a buffer
     const photo = msg.reply_to_message.photo.pop();
     const fileId = photo.file_id;
+    const fileLink = await bot.getFileLink(fileId);
 
-    // Generate a unique filename with chatId and timestamp
-    const uniqueName = `images/${chatId}_${Date.now()}.jpg`;
+    const response = await fetch(fileLink);
+    const buffer = await response.buffer();
 
-    // Download the photo file with the unique name
-    const write = await bot.downloadFile(fileId, uniqueName);
-
-    // Call the setGroupPhoto function to set it as the group profile picture
-    await setGroupPhoto(bot, chatId, write, msg.from.username, msg.id);
+    // Pass the buffer directly to setGroupPhoto
+    await setGroupPhoto(bot, chatId, buffer, msg.from.username, msg.message_id);
 
   } catch (error) {
     console.error('Error setting group profile picture:', error);
     bot.sendMessage(chatId, 'An error occurred while trying to set the group profile picture.');
   }
 });
-
 
 
 // bot.onText(/\/setgcpic/, async (msg) => {
