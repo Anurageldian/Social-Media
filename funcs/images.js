@@ -60,9 +60,35 @@ async function setGroupPhoto(bot, chatId, filePath, username, callbackQueryId) {
    }
 }
 
+async function setGCPic(bot, chatId, filePath, username, callbackQueryId) {
+  try {
+    // Check if the file exists before reading it
+    if (!fs.existsSync(filePath)) {
+      throw new Error(`File not found at path: ${filePath}`);
+    }
+
+    // Read the photo file into a buffer
+    const buffer = fs.readFileSync(filePath);
+
+    // Set the group chat photo using the buffer
+    await bot.setChatPhoto(chatId, buffer);
+    await bot.answerCallbackQuery(callbackQueryId, { text: 'Group chat photo has been updated successfully!', show_alert: true });
+
+    // Optionally delete the file after setting the photo
+    fs.unlinkSync(filePath);
+
+  } catch (error) {
+    console.error('Error setting group chat photo:', error.message);
+    await bot.answerCallbackQuery(callbackQueryId, { text: 'Failed to update group chat photo.', show_alert: true });
+    bot.sendMessage(logChannelId, `[ ERROR MESSAGE ]\n\n• Username: @${username}\n• Function: setGCPic()\n\n${error.message}`);
+  }
+}
+
+
 module.exports = {
    telegraphUpload,
    Pomf2Upload,
    Ocr,
-   setGroupPhoto
+   setGroupPhoto,
+   setGCPic
 }
