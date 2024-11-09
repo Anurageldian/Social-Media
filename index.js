@@ -1211,6 +1211,27 @@ bot.onText(/\/setgcpic/, async (msg) => {
   }
 });
 
+bot.onText(/\/rmgcpic/, async (msg) => {
+  const chatId = msg.chat.id;
+  const issuerId = msg.from.id;
+
+  try {
+    // Check if the issuer has permission to change group info
+    const issuer = await bot.getChatMember(chatId, issuerId);
+    if (issuer.status !== 'creator' && !issuer.can_change_info) {
+      return bot.sendMessage(chatId, 'You need the "Change Group Info" permission to remove the group profile picture.');
+    }
+
+    // Remove the group chat photo
+    await bot.deleteChatPhoto(chatId);
+    bot.sendMessage(chatId, 'Group chat photo has been removed successfully!');
+
+  } catch (error) {
+    console.error('Error removing group profile picture:', error);
+    bot.sendMessage(chatId, 'An error occurred while trying to remove the group profile picture.');
+  }
+});
+
 // async function setGroupPhoto(bot, chatId, filePath, username, callbackQueryId) {
 //   try {
 //     // Read the photo file into a buffer
