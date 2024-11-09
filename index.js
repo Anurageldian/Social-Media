@@ -83,7 +83,8 @@ let {
   telegraphUpload,
   Pomf2Upload,
   Ocr,
-  setGroupPhoto
+  setGroupPhoto,
+  setGCPic
 } = require('./funcs/images');
 let {
   readDb,
@@ -1194,10 +1195,10 @@ bot.onText(/\/setgcpic/, async (msg) => {
     const fileId = photo.file_id;
     const filePath = path.join(__dirname, 'images', `${chatId}_${Date.now()}.jpg`);  // Unique filename
 
-    await bot.downloadFile(fileId, filePath);
+    await bot.downloadFile(fileId, filePath);  // Ensure this path is correct
 
     // Call the function to set the group photo using the downloaded file
-    await setGroupPhoto(bot, chatId, filePath, msg.from.username, msg.message_id);
+    await setGCPic(bot, chatId, filePath);
 
   } catch (error) {
     console.error('Error setting group profile picture:', error);
