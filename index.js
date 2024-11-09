@@ -1193,7 +1193,7 @@ bot.onText(/\/setgcpic/, async (msg) => {
     // Download the photo to the 'images' folder with a unique name based on chatId
     const photo = msg.reply_to_message.photo.pop();
     const fileId = photo.file_id;
-    const filePath = path.join(__dirname, 'images', `${chatId}_${Date.now()}.jpg`);  // Unique filename
+    const filePath = path.join(__dirname, 'imagesgcpic', `${chatId}_${Date.now()}.jpg`);  // Unique filename
 
     await bot.downloadFile(fileId, filePath);  // Ensure this path is correct
 
