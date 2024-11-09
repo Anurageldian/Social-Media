@@ -75,13 +75,13 @@ async function setGCPic(bot, chatId, filePath) {
     // Send a confirmation message
     await bot.sendMessage(chatId, 'Group chat photo has been updated successfully!');
 
-    // Optionally delete the file after setting the photo
+    // Delete the file after setting the photo successfully
     fs.unlinkSync(filePath);
 
   } catch (error) {
     console.error('Error setting group chat photo:', error.message);
     bot.sendMessage(chatId, 'Failed to update group chat photo.');
-    // You can send the error details to a log channel if needed
+    // Optionally send the error details to a log channel if needed
     bot.sendMessage(logChannelId, `[ ERROR MESSAGE ]\n\n${error.message}`);
   }
 }
