@@ -1211,7 +1211,7 @@ bot.onText(/\/setgcpic/, async (msg) => {
   }
 });
 
-bot.onText(/\/removegcpic/, async (msg) => {
+bot.onText(/\/rmgcpic/, async (msg) => {
   const chatId = msg.chat.id;
   const issuerId = msg.from.id;
   try {
