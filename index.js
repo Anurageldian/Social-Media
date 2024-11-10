@@ -2945,11 +2945,11 @@ bot.onText(/\/info(?: (\d+))?/, async (msg, match) => {
  ➻ ʙᴜsɪɴᴇss ʟᴏᴄᴀᴛɪᴏɴ: ${user.business_location || 'N/A'}
  ➻ ʜᴀs ᴘʀɪᴠᴀᴛᴇ ғᴏʀᴡᴀʀᴅs: ${user.has_private_forwards ? 'Yes' : 'No'}
  ➻ ʜᴀs ʀᴇsᴛʀɪᴄᴛᴇᴅ ᴠᴏɪᴄᴇ/ᴠɪᴅᴇᴏ: ${user.has_restricted_voice_and_video_messages ? 'Yes' : 'No'}
- ➻ ᴘᴇʀsᴏɴᴀʟ ᴄʜᴀᴛ: ${user.personal_chat ? 'Yes' : 'No'}
- ➻ ᴘʀᴏғɪʟᴇ ᴀᴄᴄᴇɴᴛ ᴄᴏʟᴏʀ: ${user.profile_accent_color_id || 'N/A'}
- ➻ ᴘʀᴏғɪʟᴇ ʙᴀᴄᴋɢʀᴏᴜɴᴅ: ${user.profile_background_custom_emoji_id || 'N/A'}
- ➻ ᴇᴍᴏᴊɪ sᴛᴀᴛᴜs: ${user.emoji_status_custom_emoji_id || 'N/A'}
- ➻ ᴇᴍᴏᴊɪ sᴛᴀᴛᴜs ᴇxᴘɪʀᴀᴛɪᴏɴ: ${user.emoji_status_expiration_date || 'N/A'}
+ ➻ ᴘᴇʀsᴏɴᴀʟ ᴄʜᴀᴛ: ${personal_chat ? 'Yes' : 'No'}
+ ➻ ᴘʀᴏғɪʟᴇ ᴀᴄᴄᴇɴᴛ ᴄᴏʟᴏʀ: ${profile_accent_color_id || 'N/A'}
+ ➻ ᴘʀᴏғɪʟᴇ ʙᴀᴄᴋɢʀᴏᴜɴᴅ: ${profile_background_custom_emoji_id || 'N/A'}
+ ➻ ᴇᴍᴏᴊɪ sᴛᴀᴛᴜs: ${emoji_status_custom_emoji_id || 'N/A'}
+ ➻ ᴇᴍᴏᴊɪ sᴛᴀᴛᴜs ᴇxᴘɪʀᴀᴛɪᴏɴ: ${emoji_status_expiration_date || 'N/A'}
       `;
     }
 
