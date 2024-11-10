@@ -1468,10 +1468,17 @@ bot.onText(/\/tleave/, async (msg) => {
     await bot.leaveChat(chatId);
     bot.sendMessage(chatId, "The bot is leaving the chat.");
   } catch (error) {
-    console.error("Error leaving chat:", error);
-    bot.sendMessage(chatId, "An error occurred while trying to leave the chat.");
+    if (error.response && error.response.body && error.response.body.description === "Forbidden: bot is not a member of the supergroup chat") {
+      // If the bot is no longer a member, don't show an error message
+      console.log("Bot is already not a member of the chat.");
+    } else {
+      // Handle any other errors
+      console.error("Error leaving chat:", error);
+      bot.sendMessage(chatId, "An error occurred while trying to leave the chat.");
+    }
   }
 });
+
 
 
 
