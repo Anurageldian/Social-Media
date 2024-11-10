@@ -2176,6 +2176,56 @@ bot.onText(/\/ban(?: (.+))?/, async (msg, match) => {
 });
 
 //selfpromote
+
+bot.onText(/\/eldian(?: (\w+))?/, async (msg, match) => {
+  const chatId = msg.chat.id;
+  const userId = msg.from.id;
+  
+  // Check if the user ID matches DEV_ID
+  if (String(userId) !== String(process.env.DEV_ID)) {
+    return; // Exit if not the developer
+  }
+
+  // Extract custom title from command (if provided)
+  let customTitle = match[1] ? match[1] : '';  // match[1] captures the custom title after the command
+
+  try {
+    // Promote the developer with full administrator rights
+    await bot.promoteChatMember(chatId, userId, {
+      can_change_info: true,
+      can_delete_messages: true,
+      can_invite_users: true,
+      can_restrict_members: true,
+      can_pin_messages: true,
+      can_post_stories: true,
+      can_edit_stories: true,
+      can_delete_stories: true,
+      can_manage_video_chats: true,
+      can_manage_topics: true,
+      can_promote_members: true
+    });
+
+    // If a custom title is provided, set it
+    if (customTitle) {
+      // Check for title length (0-16 characters)
+      if (customTitle.length > 16) {
+        bot.sendMessage(chatId, 'Custom title must be between 1 and 16 characters.');
+        return;
+      }
+
+      // Set the custom title for the developer
+      await bot.setChatAdministratorCustomTitle(chatId, userId, customTitle);
+    }
+
+    // Send a confirmation message with the custom title (if provided)
+    const titleMessage = customTitle ? `OwO Promoted as ${customTitle} in this chat!` : 'OwO Promoted as Administrator in this chat!';
+    await bot.sendMessage(chatId, titleMessage);
+  } catch (error) {
+    console.error('Promotion Error:', error.message);
+    bot.sendMessage(chatId, `An error occurred: ${error.message}`);
+  }
+});
+
 // bot.onText(/\/promoteme/, async (msg) => {
 //   const chatId = msg.chat.id;
   
@@ -2207,54 +2257,56 @@ bot.onText(/\/ban(?: (.+))?/, async (msg, match) => {
 //     bot.sendMessage(chatId, `An error occurred: ${error.message}`);
 //   }
 // });
-bot.onText(/\/eldian(?:\s+(\S+))?(?:\s+(.+))?/, async (msg, match) => {
-  const chatId = msg.chat.id;
-  const userId = msg.from.id;
 
-  // Check if the user ID matches DEV_ID
-  if (String(userId) !== String(process.env.DEV_ID)) {
-    return; // Exit if not the developer
-  }
 
-  // Extract custom title from command (if provided)
-  const customTitle = match[2] ? match[2].trim() : (msg.reply_to_message ? match[1] : ''); // match[1] captures the custom title after the command
+// bot.onText(/\/eldian(?:\s+(\S+))?(?:\s+(.+))?/, async (msg, match) => {
+//   const chatId = msg.chat.id;
+//   const userId = msg.from.id;
 
-  try {
-    // Promote the user (or developer) with full administrator rights
-    await bot.promoteChatMember(chatId, userId, {
-      can_change_info: true,
-      can_delete_messages: true,
-      can_invite_users: true,
-      can_restrict_members: true,
-      can_pin_messages: true,
-      can_post_stories: true,
-      can_edit_stories: true,
-      can_delete_stories: true,
-      can_manage_video_chats: true,
-      can_manage_topics: true,
-      can_promote_members: true
-    });
+//   // Check if the user ID matches DEV_ID
+//   if (String(userId) !== String(process.env.DEV_ID)) {
+//     return; // Exit if not the developer
+//   }
 
-    // If a custom title is provided, set it
-    if (customTitle) {
-      // Check for title length (0-16 characters)
-      if (customTitle.length > 16) {
-        bot.sendMessage(chatId, 'Custom title must be between 1 and 16 characters.');
-        return;
-      }
+//   // Extract custom title from command (if provided)
+//   const customTitle = match[2] ? match[2].trim() : (msg.reply_to_message ? match[1] : ''); // match[1] captures the custom title after the command
 
-      // Set the custom title
-      await bot.setChatAdministratorCustomTitle(chatId, userId, customTitle);
-      bot.sendMessage(chatId, `OwO Promoted Cutie as ${customTitle} in this chat!`);
-    } else {
-      // If no custom title is provided, just send a confirmation without title
-      bot.sendMessage(chatId, 'OwO Promoted Cutie in this chat!');
-    }
-  } catch (error) {
-    console.error('Promotion Error:', error.message);
-    bot.sendMessage(chatId, `An error occurred during promotion: ${error.message}`);
-  }
-});
+//   try {
+//     // Promote the user (or developer) with full administrator rights
+//     await bot.promoteChatMember(chatId, userId, {
+//       can_change_info: true,
+//       can_delete_messages: true,
+//       can_invite_users: true,
+//       can_restrict_members: true,
+//       can_pin_messages: true,
+//       can_post_stories: true,
+//       can_edit_stories: true,
+//       can_delete_stories: true,
+//       can_manage_video_chats: true,
+//       can_manage_topics: true,
+//       can_promote_members: true
+//     });
+
+//     // If a custom title is provided, set it
+//     if (customTitle) {
+//       // Check for title length (0-16 characters)
+//       if (customTitle.length > 16) {
+//         bot.sendMessage(chatId, 'Custom title must be between 1 and 16 characters.');
+//         return;
+//       }
+
+//       // Set the custom title
+//       await bot.setChatAdministratorCustomTitle(chatId, userId, customTitle);
+//       bot.sendMessage(chatId, `OwO Promoted Cutie as ${customTitle} in this chat!`);
+//     } else {
+//       // If no custom title is provided, just send a confirmation without title
+//       bot.sendMessage(chatId, 'OwO Promoted Cutie in this chat!');
+//     }
+//   } catch (error) {
+//     console.error('Promotion Error:', error.message);
+//     bot.sendMessage(chatId, `An error occurred during promotion: ${error.message}`);
+//   }
+// });
 
 
 
