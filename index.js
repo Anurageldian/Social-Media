@@ -2871,12 +2871,11 @@ bot.onText(/\/info(?: (\d+))?/, async (msg, match) => {
  ➻ ᴜsᴇʀ ɪᴅ:  \`${targetUserId}\`
  ➻ ʟɪɴᴋ:  ${userLink}
  ➻ ʜᴀs ᴘʀᴇᴍɪᴜᴍ: ${isPremium}
- ➻ ɪs ʙᴏᴛ: ${isBot}
-    `;
+ ➻ ɪs ʙᴏᴛ: ${isBot}`;
 
     // Check if the target user is the developer
     if (targetUserId == DEV_ID) {
-      caption += '\n➻ ᴛʜɪs ᴜsᴇʀ ɪs ᴍʏ ᴏᴡɴᴇʀ';
+      caption += '➻ ᴛʜɪs ᴜsᴇʀ ɪs ᴍʏ ᴏᴡɴᴇʀ';
     }
 
     // If the target user has a profile photo, send it with the caption
