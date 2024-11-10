@@ -2830,50 +2830,51 @@ bot.onText(/\/getprofilepics (\d+)/, async (msg, match) => {
 
 
 // Event listener for /info command
+
 function escapeMarkdown(text) {
   return text.replace(/(\*|_|`|\[|\])/g, '\\$1');
 }
 
 bot.onText(/\/info/, async (msg) => {
   const chatId = msg.chat.id;
-
-  // Check if the command is used as a reply; if so, get the replied-to user info
-  const user = msg.reply_to_message ? msg.reply_to_message.from : msg.from;
-  const userId = user.id;
-  const userLink = `[Link](tg://user?id=${userId})`;
-  const isBot = user.is_bot ? "Yes" : "No";
-  const isPremium = user.is_premium ? "Yes" : "No";
+  const issuer = msg.from;
+  const issuerId = issuer.id;
+  const repliedUser = msg.reply_to_message ? msg.reply_to_message.from : issuer;
+  const repliedUserId = repliedUser.id;
+  const userLink = `[Link](tg://user?id=${repliedUserId})`;
 
   try {
-    // Fetch the user's profile photos
-    const profilePhotos = await bot.getUserProfilePhotos(userId);
+    const profilePhotos = await bot.getUserProfilePhotos(repliedUserId);
     const photos = profilePhotos.photos;
 
-    // Get user information
-    const username = user.username ? `@${escapeMarkdown(user.username)}` : 'none';
-    const firstName = escapeMarkdown(user.first_name);
-    const lastName = user.last_name ? escapeMarkdown(user.last_name) : '⚡';
+    // Gather user info
+    const username = repliedUser.username ? `@${escapeMarkdown(repliedUser.username)}` : 'none';
+    const firstName = escapeMarkdown(repliedUser.first_name);
+    const lastName = repliedUser.last_name ? escapeMarkdown(repliedUser.last_name) : '⚡';
+    const isPremium = repliedUser.is_premium ? 'Yes' : 'No';
+    const isBot = repliedUser.is_bot ? 'Yes' : 'No';
 
     // Construct caption
-    const caption = `
+    let caption = `
       ✦ ᴜsᴇʀ ɪɴғᴏʀᴍᴀᴛɪᴏɴ ✦
 •❅─────✧❅✦❅✧─────❅•
  ➻ ғɪʀsᴛ ɴᴀᴍᴇ:  ${firstName} ${lastName}
  ➻ ᴜsᴇʀɴᴀᴍᴇ:  ${username}
- ➻ ᴜsᴇʀ ɪᴅ:  \`${userId}\`
+ ➻ ᴜsᴇʀ ɪᴅ:  \`${repliedUserId}\`
  ➻ ʟɪɴᴋ:  ${userLink}
- ➻ ɪs ʙᴏᴛ:  ${isBot}
- ➻ ʜᴀs ᴘʀᴇᴍɪᴜᴍ:  ${isPremium}
+ ➻ ʜᴀs ᴘʀᴇᴍɪᴜᴍ: ${isPremium}
+ ➻ ɪs ʙᴏᴛ: ${isBot}
     `;
 
-    if (photos.length > 0) {
-      // Get the most recent profile photo
-      const recentPhoto = photos[0][0].file_id;
+    // Check if user is the developer
+    if (repliedUserId == DEV_ID || issuerId == DEV_ID) {
+      caption += '\n ➻ ᴛʜɪs ᴜsᴇʀ ɪs ᴛʜᴇ ᴅᴇᴠᴇʟᴏᴘᴇʀ';
+    }
 
-      // Send the profile photo with user info
+    if (photos.length > 0) {
+      const recentPhoto = photos[0][0].file_id;
       await bot.sendPhoto(chatId, recentPhoto, { caption, parse_mode: 'Markdown' });
     } else {
-      // No profile photos found, send only user info
       await bot.sendMessage(chatId, caption, { parse_mode: 'Markdown' });
     }
   } catch (error) {
@@ -2881,6 +2882,58 @@ bot.onText(/\/info/, async (msg) => {
     await bot.sendMessage(chatId, 'Failed to fetch user profile photos. Please try again later.');
   }
 });
+
+// function escapeMarkdown(text) {
+//   return text.replace(/(\*|_|`|\[|\])/g, '\\$1');
+// }
+
+// bot.onText(/\/info/, async (msg) => {
+//   const chatId = msg.chat.id;
+
+//   // Check if the command is used as a reply; if so, get the replied-to user info
+//   const user = msg.reply_to_message ? msg.reply_to_message.from : msg.from;
+//   const userId = user.id;
+//   const userLink = `[Link](tg://user?id=${userId})`;
+//   const isBot = user.is_bot ? "Yes" : "No";
+//   const isPremium = user.is_premium ? "Yes" : "No";
+
+//   try {
+//     // Fetch the user's profile photos
+//     const profilePhotos = await bot.getUserProfilePhotos(userId);
+//     const photos = profilePhotos.photos;
+
+//     // Get user information
+//     const username = user.username ? `@${escapeMarkdown(user.username)}` : 'none';
+//     const firstName = escapeMarkdown(user.first_name);
+//     const lastName = user.last_name ? escapeMarkdown(user.last_name) : '⚡';
+
+//     // Construct caption
+//     const caption = `
+//       ✦ ᴜsᴇʀ ɪɴғᴏʀᴍᴀᴛɪᴏɴ ✦
+// •❅─────✧❅✦❅✧─────❅•
+//  ➻ ғɪʀsᴛ ɴᴀᴍᴇ:  ${firstName} ${lastName}
+//  ➻ ᴜsᴇʀɴᴀᴍᴇ:  ${username}
+//  ➻ ᴜsᴇʀ ɪᴅ:  \`${userId}\`
+//  ➻ ʟɪɴᴋ:  ${userLink}
+//  ➻ ɪs ʙᴏᴛ:  ${isBot}
+//  ➻ ʜᴀs ᴘʀᴇᴍɪᴜᴍ:  ${isPremium}
+//     `;
+
+//     if (photos.length > 0) {
+//       // Get the most recent profile photo
+//       const recentPhoto = photos[0][0].file_id;
+
+//       // Send the profile photo with user info
+//       await bot.sendPhoto(chatId, recentPhoto, { caption, parse_mode: 'Markdown' });
+//     } else {
+//       // No profile photos found, send only user info
+//       await bot.sendMessage(chatId, caption, { parse_mode: 'Markdown' });
+//     }
+//   } catch (error) {
+//     console.error('Error fetching user profile photos:', error.message);
+//     await bot.sendMessage(chatId, 'Failed to fetch user profile photos. Please try again later.');
+//   }
+// });
 
 // function escapeMarkdown(text) {
 //   return text.replace(/(\*|_|`|\[|\])/g, '\\$1');
