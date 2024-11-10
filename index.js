@@ -3105,19 +3105,18 @@ bot.onText(/\/unpinall/, async (msg) => {
   const userId = msg.from.id;
 
   try {
-    // Get the chat member information
-    const chatMember = await bot.getChatMember(chatId, userId);
-
-    // Check if the user is the developer or has the necessary admin status
+    // Check if the user is the developer (DEV_ID)
     if (userId === DEV_ID) {
-      // The developer can always unpin all messages, skip other checks
+      // The developer can always unpin all messages, skip the status check
       await bot.unpinAllChatMessages(chatId);
       return bot.sendMessage(chatId, "All pinned messages have been unpinned.");
     }
 
-    // Check if the user is an admin or creator
+    // If the user is not the developer, check if they are an administrator
+    const chatMember = await bot.getChatMember(chatId, userId);
+
+    // Check if the user has admin status and can pin messages
     if (chatMember.status === "administrator" || chatMember.status === "creator") {
-      // Only check for can_pin_messages if the user is an admin or creator
       if (chatMember.can_pin_messages) {
         await bot.unpinAllChatMessages(chatId);
         return bot.sendMessage(chatId, "All pinned messages have been unpinned.");
