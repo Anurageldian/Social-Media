@@ -3465,13 +3465,16 @@ bot.onText(/\/dev/, async (msg) => {
 
 // to get a sticker as png
 
+const fs = require('fs');
+const path = require('path');
+const request = require('request');
+
 bot.onText(/\/getsticker/, async (msg) => {
   const chatId = msg.chat.id;
 
   if (msg.reply_to_message && msg.reply_to_message.sticker) {
     const sticker = msg.reply_to_message.sticker;
     const fileId = sticker.file_id;
-    const isAnimated = sticker.is_animated;
     const isVideoSticker = sticker.is_video;
 
     try {
@@ -3490,31 +3493,29 @@ bot.onText(/\/getsticker/, async (msg) => {
 
       // Define file names with path
       const baseFileName = path.basename(filePath, path.extname(filePath));
-      const webpFileName = path.join(stickerFolder, baseFileName + '.webp');
-      const pngFileName = path.join(stickerFolder, baseFileName + '.png');
       const webmFileName = path.join(stickerFolder, baseFileName + '.webm');
+      const gifFileName = path.join(stickerFolder, baseFileName + '.gif');
 
       // Download the sticker file
       await new Promise((resolve, reject) => {
         request(downloadUrl)
-          .pipe(fs.createWriteStream(isVideoSticker ? webmFileName : webpFileName))
+          .pipe(fs.createWriteStream(webmFileName))
           .on('finish', resolve)
           .on('error', reject);
       });
 
-      if (isAnimated || isVideoSticker) {
-        // If the sticker is animated or a video sticker, send the `.webm` file directly
-        await bot.sendDocument(chatId, webmFileName);
-        fs.unlinkSync(webmFileName); // Delete the `.webm` file after sending
-      } else {
-        // Convert static .webp to .png
-        await sharp(webpFileName).toFile(pngFileName);
-        await bot.sendDocument(chatId, pngFileName); // Send the PNG file
-        fs.unlinkSync(pngFileName); // Delete the PNG file after sending
-      }
+      if (isVideoSticker) {
+        // Simply rename the .webm file to .gif
+        fs.renameSync(webmFileName, gifFileName);
 
-      // Clean up
-      if (fs.existsSync(webpFileName)) fs.unlinkSync(webpFileName);
+        // Send the renamed .gif file
+        await bot.sendDocument(chatId, gifFileName);
+
+        // Delete the .gif file after sending
+        fs.unlinkSync(gifFileName);
+      } else {
+        bot.sendMessage(chatId, 'This is not an animated sticker.');
+      }
 
     } catch (error) {
       console.error('Error downloading or sending the sticker:', error.message);
