@@ -2841,6 +2841,8 @@ bot.onText(/\/info/, async (msg) => {
   const user = msg.reply_to_message ? msg.reply_to_message.from : msg.from;
   const userId = user.id;
   const userLink = `[Link](tg://user?id=${userId})`;
+  const isBot = user.is_bot ? "Yes" : "No";
+  const isPremium = user.is_premium ? "Yes" : "No";
 
   try {
     // Fetch the user's profile photos
@@ -2860,6 +2862,8 @@ bot.onText(/\/info/, async (msg) => {
  ➻ ᴜsᴇʀɴᴀᴍᴇ:  ${username}
  ➻ ᴜsᴇʀ ɪᴅ:  \`${userId}\`
  ➻ ʟɪɴᴋ:  ${userLink}
+ ➻ ɪs ʙᴏᴛ:  ${isBot}
+ ➻ ɪs ᴘʀᴇᴍɪᴜᴍ:  ${isPremium}
     `;
 
     if (photos.length > 0) {
@@ -2877,6 +2881,54 @@ bot.onText(/\/info/, async (msg) => {
     await bot.sendMessage(chatId, 'Failed to fetch user profile photos. Please try again later.');
   }
 });
+
+// function escapeMarkdown(text) {
+//   return text.replace(/(\*|_|`|\[|\])/g, '\\$1');
+// }
+
+// bot.onText(/\/info/, async (msg) => {
+//   const chatId = msg.chat.id;
+
+//   // Check if the command is used as a reply; if so, get the replied-to user info
+//   const user = msg.reply_to_message ? msg.reply_to_message.from : msg.from;
+//   const userId = user.id;
+//   const userLink = `[Link](tg://user?id=${userId})`;
+
+//   try {
+//     // Fetch the user's profile photos
+//     const profilePhotos = await bot.getUserProfilePhotos(userId);
+//     const photos = profilePhotos.photos;
+
+//     // Get user information
+//     const username = user.username ? `@${escapeMarkdown(user.username)}` : 'none';
+//     const firstName = escapeMarkdown(user.first_name);
+//     const lastName = user.last_name ? escapeMarkdown(user.last_name) : '⚡';
+
+//     // Construct caption
+//     const caption = `
+//       ✦ ᴜsᴇʀ ɪɴғᴏʀᴍᴀᴛɪᴏɴ ✦
+// •❅─────✧❅✦❅✧─────❅•
+//  ➻ ғɪʀsᴛ ɴᴀᴍᴇ:  ${firstName} ${lastName}
+//  ➻ ᴜsᴇʀɴᴀᴍᴇ:  ${username}
+//  ➻ ᴜsᴇʀ ɪᴅ:  \`${userId}\`
+//  ➻ ʟɪɴᴋ:  ${userLink}
+//     `;
+
+//     if (photos.length > 0) {
+//       // Get the most recent profile photo
+//       const recentPhoto = photos[0][0].file_id;
+
+//       // Send the profile photo with user info
+//       await bot.sendPhoto(chatId, recentPhoto, { caption, parse_mode: 'Markdown' });
+//     } else {
+//       // No profile photos found, send only user info
+//       await bot.sendMessage(chatId, caption, { parse_mode: 'Markdown' });
+//     }
+//   } catch (error) {
+//     console.error('Error fetching user profile photos:', error.message);
+//     await bot.sendMessage(chatId, 'Failed to fetch user profile photos. Please try again later.');
+//   }
+// });
 
 
 // function escapeMarkdown(text) {
