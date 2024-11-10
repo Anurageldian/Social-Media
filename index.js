@@ -3705,16 +3705,26 @@ bot.onText(/\/chatinfo/, async (msg) => {
     // Check if join by request is enabled
     const joinByRequest = chat.join_by_request ? 'Yes' : 'No';
 
-    // Retrieve pinned message
+    // Retrieve pinned message from msg (not chat)
     let pinnedMessage = 'No pinned message';
-    if (chat.pinned_message) {
-      pinnedMessage = chat.pinned_message.text || 'No pinned text';
+    if (msg.pinned_message) {
+      pinnedMessage = msg.pinned_message.text || 'No pinned text';
     }
 
     // Retrieve invite link (if available)
     let inviteLink = 'No invite link';
     if (chat.invite_link) {
       inviteLink = chat.invite_link;
+    } else {
+      try {
+        // Attempt to get the invite link using the bot's API
+        const chatDetails = await bot.getChat(chatId);
+        if (chatDetails.invite_link) {
+          inviteLink = chatDetails.invite_link;
+        }
+      } catch (error) {
+        console.error('Error fetching invite link:', error);
+      }
     }
 
     // Retrieve group profile photo
