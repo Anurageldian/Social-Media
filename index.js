@@ -1,4 +1,4 @@
-/* required to disable the deprecation warning, 
+// /* required to disable the deprecation warning, 
 will be fixed when node-telegram-bot-api gets a new update */
 require('dotenv').config()
 process.env['NTBA_FIX_350'] = 1
@@ -762,7 +762,6 @@ bot.onText(/\/purge/, async (msg) => {
   // Check if the user is the developer or has the necessary permissions
   if (String(userId) === String(process.env.DEV_ID)) {
     // Developer can delete messages without admin rights
-    console.log("Developer executing purge.");
   } else {
     const user = await bot.getChatMember(chatId, userId);
     if (user.status !== 'administrator' && user.status !== 'creator') {
