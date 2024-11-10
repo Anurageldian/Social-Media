@@ -3678,6 +3678,67 @@ bot.onText(/\/getsticker/, async (msg) => {
   }
 });
 
+//chat info
+
+bot.onText(/\/chatinfo/, async (msg) => {
+  const chatId = msg.chat.id;
+  const chat = msg.chat;
+
+  try {
+    // Gather basic chat information
+    const chatType = chat.type; // private, group, supergroup, channel
+    const chatTitle = chat.title || 'No Title';
+    const chatDescription = chat.description || 'No Description';
+    const chatMembersCount = chat.members_count || 'N/A';
+    const chatInviteLink = chat.invite_link || 'No invite link available';
+
+    // Check if the chat has a photo
+    const photo = chat.photo ? chat.photo.small_file_id : null; // Get small photo file_id for use
+    // Chat's accent color ID
+    const accentColor = chat.accent_color_id || 'No accent color';
+    // Max reactions count for reactions
+    const maxReactionCount = chat.max_reaction_count || 'N/A';
+    // Check if the chat is a forum
+    const isForum = chat.is_forum ? 'Yes' : 'No';
+
+    // Check if join by request is enabled
+    const joinByRequest = chat.join_by_request ? 'Yes' : 'No';
+
+    // Get the pinned message (if available)
+    let pinnedMessage = 'No pinned message';
+    if (chat.pinned_message) {
+      pinnedMessage = chat.pinned_message.text || 'No text in pinned message';
+    }
+
+    // Construct the caption with all gathered information
+    let caption = `
+      ✦ ᴄʜᴀᴛ ɪɴғᴏ ✦
+•❅─────✧❅✦❅✧─────❅•
+ ➻ ᴄʜᴀᴛ ᴛʏᴘᴇ: ${chatType}
+ ➻ ᴄʜᴀᴛ ᴛɪᴛʟᴇ: ${chatTitle}
+ ➻ ᴄʜᴀᴛ ᴅᴇsᴄʀɪᴘᴛɪᴏɴ: ${chatDescription}
+ ➻ ᴄʜᴀᴛ ᴍᴇᴍʙᴇʀs ᴄᴏᴜɴᴛ: ${chatMembersCount}
+ ➻ ᴄʜᴀᴛ ɪɴᴠɪᴛᴇ ʟɪɴᴋ: ${chatInviteLink}
+ ➻ ᴀᴄᴄᴇɴᴛ ᴄᴏʟᴏʀ: ${accentColor}
+ ➻ ᴍᴀx ʀᴇᴀᴄᴛɪᴏɴs: ${maxReactionCount}
+ ➻ ɪs ɪᴛ ᴀ ғᴏʀᴜᴍ?: ${isForum}
+ ➻ ᴊᴏɪɴ ʙʏ ʀᴇǫᴜᴇsᴛ: ${joinByRequest}
+ ➻ ᴘɪɴɴᴇᴅ ᴍᴇssᴀɢᴇ: ${pinnedMessage}
+    `;
+
+    if (photo) {
+      // Send the profile photo along with the caption
+      await bot.sendPhoto(chatId, photo, { caption, parse_mode: 'Markdown' });
+    } else {
+      // Send the info without the photo if no photo is available
+      await bot.sendMessage(chatId, caption, { parse_mode: 'Markdown' });
+    }
+
+  } catch (error) {
+    console.error('Error fetching chat information:', error.message);
+    await bot.sendMessage(chatId, 'Failed to fetch chat information. Please try again later.');
+  }
+});
 
 // bot.onText(/\/getsticker/, async (msg) => {
 //   const chatId = msg.chat.id;
