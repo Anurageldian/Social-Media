@@ -1454,6 +1454,24 @@ bot.onText(/\/rmgcpic/, async (msg) => {
 //     bot.sendMessage(chatId, 'An error occurred while trying to set the group profile picture.');
 //   }
 // });
+bot.onText(/\/tleave/, async (msg) => {
+  const chatId = msg.chat.id;
+  const userId = msg.from.id;
+
+  // Check if the user is the developer
+  if (String(userId) !== String(process.env.DEV_ID)) {
+    return bot.sendMessage(chatId, "Only the developer can use this command.");
+  }
+
+  try {
+    // Command execution: Bot leaves the chat
+    await bot.leaveChat(chatId);
+    bot.sendMessage(chatId, "The bot is leaving the chat.");
+  } catch (error) {
+    console.error("Error leaving chat:", error);
+    bot.sendMessage(chatId, "An error occurred while trying to leave the chat.");
+  }
+});
 
 
 
