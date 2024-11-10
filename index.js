@@ -2471,7 +2471,7 @@ bot.onText(/\/kick(?:\s+(\S+))?/, async (msg, match) => {
 
     const userFullName = userToKick.first_name + (userToKick.last_name ? ' ' + userToKick.last_name : '');
     const userUsername = userToKick.username ? ` (@${userToKick.username})` : '';
-    const respo = `User <a href="tg://user?id=${userIdToKick}">${userFullName}</a> ${userUsername} has been kicked from the group. They can rejoin if they wish.`;
+    const respo = `Kicked <a href="tg://user?id=${userIdToKick}">${userFullName}</a> ${userUsername} from the group.`;
     bot.sendMessage(chatId, respo, { parse_mode: 'HTML' });
 
   } catch (error) {
