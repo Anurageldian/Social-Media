@@ -1,4 +1,4 @@
-// /* required to disable the deprecation warning, 
+/* required to disable the deprecation warning, 
 will be fixed when node-telegram-bot-api gets a new update */
 require('dotenv').config()
 process.env['NTBA_FIX_350'] = 1
