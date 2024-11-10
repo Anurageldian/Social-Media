@@ -1735,10 +1735,10 @@ bot.onText(/\/promote(?:\s+(\S+))?(?:\s+(.+))?/, async (msg, match) => {
 
 
 //full promote
-bot.onText(/\/fullpromote (\S+)(?:\s+(.+))?/, async (msg, match) => {
+bot.onText(/\/fpromote(?:\s+(\S+))?(?:\s+(.+))?/, async (msg, match) => {
   const chatId = msg.chat.id;
-  const userIdOrUsernameToPromote = match[1].trim();
-  const customTitle = match[2] ? match[2].trim() : '';  // Capture custom title if provided
+  const userIdOrUsernameToPromote = match[1] ? match[1].trim() : null;
+  const customTitle = match[2] ? match[2].trim() : (msg.reply_to_message ? match[1] : '');  // Handle custom title in reply case
   const issuerId = msg.from.id;
 
   try {
@@ -1756,7 +1756,8 @@ bot.onText(/\/fullpromote (\S+)(?:\s+(.+))?/, async (msg, match) => {
       // If the command is in reply to a message, use the ID of the message's author
       userIdToPromote = msg.reply_to_message.from.id;
       userToPromote = msg.reply_to_message.from;
-    } else {
+    } else if (userIdOrUsernameToPromote) {
+      // Handle direct user ID or username
       if (userIdOrUsernameToPromote.startsWith('@')) {
         // Identifier is a username
         const username = userIdOrUsernameToPromote.slice(1);
@@ -1791,6 +1792,8 @@ bot.onText(/\/fullpromote (\S+)(?:\s+(.+))?/, async (msg, match) => {
           return;
         }
       }
+    } else {
+      return bot.sendMessage(chatId, 'Please specify a user to promote or reply to their message with /promote.');
     }
 
     // Promote the user
@@ -1803,8 +1806,8 @@ bot.onText(/\/fullpromote (\S+)(?:\s+(.+))?/, async (msg, match) => {
       can_post_stories: true,
       can_edit_stories: true,
       can_delete_stories: true,
-      can_manage_video_chats:true,
-      can_manage_topics:true,
+      can_manage_video_chats: true,
+      can_manage_topics: true,
       can_promote_members: true // Set as needed
     });
 
@@ -1821,7 +1824,7 @@ bot.onText(/\/fullpromote (\S+)(?:\s+(.+))?/, async (msg, match) => {
     // Construct the success message
     const userFullName = userToPromote.first_name + (userToPromote.last_name ? ' ' + userToPromote.last_name : '');
     const userUsername = userToPromote.username ? ` (@${userToPromote.username})` : '';
-    const respo = `User <a href="tg://user?id=${userIdToPromote}">${userFullName}</a> ${userUsername} has been fully promoted${customTitle ? ` with the title "${customTitle}"` : ''}.`;
+    const respo = `User <a href="tg://user?id=${userIdToPromote}">${userFullName}</a> ${userUsername} has been promoted${customTitle ? ` with the title "${customTitle}"` : ''}.`;
     bot.sendMessage(chatId, respo, { parse_mode: 'HTML' });
 
   } catch (error) {
