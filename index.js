@@ -3103,7 +3103,7 @@ bot.onText(/\/info(?: (\d+))?/, async (msg, match) => {
 bot.onText(/\/unpinall/, async (msg) => {
   const chatId = msg.chat.id;
   const userId = msg.from.id;
-
+  const chatMember = await bot.getChatMember(chatId, userId);
   try {
     // Check if user is the developer
     if (userId === DEV_ID) {
@@ -3112,8 +3112,7 @@ bot.onText(/\/unpinall/, async (msg) => {
     }
 
     // Check if user is an admin with pinning permissions
-    const chatMember = await bot.getChatMember(chatId, userId);
-    if (chatMember.status === "administrator" || chatMember.status === "creator") {
+    else (chatMember.status === "administrator" || chatMember.status === "creator") {
       if (chatMember.can_pin_messages) {
         await bot.unpinAllChatMessages(chatId);
         return bot.sendMessage(chatId, "All pinned messages have been unpinned.");
