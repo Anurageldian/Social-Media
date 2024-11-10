@@ -2937,9 +2937,9 @@ bot.onText(/\/info(?: (\d+))?/, async (msg, match) => {
 
     if (photos.length > 0) {
       const recentPhoto = photos[0][0].file_id;
-      await bot.sendPhoto(chatId, recentPhoto, { caption, parse_mode: 'Markdown' }, { reply_to_message_id: msg.message_id });
+      await bot.sendPhoto(chatId, { reply_to_message_id: msg.message_id }, recentPhoto, { caption, parse_mode: 'Markdown' });
     } else {
-      await bot.sendMessage(chatId, caption, { parse_mode: 'Markdown' }, { reply_to_message_id: msg.message_id });
+      await bot.sendMessage(chatId, { reply_to_message_id: msg.message_id }, caption, { parse_mode: 'Markdown' });
     }
   } catch (error) {
     console.error('Error fetching user information:', error.message);
