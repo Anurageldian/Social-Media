@@ -3461,58 +3461,53 @@ bot.onText(/\/dev/, async (msg) => {
   })
 });
 
-
-
 // to get a sticker as png
 
 bot.onText(/\/getsticker/, async (msg) => {
   const chatId = msg.chat.id;
-
+  const replyToMessageId = msg.message_id;
   if (msg.reply_to_message && msg.reply_to_message.sticker) {
     const sticker = msg.reply_to_message.sticker;
     const fileId = sticker.file_id;
     const isVideoSticker = sticker.is_video;
-
     try {
       // Get the file path
       const file = await bot.getFile(fileId);
       const filePath = file.file_path;
-
       // Construct the download URL
       const downloadUrl = `https://api.telegram.org/file/bot${bot.token}/${filePath}`;
       const stickerFolder = path.join(__dirname, 'stickers');
-
       // Ensure the stickers folder exists
       if (!fs.existsSync(stickerFolder)) {
         fs.mkdirSync(stickerFolder);
       }
-
       // Define file names with path
       const baseFileName = path.basename(filePath, path.extname(filePath));
       const webmFileName = path.join(stickerFolder, baseFileName + '.webm');
       const gifFileName = path.join(stickerFolder, baseFileName + '.gif');
-
+      const pngFileName = path.join(stickerFolder, baseFileName + '.png');
       // Download the sticker file
       await new Promise((resolve, reject) => {
         request(downloadUrl)
-          .pipe(fs.createWriteStream(webmFileName))
+          .pipe(fs.createWriteStream(isVideoSticker ? webmFileName : pngFileName))
           .on('finish', resolve)
           .on('error', reject);
       });
-
       if (isVideoSticker) {
-        // Simply rename the .webm file to .gif
+        // Rename the .webm file to .gif without conversion
         fs.renameSync(webmFileName, gifFileName);
-
-        // Send the renamed .gif file
-        await bot.sendDocument(chatId, gifFileName);
-
+        // Reply to the original message with the .gif file
+        await bot.sendDocument(chatId, gifFileName, { reply_to_message_id: replyToMessageId });
         // Delete the .gif file after sending
         fs.unlinkSync(gifFileName);
       } else {
-        bot.sendMessage(chatId, 'This is not an animated sticker.');
+        // For static stickers, convert the .webp to .png and send
+        await sharp(pngFileName).toFile(pngFileName);
+        // Reply to the original message with the .png file
+        await bot.sendDocument(chatId, pngFileName, { reply_to_message_id: replyToMessageId });
+        // Delete the .png file after sending
+        fs.unlinkSync(pngFileName);
       }
-
     } catch (error) {
       console.error('Error downloading or sending the sticker:', error.message);
       bot.sendMessage(chatId, 'Error downloading or sending the sticker.');
