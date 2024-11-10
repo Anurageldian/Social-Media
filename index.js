@@ -759,24 +759,28 @@ bot.onText(/\/purge/, async (msg) => {
   // Get the starting message ID from the reply
   const purgeStartMessageId = msg.reply_to_message.message_id;
 
-  // Check if the user is the developer or an admin
-  if (String(userId) !== String(process.env.DEV_ID)) {
+  // Check if the user is the developer or has the necessary permissions
+  if (String(userId) === String(process.env.DEV_ID)) {
+    // Developer can delete messages without admin rights
+    console.log("Developer executing purge.");
+  } else {
     const user = await bot.getChatMember(chatId, userId);
     if (user.status !== 'administrator' && user.status !== 'creator') {
       return bot.sendMessage(chatId, "Only admins or the developer can use the /purge command.");
+    }
+
+    // Check if the user has 'can_delete_messages' permission
+    if (!user.can_delete_messages) {
+      return bot.sendMessage(chatId, "You do not have permission to delete messages.");
     }
   }
 
   // Initialize a counter for deleted messages
   let deletedCount = 0;
 
-  // Get the latest message in the chat to determine the end of the purge range
-  const chatMessages = await bot.getChatHistory(chatId, { limit: 1 });
-  const purgeEndMessageId = chatMessages[0].message_id;
-
-  // Purge messages from purgeStartMessageId to purgeEndMessageId
+  // Loop through and delete messages starting from the replied message
   try {
-    for (let messageId = purgeStartMessageId; messageId <= purgeEndMessageId; messageId++) {
+    for (let messageId = purgeStartMessageId; messageId <= msg.message_id; messageId++) {
       try {
         // Attempt to delete each message
         await bot.deleteMessage(chatId, messageId);
@@ -797,6 +801,7 @@ bot.onText(/\/purge/, async (msg) => {
     bot.sendMessage(chatId, "An error occurred while purging messages.");
   }
 });
+
 
 // bot.onText(/\/purge/, async (msg) => {
 //   const chatId = msg.chat.id;
