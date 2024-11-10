@@ -3103,16 +3103,18 @@ bot.onText(/\/info(?: (\d+))?/, async (msg, match) => {
 bot.onText(/\/unpinall/, async (msg) => {
   const chatId = msg.chat.id;
   const userId = msg.from.id;
-  const chatMember = await bot.getChatMember(chatId, userId);
+
   try {
     // Check if user is the developer
     if (userId === DEV_ID) {
+      // Developer can unpin all messages regardless of admin status
       await bot.unpinAllChatMessages(chatId);
       return bot.sendMessage(chatId, "All pinned messages have been unpinned by the developer.");
     }
 
     // Check if user is an admin with pinning permissions
-    else (chatMember.status === "administrator" || chatMember.status === "creator") {
+    const chatMember = await bot.getChatMember(chatId, userId);
+    if (chatMember.status === "administrator" || chatMember.status === "creator") {
       if (chatMember.can_pin_messages) {
         await bot.unpinAllChatMessages(chatId);
         return bot.sendMessage(chatId, "All pinned messages have been unpinned.");
@@ -3127,6 +3129,7 @@ bot.onText(/\/unpinall/, async (msg) => {
     await bot.sendMessage(chatId, "Failed to unpin messages. Please try again later.");
   }
 });
+
 
 
 //list files for the ids 
