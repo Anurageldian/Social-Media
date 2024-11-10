@@ -193,7 +193,7 @@ bot.onText(/\/start/, async (msg) => {
     ],
     
   ];
-  bot.sendSticker(chatId, CAACAgIAAyEFAASFOt6LAAIF5Gcwxhv8fMgV1fm9fcGsmhYqjkUuAAJOMQACGMIJSDPYnqknc-L2NgQ);
+  bot.sendSticker(msg.chat.id, CAACAgIAAyEFAASFOt6LAAIF5Gcwxhv8fMgV1fm9fcGsmhYqjkUuAAJOMQACGMIJSDPYnqknc-L2NgQ);
   let response = await bot.sendPhoto(msg.chat.id, 'https://telegra.ph/file/57fabcc59ac97735de40b.jpg', {
     caption:
 `ʜᴇʟʟᴏ ɪ ᴀᴍ <b><i>${botName}</i></b>
