@@ -3105,33 +3105,26 @@ bot.onText(/\/unpinall/, async (msg) => {
   const userId = msg.from.id;
 
   try {
-    // If the command issuer is the developer, bypass admin checks
-    if (userId === DEV_ID) {
-      await bot.unpinAllChatMessages(chatId);
-      return bot.sendMessage(chatId, "All pinned messages have been unpinned by the developer.");
-    }
-
-    // Check if the command issuer is an admin with 'can_pin_messages'
+    // Check if the command issuer is the developer
     const chatMember = await bot.getChatMember(chatId, userId);
-    
-    if (chatMember.status === "administrator" || chatMember.status === "creator") {
-      if (chatMember.can_pin_messages) {
+
+    // Check if the user is the developer or has admin status with pin permissions
+    if (userId === DEV_ID || chatMember.status === "administrator" || chatMember.status === "creator") {
+      // If they are an admin or the creator, check if they have the 'can_pin_messages' permission
+      if (chatMember.can_pin_messages || userId === DEV_ID) {
         await bot.unpinAllChatMessages(chatId);
         return bot.sendMessage(chatId, "All pinned messages have been unpinned.");
       } else {
         return bot.sendMessage(chatId, "You do not have permission to unpin messages.");
       }
     } else {
-      return bot.sendMessage(chatId, "Only an administrator with pin permissions can use this command.");
+      return bot.sendMessage(chatId, "Only an administrator or the developer can unpin all messages.");
     }
   } catch (error) {
     console.error("Error unpinning messages:", error.message);
     await bot.sendMessage(chatId, "Failed to unpin messages. Please try again later.");
   }
 });
-
-
-
 
 //list files for the ids 
 bot.onText(/\/listfiles/, async (msg) => {
