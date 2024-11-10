@@ -3465,7 +3465,6 @@ bot.onText(/\/dev/, async (msg) => {
 
 bot.onText(/\/getsticker/, async (msg) => {
   const chatId = msg.chat.id;
-  const replyToMessageId = msg.message_id;
   if (msg.reply_to_message && msg.reply_to_message.sticker) {
     const sticker = msg.reply_to_message.sticker;
     const fileId = sticker.file_id;
@@ -3483,29 +3482,30 @@ bot.onText(/\/getsticker/, async (msg) => {
       }
       // Define file names with path
       const baseFileName = path.basename(filePath, path.extname(filePath));
-      const webmFileName = path.join(stickerFolder, baseFileName + '.webm');
-      const gifFileName = path.join(stickerFolder, baseFileName + '.gif');
+      const webpFileName = path.join(stickerFolder, baseFileName + '.webp');
       const pngFileName = path.join(stickerFolder, baseFileName + '.png');
+      const gifFileName = path.join(stickerFolder, baseFileName + '.gif');
       // Download the sticker file
       await new Promise((resolve, reject) => {
         request(downloadUrl)
-          .pipe(fs.createWriteStream(isVideoSticker ? webmFileName : pngFileName))
+          .pipe(fs.createWriteStream(isVideoSticker ? webpFileName : webpFileName))
           .on('finish', resolve)
           .on('error', reject);
       });
       if (isVideoSticker) {
-        // Rename the .webm file to .gif without conversion
-        fs.renameSync(webmFileName, gifFileName);
-        // Reply to the original message with the .gif file
-        await bot.sendDocument(chatId, gifFileName, { reply_to_message_id: replyToMessageId });
-        // Delete the .gif file after sending
+        // Rename the .webm file to .gif for animated stickers
+        fs.renameSync(webpFileName, gifFileName);
+        // Send the .gif file as a reply to the command
+        await bot.sendDocument(chatId, gifFileName, { reply_to_message_id: msg.message_id });
+        // Clean up by deleting the .gif file
         fs.unlinkSync(gifFileName);
       } else {
-        // For static stickers, convert the .webp to .png and send
-        await sharp(pngFileName).toFile(pngFileName);
-        // Reply to the original message with the .png file
-        await bot.sendDocument(chatId, pngFileName, { reply_to_message_id: replyToMessageId });
-        // Delete the .png file after sending
+        // Convert the .webp file to .png for static stickers
+        await sharp(webpFileName).toFile(pngFileName);
+        // Send the .png file as a reply to the command
+        await bot.sendDocument(chatId, pngFileName, { reply_to_message_id: msg.message_id });
+        // Clean up by deleting the .webp and .png files
+        fs.unlinkSync(webpFileName);
         fs.unlinkSync(pngFileName);
       }
     } catch (error) {
@@ -3516,6 +3516,7 @@ bot.onText(/\/getsticker/, async (msg) => {
     bot.sendMessage(chatId, 'Please reply to a sticker message to use this command.');
   }
 });
+
 
 // bot.onText(/\/getsticker/, async (msg) => {
 //   const chatId = msg.chat.id;
