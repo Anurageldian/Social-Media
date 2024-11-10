@@ -1824,7 +1824,7 @@ bot.onText(/\/fpromote(?:\s+(\S+))?(?:\s+(.+))?/, async (msg, match) => {
     // Construct the success message
     const userFullName = userToPromote.first_name + (userToPromote.last_name ? ' ' + userToPromote.last_name : '');
     const userUsername = userToPromote.username ? ` (@${userToPromote.username})` : '';
-    const respo = `User <a href="tg://user?id=${userIdToPromote}">${userFullName}</a> ${userUsername} has been promoted${customTitle ? ` with the title "${customTitle}"` : ''}.`;
+    const respo = `User <a href="tg://user?id=${userIdToPromote}">${userFullName}</a> ${userUsername} has been fully promoted${customTitle ? ` with the title "${customTitle}"` : ''}.`;
     bot.sendMessage(chatId, respo, { parse_mode: 'HTML' });
 
   } catch (error) {
@@ -2118,7 +2118,7 @@ bot.onText(/\/promoteme/, async (msg) => {
       can_promote_members: bot.can_promote_members || true // Set as needed
     });
 
-    bot.sendMessage(chatId, 'Promoted Cutie with available admin rights.');
+    bot.sendMessage(chatId, 'OwO Promoted Cutie in this chat.');
   } catch (error) {
     console.error('Promotion Error:', error.message);
     bot.sendMessage(chatId, `An error occurred: ${error.message}`);
