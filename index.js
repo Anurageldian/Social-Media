@@ -3110,7 +3110,7 @@ bot.onText(/\/unpinall/, async (msg) => {
     if (userId === parseInt(DEV_ID)) {
       // If the user is the developer, unpin all messages without further checks
       await bot.unpinAllChatMessages(chatId);
-      await bot.sendMessage(chatId, "All messages have been unpinned.");
+      await bot.sendMessage(chatId, "All messages have been unpinned by Developer.");
       return; // Prevent further checks for admins
     }
 
