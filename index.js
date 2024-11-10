@@ -924,7 +924,7 @@ bot.on('message', async (msg) => {
   const isJoinMessage = msg.new_chat_members;
   const isLeaveMessage = msg.left_chat_member;
   const isPinnedMessage = msg.pinned_message;
-  const isTitleChange = msg.group_chat_created || msg.supergroup_chat_created || msg.migrate_to_chat_id || msg.migrate_from_chat_id;
+  const isTitleChange = msg.group_chat_created || msg.supergroup_chat_created || msg.migrate_to_chat_id || msg.migrate_from_chat_id || msg.new_chat_photo || msg.delete_chat_photo;
   const isVideoChatMessage = msg.video_chat_started || msg.video_chat_ended || msg.video_chat_scheduled || msg.video_chat_participants_invited;
 
   // Only delete service messages that match the group setting
