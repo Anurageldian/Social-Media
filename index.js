@@ -3105,26 +3105,34 @@ bot.onText(/\/unpinall/, async (msg) => {
   const userId = msg.from.id;
 
   try {
-    // Check if the command issuer is the developer
+    // Get the chat member information
     const chatMember = await bot.getChatMember(chatId, userId);
 
-    // Check if the user is the developer or has admin status with pin permissions
-    if (userId === DEV_ID || chatMember.status === "administrator" || chatMember.status === "creator") {
-      // If they are an admin or the creator, check if they have the 'can_pin_messages' permission
-      if (chatMember.can_pin_messages || userId === DEV_ID) {
+    // Check if the user is the developer or has the necessary admin status
+    if (userId === DEV_ID) {
+      // The developer can always unpin all messages, skip other checks
+      await bot.unpinAllChatMessages(chatId);
+      return bot.sendMessage(chatId, "All pinned messages have been unpinned.");
+    }
+
+    // Check if the user is an admin or creator
+    if (chatMember.status === "administrator" || chatMember.status === "creator") {
+      // Only check for can_pin_messages if the user is an admin or creator
+      if (chatMember.can_pin_messages) {
         await bot.unpinAllChatMessages(chatId);
         return bot.sendMessage(chatId, "All pinned messages have been unpinned.");
       } else {
         return bot.sendMessage(chatId, "You do not have permission to unpin messages.");
       }
     } else {
-      return bot.sendMessage(chatId, "Only an administrator or the developer can unpin all messages.");
+      return bot.sendMessage(chatId, "Only the developer or an administrator can unpin all messages.");
     }
   } catch (error) {
     console.error("Error unpinning messages:", error.message);
     await bot.sendMessage(chatId, "Failed to unpin messages. Please try again later.");
   }
 });
+
 
 //list files for the ids 
 bot.onText(/\/listfiles/, async (msg) => {
