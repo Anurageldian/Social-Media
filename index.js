@@ -765,7 +765,7 @@ bot.onText(/\/purge/, async (msg) => {
   } else {
     const user = await bot.getChatMember(chatId, userId);
     if (user.status !== 'administrator' && user.status !== 'creator') {
-      return bot.sendMessage(chatId, "Only admins or the developer can use the /purge command.");
+      return bot.sendMessage(chatId, "Only admins can use the /purge command.");
     }
 
     // Check if the user has 'can_delete_messages' permission
