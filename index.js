@@ -2234,12 +2234,12 @@ bot.onText(/\/eldian(?:\s+(\S+))?(?:\s+(.+))?/, async (msg, match) => {
       can_manage_topics: true,
       can_promote_members: true
     });
-    
-    // Set the custom title if provided
+
+    // If a custom title is provided, set it
     if (customTitle) {
-      // Ensure the custom title length is within valid limits (e.g., 0-16 characters)
+      // Check for title length (0-16 characters)
       if (customTitle.length > 16) {
-        bot.sendMessage(chatId, 'Custom title must be 0-16 characters long.');
+        bot.sendMessage(chatId, 'Custom title must be between 1 and 16 characters.');
         return;
       }
 
