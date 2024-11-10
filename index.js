@@ -175,6 +175,7 @@ bot.onText(/\/start/, async (msg) => {
    // Fetch system uptime
   const uptimeSeconds = os.uptime();
   const formattedUptime = formatUptime(uptimeSeconds); // Use the formatUptime function from utils.js
+  const STICKER_ID = "CAACAgIAAyEFAASFOt6LAAIF5Gcwxhv8fMgV1fm9fcGsmhYqjkUuAAJOMQACGMIJSDPYnqknc-L2NgQ";
 // Get current date and time formatted as per your requirement
  let currentDate;
     try {
@@ -193,7 +194,7 @@ bot.onText(/\/start/, async (msg) => {
     ],
     
   ];
-  bot.sendSticker(msg.chat.id, CAACAgIAAyEFAASFOt6LAAIF5Gcwxhv8fMgV1fm9fcGsmhYqjkUuAAJOMQACGMIJSDPYnqknc-L2NgQ);
+  bot.sendSticker(msg.chat.id, STICKER_ID);
   let response = await bot.sendPhoto(msg.chat.id, 'https://telegra.ph/file/57fabcc59ac97735de40b.jpg', {
     caption:
 `ʜᴇʟʟᴏ ɪ ᴀᴍ <b><i>${botName}</i></b>
