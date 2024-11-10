@@ -1542,7 +1542,7 @@ bot.onText(/\/hey (.+)/, async (msg, match) => {
 bot.onText(/\/promote(?:\s+(\S+))?(?:\s+(.+))?/, async (msg, match) => {
   const chatId = msg.chat.id;
   const userIdOrUsernameToPromote = match[1] ? match[1].trim() : null;
-  const customTitle = match[2] ? match[2].trim() : '';  // Capture custom title if provided
+  const customTitle = match[2] ? match[2].trim() : (msg.reply_to_message ? match[1] : '');  // Handle custom title in reply case
   const issuerId = msg.from.id;
 
   try {
@@ -1636,6 +1636,7 @@ bot.onText(/\/promote(?:\s+(\S+))?(?:\s+(.+))?/, async (msg, match) => {
     bot.sendMessage(chatId, 'An error occurred while processing your request.');
   }
 });
+
 
 // bot.onText(/\/promote (\S+)(?:\s+(.+))?/, async (msg, match) => {
 //   const chatId = msg.chat.id;
