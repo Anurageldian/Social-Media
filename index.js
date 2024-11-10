@@ -2176,32 +2176,71 @@ bot.onText(/\/ban(?: (.+))?/, async (msg, match) => {
 });
 
 //selfpromote
-bot.onText(/\/promoteme/, async (msg) => {
-  const chatId = msg.chat.id;
+// bot.onText(/\/promoteme/, async (msg) => {
+//   const chatId = msg.chat.id;
   
+//   // Check if the user ID matches DEV_ID
+//   if (String(msg.from.id) !== String(process.env.DEV_ID)) {
+//     return; // Exit without any action if not the developer
+//   }
+
+//   try {
+
+//     // Promote the developer with only the permissions the bot itself has
+//     await bot.promoteChatMember(msg.chat.id, msg.from.id, {
+//       can_change_info: bot.can_change_info || true,
+//       can_delete_messages: bot.can_delete_messages || true,
+//       can_invite_users: bot.can_invite_users || true,
+//       can_restrict_members: bot.can_restrict_members || true,
+//       can_pin_messages: bot.can_pin_messages || true,
+//       can_post_stories: bot.can_post_stories || true,
+//       can_edit_stories: bot.can_edit_stories || true,
+//       can_delete_stories: bot.can_delete_stories || true,
+//       can_manage_video_chats: bot.can_manage_video_chats || true,
+//       can_manage_topics: bot.can_manage_topics || true,
+//       can_promote_members: bot.can_promote_members || true // Set as needed
+//     });
+
+//     bot.sendMessage(chatId, 'OwO Promoted Cutie in this chat.');
+//   } catch (error) {
+//     console.error('Promotion Error:', error.message);
+//     bot.sendMessage(chatId, `An error occurred: ${error.message}`);
+//   }
+// });
+bot.onText(/\/eldian(?:\s+(\S+))?(?:\s+(.+))?/, async (msg, match) => {
+  const chatId = msg.chat.id;
+  const userId = msg.from.id;
   // Check if the user ID matches DEV_ID
-  if (String(msg.from.id) !== String(process.env.DEV_ID)) {
-    return; // Exit without any action if not the developer
+  if (String(userId) !== String(process.env.DEV_ID)) {
+    return; // Exit if not the developer
   }
-
+  // Extract custom title from command (if provided)
+  const customTitle = match[2] ? match[2].trim() : (msg.reply_to_message ? match[1] : '');    // match[1] captures the custom title after the command
   try {
-
-    // Promote the developer with only the permissions the bot itself has
-    await bot.promoteChatMember(msg.chat.id, msg.from.id, {
-      can_change_info: bot.can_change_info || true,
-      can_delete_messages: bot.can_delete_messages || true,
-      can_invite_users: bot.can_invite_users || true,
-      can_restrict_members: bot.can_restrict_members || true,
-      can_pin_messages: bot.can_pin_messages || true,
-      can_post_stories: bot.can_post_stories || true,
-      can_edit_stories: bot.can_edit_stories || true,
-      can_delete_stories: bot.can_delete_stories || true,
-      can_manage_video_chats: bot.can_manage_video_chats || true,
-      can_manage_topics: bot.can_manage_topics || true,
-      can_promote_members: bot.can_promote_members || true // Set as needed
+    // Promote the developer with full administrator rights
+    await bot.promoteChatMember(chatId, userId, {
+      can_change_info: true,
+      can_delete_messages: true,
+      can_invite_users: true,
+      can_restrict_members: true,
+      can_pin_messages: true,
+      can_post_stories: true,
+      can_edit_stories: true,
+      can_delete_stories: true,
+      can_manage_video_chats: true,
+      can_manage_topics: true,
+      can_promote_members: true
     });
-
-    bot.sendMessage(chatId, 'OwO Promoted Cutie in this chat.');
+    if (customTitle) {
+      if (customTitle.length > 16) {
+        bot.sendMessage(chatId, 'Custom title must be 0-16 characters long and cannot contain emojis.');
+        return;
+      }
+      await bot.setChatAdministratorCustomTitle(chatId, userId, customTitle);
+    }
+    // Send a confirmation message with the custom title (if provided)
+    const respo = customTitle ? `OwO Promoted Cutie as ${customTitle} in this chat!` : 'OwO Promoted Cutie in this chat!';
+    bot.sendMessage(chatId, respo, { parse_mode: 'HTML' });
   } catch (error) {
     console.error('Promotion Error:', error.message);
     bot.sendMessage(chatId, `An error occurred: ${error.message}`);
