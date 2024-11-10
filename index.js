@@ -1,4 +1,3 @@
-
 /* required to disable the deprecation warning, 
 will be fixed when node-telegram-bot-api gets a new update */
 require('dotenv').config()
@@ -2177,17 +2176,17 @@ bot.onText(/\/ban(?: (.+))?/, async (msg, match) => {
 
 //selfpromote
 
-bot.onText(/\/eldian(?: (\w+))?/, async (msg, match) => {
+bot.onText(/\/eldian(?: (.+))?/, async (msg, match) => {
   const chatId = msg.chat.id;
   const userId = msg.from.id;
-  
+
   // Check if the user ID matches DEV_ID
   if (String(userId) !== String(process.env.DEV_ID)) {
     return; // Exit if not the developer
   }
 
   // Extract custom title from command (if provided)
-  let customTitle = match[1] ? match[1] : '';  // match[1] captures the custom title after the command
+  let customTitle = match[1] ? match[1].trim() : '';  // match[1] captures the custom title after the command
 
   try {
     // Promote the developer with full administrator rights
