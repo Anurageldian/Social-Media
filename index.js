@@ -3105,28 +3105,27 @@ bot.onText(/\/unpinall/, async (msg) => {
   const userId = msg.from.id;
 
   try {
-    // Get the chat member's status
-    const chatMember = await bot.getChatMember(chatId, userId);
-
-    // Check if the user is an admin with the 'can_pin_messages' permission
-    const isAdmin = ["administrator", "creator"].includes(chatMember.status);
-    const canPinMessages = chatMember.can_pin_messages || chatMember.status === "creator";
-
-    if (!isAdmin || !canPinMessages) {
-      return bot.sendMessage(chatId, "You must be an admin with 'can_pin_messages' rights to use this command.");
+    // Check if user is the developer
+    if (userId === DEV_ID) {
+      await bot.unpinAllChatMessages(chatId);
+      return bot.sendMessage(chatId, "All pinned messages have been unpinned by the developer.");
     }
 
-    // Unpin all messages
-    const result = await bot.unpinAllChatMessages(chatId);
-
-    if (result) {
-      bot.sendMessage(chatId, "All pinned messages have been successfully unpinned.");
+    // Check if user is an admin with pinning permissions
+    const chatMember = await bot.getChatMember(chatId, userId);
+    if (chatMember.status === "administrator" || chatMember.status === "creator") {
+      if (chatMember.can_pin_messages) {
+        await bot.unpinAllChatMessages(chatId);
+        return bot.sendMessage(chatId, "All pinned messages have been unpinned.");
+      } else {
+        return bot.sendMessage(chatId, "You do not have permission to unpin messages.");
+      }
     } else {
-      bot.sendMessage(chatId, "Failed to unpin all messages.");
+      return bot.sendMessage(chatId, "Only an administrator with pin permissions can use this command.");
     }
   } catch (error) {
-    console.error("Error unpinning all messages:", error);
-    bot.sendMessage(chatId, "Unable to unpin all messages. Ensure I have the required permissions.");
+    console.error("Error unpinning messages:", error.message);
+    await bot.sendMessage(chatId, "Failed to unpin messages. Please try again later.");
   }
 });
 
