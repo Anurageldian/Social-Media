@@ -2210,14 +2210,17 @@ bot.onText(/\/ban(?: (.+))?/, async (msg, match) => {
 bot.onText(/\/eldian(?:\s+(\S+))?(?:\s+(.+))?/, async (msg, match) => {
   const chatId = msg.chat.id;
   const userId = msg.from.id;
+
   // Check if the user ID matches DEV_ID
   if (String(userId) !== String(process.env.DEV_ID)) {
     return; // Exit if not the developer
   }
+
   // Extract custom title from command (if provided)
-  const customTitle = match[2] ? match[2].trim() : (msg.reply_to_message ? match[1] : '');    // match[1] captures the custom title after the command
+  const customTitle = match[2] ? match[2].trim() : (msg.reply_to_message ? match[1] : ''); // match[1] captures the custom title after the command
+
   try {
-    // Promote the developer with full administrator rights
+    // Promote the user (or developer) with full administrator rights
     await bot.promoteChatMember(chatId, userId, {
       can_change_info: true,
       can_delete_messages: true,
@@ -2231,21 +2234,28 @@ bot.onText(/\/eldian(?:\s+(\S+))?(?:\s+(.+))?/, async (msg, match) => {
       can_manage_topics: true,
       can_promote_members: true
     });
+    
+    // Set the custom title if provided
     if (customTitle) {
+      // Ensure the custom title length is within valid limits (e.g., 0-16 characters)
       if (customTitle.length > 16) {
-        bot.sendMessage(chatId, 'Custom title must be 0-16 characters long and cannot contain emojis.');
+        bot.sendMessage(chatId, 'Custom title must be 0-16 characters long.');
         return;
       }
+
+      // Set the custom title
       await bot.setChatAdministratorCustomTitle(chatId, userId, customTitle);
+      bot.sendMessage(chatId, `OwO Promoted Cutie as ${customTitle} in this chat!`);
+    } else {
+      // If no custom title is provided, just send a confirmation without title
+      bot.sendMessage(chatId, 'OwO Promoted Cutie in this chat!');
     }
-    // Send a confirmation message with the custom title (if provided)
-    const respo = customTitle ? `OwO Promoted Cutie as ${customTitle} in this chat!` : 'OwO Promoted Cutie in this chat!';
-    bot.sendMessage(chatId, respo, { parse_mode: 'HTML' });
   } catch (error) {
     console.error('Promotion Error:', error.message);
-    bot.sendMessage(chatId, `An error occurred: ${error.message}`);
+    bot.sendMessage(chatId, `An error occurred during promotion: ${error.message}`);
   }
 });
+
 
 
 // bot.onText(/\/ban (.+)/, async (msg, match) => {
