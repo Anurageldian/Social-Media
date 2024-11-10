@@ -2863,7 +2863,7 @@ bot.onText(/\/info/, async (msg) => {
  ➻ ᴜsᴇʀ ɪᴅ:  \`${userId}\`
  ➻ ʟɪɴᴋ:  ${userLink}
  ➻ ɪs ʙᴏᴛ:  ${isBot}
- ➻ ɪs ᴘʀᴇᴍɪᴜᴍ:  ${isPremium}
+ ➻ ʜᴀs ᴘʀᴇᴍɪᴜᴍ:  ${isPremium}
     `;
 
     if (photos.length > 0) {
