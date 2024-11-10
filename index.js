@@ -2418,7 +2418,7 @@ bot.onText(/\/unban(?: (.+))?/, async (msg, match) => {
 });
 
 //kick a user, user can join group again if they wish
-bot.onText(/\/kick (\S+)?/, async (msg, match) => {
+bot.onText(/\/kick(?:\s+(\S+))?/, async (msg, match) => {
   const chatId = msg.chat.id;
   const userIdOrUsernameToKick = match[1] ? match[1].trim() : null;
   const issuerId = msg.from.id;
@@ -2442,7 +2442,7 @@ bot.onText(/\/kick (\S+)?/, async (msg, match) => {
         // If the identifier is a username
         const username = userIdOrUsernameToKick.slice(1);
         try {
-          const member = await bot.getChatMember(chatId, userIdOrUsernameToKick);
+          const member = await bot.getChatMember(chatId, username);
           userIdToKick = member.user.id;
           userToKick = member.user;
         } catch (error) {
@@ -2471,11 +2471,11 @@ bot.onText(/\/kick (\S+)?/, async (msg, match) => {
 
     const userFullName = userToKick.first_name + (userToKick.last_name ? ' ' + userToKick.last_name : '');
     const userUsername = userToKick.username ? ` (@${userToKick.username})` : '';
-    const respo = `Kicked <a href="tg://user?id=${userIdToKick}">${userFullName}</a> ${userUsername} from the group.`;
+    const respo = `User <a href="tg://user?id=${userIdToKick}">${userFullName}</a> ${userUsername} has been kicked from the group. They can rejoin if they wish.`;
     bot.sendMessage(chatId, respo, { parse_mode: 'HTML' });
 
   } catch (error) {
-    console.error(error);
+    console.error('Error kicking user:', error);
     bot.sendMessage(chatId, 'An error occurred while processing your request.');
   }
 });
