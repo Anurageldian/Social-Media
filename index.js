@@ -3465,10 +3465,6 @@ bot.onText(/\/dev/, async (msg) => {
 
 // to get a sticker as png
 
-const fs = require('fs');
-const path = require('path');
-const request = require('request');
-
 bot.onText(/\/getsticker/, async (msg) => {
   const chatId = msg.chat.id;
 
