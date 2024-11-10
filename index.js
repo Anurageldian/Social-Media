@@ -2876,7 +2876,7 @@ bot.onText(/\/info(?: (\d+))?/, async (msg, match) => {
 
     // Check if the target user is the developer
     if (targetUserId == DEV_ID) {
-      caption += '\n ➻ ᴛʜɪs ᴜsᴇʀ ɪs ᴛʜᴇ ᴅᴇᴠᴇʟᴏᴘᴇʀ';
+      caption += '➻ ᴛʜɪs ᴜsᴇʀ ɪs ᴍʏ ᴏᴡɴᴇʀ';
     }
 
     // If the target user has a profile photo, send it with the caption
@@ -3741,92 +3741,92 @@ bot.onText(/\/getsticker/, async (msg) => {
 });
 
 //chat info
-bot.onText(/\/chatinfo/, async (msg) => {
-  const chatId = msg.chat.id;
-  const chat = msg.chat;
+// bot.onText(/\/chatinfo/, async (msg) => {
+//   const chatId = msg.chat.id;
+//   const chat = msg.chat;
 
-  // Check if the command is issued in a group (or supergroup)
-  if (chat.type !== 'group' && chat.type !== 'supergroup') {
-    return bot.sendMessage(chatId, 'This command can only be used in groups or supergroups.');
-  }
+//   // Check if the command is issued in a group (or supergroup)
+//   if (chat.type !== 'group' && chat.type !== 'supergroup') {
+//     return bot.sendMessage(chatId, 'This command can only be used in groups or supergroups.');
+//   }
 
-  try {
-    // Gather basic chat information
-    const chatType = chat.type; // private, group, supergroup, channel
-    const chatTitle = chat.title || 'No Title';
-    const chatDescription = chat.description || 'No Description';
-    const chatMembersCount = chat.members_count || 'N/A';
+//   try {
+//     // Gather basic chat information
+//     const chatType = chat.type; // private, group, supergroup, channel
+//     const chatTitle = chat.title || 'No Title';
+//     const chatDescription = chat.description || 'No Description';
+//     const chatMembersCount = chat.members_count || 'N/A';
 
-    // Accent color and max reactions count
-    const accentColor = chat.accent_color_id || 'No accent color';
-    const maxReactionCount = chat.max_reaction_count || 'N/A';
+//     // Accent color and max reactions count
+//     const accentColor = chat.accent_color_id || 'No accent color';
+//     const maxReactionCount = chat.max_reaction_count || 'N/A';
 
-    // Check if the chat is a forum
-    const isForum = chat.is_forum ? 'Yes' : 'No';
+//     // Check if the chat is a forum
+//     const isForum = chat.is_forum ? 'Yes' : 'No';
 
-    // Check if join by request is enabled
-    const joinByRequest = chat.join_by_request ? 'Yes' : 'No';
+//     // Check if join by request is enabled
+//     const joinByRequest = chat.join_by_request ? 'Yes' : 'No';
 
-    // Retrieve pinned message from msg (not chat)
-    let pinnedMessage = 'No pinned message';
-    if (msg.pinned_message) {
-      pinnedMessage = msg.pinned_message.text || 'No pinned text';
-    }
+//     // Retrieve pinned message from msg (not chat)
+//     let pinnedMessage = 'No pinned message';
+//     if (msg.pinned_message) {
+//       pinnedMessage = msg.pinned_message.text || 'No pinned text';
+//     }
 
-    // Retrieve invite link (if available)
-    let inviteLink = 'No invite link';
-    if (chat.invite_link) {
-      inviteLink = chat.invite_link;
-    } else {
-      try {
-        // Attempt to get the invite link using the bot's API
-        const chatDetails = await bot.getChat(chatId);
-        if (chatDetails.invite_link) {
-          inviteLink = chatDetails.invite_link;
-        }
-      } catch (error) {
-        console.error('Error fetching invite link:', error);
-      }
-    }
+//     // Retrieve invite link (if available)
+//     let inviteLink = 'No invite link';
+//     if (chat.invite_link) {
+//       inviteLink = chat.invite_link;
+//     } else {
+//       try {
+//         // Attempt to get the invite link using the bot's API
+//         const chatDetails = await bot.getChat(chatId);
+//         if (chatDetails.invite_link) {
+//           inviteLink = chatDetails.invite_link;
+//         }
+//       } catch (error) {
+//         console.error('Error fetching invite link:', error);
+//       }
+//     }
 
-    // Retrieve group profile photo
-    let profilePhotoUrl = 'No profile photo';
-    if (chat.photo) {
-      // Get file_id of the profile photo
-      const fileId = chat.photo.small_file_id;
-      const file = await bot.getFile(fileId); // Retrieve the file info
-      profilePhotoUrl = `https://api.telegram.org/file/bot${bot.token}/${file.file_path}`; // Construct the URL
-    }
+//     // Retrieve group profile photo
+//     let profilePhotoUrl = 'No profile photo';
+//     if (chat.photo) {
+//       // Get file_id of the profile photo
+//       const fileId = chat.photo.small_file_id;
+//       const file = await bot.getFile(fileId); // Retrieve the file info
+//       profilePhotoUrl = `https://api.telegram.org/file/bot${bot.token}/${file.file_path}`; // Construct the URL
+//     }
 
-    // Construct the caption with all gathered information
-    let caption = `
-      ✦ ᴄʜᴀᴛ ɪɴғᴏ ✦
-•❅─────✧❅✦❅✧─────❅•
- ➻ ᴄʜᴀᴛ ᴛʏᴘᴇ: ${chatType}
- ➻ ᴄʜᴀᴛ ᴛɪᴛʟᴇ: ${chatTitle}
- ➻ ᴄʜᴀᴛ ᴅᴇsᴄʀɪᴘᴛɪᴏɴ: ${chatDescription}
- ➻ ᴄʜᴀᴛ ᴍᴇᴍʙᴇʀs ᴄᴏᴜɴᴛ: ${chatMembersCount}
- ➻ ᴀᴄᴄᴇɴᴛ ᴄᴏʟᴏʀ: ${accentColor}
- ➻ ᴍᴀx ʀᴇᴀᴄᴛɪᴏɴs: ${maxReactionCount}
- ➻ ɪs ɪᴛ ᴀ ғᴏʀᴜᴍ?: ${isForum}
- ➻ ᴊᴏɪɴ ʙʏ ʀᴇǫᴜᴇsᴛ: ${joinByRequest}
- ➻ ᴘɪɴɴᴇᴅ ᴍᴇssᴀɢᴇ: ${pinnedMessage}
- ➻ ɪɴᴠɪᴛᴇ ʟɪɴᴋ: ${inviteLink}
-    `;
+//     // Construct the caption with all gathered information
+//     let caption = `
+//       ✦ ᴄʜᴀᴛ ɪɴғᴏ ✦
+// •❅─────✧❅✦❅✧─────❅•
+//  ➻ ᴄʜᴀᴛ ᴛʏᴘᴇ: ${chatType}
+//  ➻ ᴄʜᴀᴛ ᴛɪᴛʟᴇ: ${chatTitle}
+//  ➻ ᴄʜᴀᴛ ᴅᴇsᴄʀɪᴘᴛɪᴏɴ: ${chatDescription}
+//  ➻ ᴄʜᴀᴛ ᴍᴇᴍʙᴇʀs ᴄᴏᴜɴᴛ: ${chatMembersCount}
+//  ➻ ᴀᴄᴄᴇɴᴛ ᴄᴏʟᴏʀ: ${accentColor}
+//  ➻ ᴍᴀx ʀᴇᴀᴄᴛɪᴏɴs: ${maxReactionCount}
+//  ➻ ɪs ɪᴛ ᴀ ғᴏʀᴜᴍ?: ${isForum}
+//  ➻ ᴊᴏɪɴ ʙʏ ʀᴇǫᴜᴇsᴛ: ${joinByRequest}
+//  ➻ ᴘɪɴɴᴇᴅ ᴍᴇssᴀɢᴇ: ${pinnedMessage}
+//  ➻ ɪɴᴠɪᴛᴇ ʟɪɴᴋ: ${inviteLink}
+//     `;
 
-    // Send group profile photo along with the info caption
-    if (profilePhotoUrl !== 'No profile photo') {
-      await bot.sendPhoto(chatId, profilePhotoUrl, { caption, parse_mode: 'Markdown' });
-    } else {
-      // If no profile photo, just send the caption
-      await bot.sendMessage(chatId, caption, { parse_mode: 'Markdown' });
-    }
+//     // Send group profile photo along with the info caption
+//     if (profilePhotoUrl !== 'No profile photo') {
+//       await bot.sendPhoto(chatId, profilePhotoUrl, { caption, parse_mode: 'Markdown' });
+//     } else {
+//       // If no profile photo, just send the caption
+//       await bot.sendMessage(chatId, caption, { parse_mode: 'Markdown' });
+//     }
 
-  } catch (error) {
-    console.error('Error fetching chat information:', error.message);
-    await bot.sendMessage(chatId, 'Failed to fetch chat information. Please try again later.');
-  }
-});
+//   } catch (error) {
+//     console.error('Error fetching chat information:', error.message);
+//     await bot.sendMessage(chatId, 'Failed to fetch chat information. Please try again later.');
+//   }
+// });
 
 
 
