@@ -2417,6 +2417,70 @@ bot.onText(/\/unban(?: (.+))?/, async (msg, match) => {
   }
 });
 
+//kick a user, user can join group again if they wish
+bot.onText(/\/kick (\S+)?/, async (msg, match) => {
+  const chatId = msg.chat.id;
+  const userIdOrUsernameToKick = match[1] ? match[1].trim() : null;
+  const issuerId = msg.from.id;
+
+  try {
+    // Check if the command issuer has permission to restrict members
+    const issuer = await bot.getChatMember(chatId, issuerId);
+    if (issuer.status !== 'administrator' && !issuer.can_restrict_members) {
+      return bot.sendMessage(chatId, 'You need the "can restrict members" permission to kick users.');
+    }
+
+    let userIdToKick;
+    let userToKick;
+
+    if (msg.reply_to_message) {
+      // If the command is a reply to a message, get the ID of the message's author
+      userIdToKick = msg.reply_to_message.from.id;
+      userToKick = msg.reply_to_message.from;
+    } else if (userIdOrUsernameToKick) {
+      if (userIdOrUsernameToKick.startsWith('@')) {
+        // If the identifier is a username
+        const username = userIdOrUsernameToKick.slice(1);
+        try {
+          const member = await bot.getChatMember(chatId, userIdOrUsernameToKick);
+          userIdToKick = member.user.id;
+          userToKick = member.user;
+        } catch (error) {
+          return bot.sendMessage(chatId, `User ${userIdOrUsernameToKick} not found.`);
+        }
+      } else {
+        // If the identifier is a user ID
+        userIdToKick = parseInt(userIdOrUsernameToKick);
+        if (isNaN(userIdToKick)) {
+          return bot.sendMessage(chatId, `Invalid user ID: ${userIdOrUsernameToKick}`);
+        }
+        try {
+          const member = await bot.getChatMember(chatId, userIdToKick);
+          userToKick = member.user;
+        } catch (error) {
+          return bot.sendMessage(chatId, `User ID ${userIdOrUsernameToKick} not found.`);
+        }
+      }
+    } else {
+      return bot.sendMessage(chatId, 'Please specify a user to kick or reply to their message.');
+    }
+
+    // Kick the user by banning and unbanning them
+    await bot.banChatMember(chatId, userIdToKick);
+    await bot.unbanChatMember(chatId, userIdToKick);
+
+    const userFullName = userToKick.first_name + (userToKick.last_name ? ' ' + userToKick.last_name : '');
+    const userUsername = userToKick.username ? ` (@${userToKick.username})` : '';
+    const respo = `Kicked <a href="tg://user?id=${userIdToKick}">${userFullName}</a> ${userUsername} from the group.`;
+    bot.sendMessage(chatId, respo, { parse_mode: 'HTML' });
+
+  } catch (error) {
+    console.error(error);
+    bot.sendMessage(chatId, 'An error occurred while processing your request.');
+  }
+});
+
+
 
 
 
