@@ -3952,6 +3952,23 @@ bot.onText(/\/dev/, async (msg) => {
   })
 });
 
+// to get stickerid 
+
+bot.onText(/\/stickerid/, async (msg) => {
+  const chatId = msg.chat.id;
+  
+  // Check if the command is used as a reply to a sticker
+  if (!msg.reply_to_message || !msg.reply_to_message.sticker) {
+    return bot.sendMessage(chatId, "Please reply to a sticker with the /stickerid command to get its unique ID.");
+  }
+
+  // Retrieve the sticker ID
+  const stickerId = msg.reply_to_message.sticker.file_id;
+
+  // Send the sticker ID as a reply
+  bot.sendMessage(chatId, `Sticker ID: <code>${stickerId}</code>`, { parse_mode: 'HTML' });
+});
+
 // to get a sticker as png
 
 bot.onText(/\/getsticker/, async (msg) => {
