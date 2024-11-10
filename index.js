@@ -3464,6 +3464,12 @@ bot.onText(/\/dev/, async (msg) => {
 
 
 // to get a sticker as png
+
+const fs = require('fs');
+const path = require('path');
+const request = require('request');
+const sharp = require('sharp');
+
 bot.onText(/\/getsticker/, async (msg) => {
   const chatId = msg.chat.id;
 
@@ -3478,10 +3484,18 @@ bot.onText(/\/getsticker/, async (msg) => {
 
       // Construct the download URL
       const downloadUrl = `https://api.telegram.org/file/bot${bot.token}/${filePath}`;
-      const webpFileName = path.basename(filePath, path.extname(filePath)) + '.webp';
-      const pngFileName = path.basename(filePath, path.extname(filePath)) + '.png';
+      const stickerFolder = path.join(__dirname, 'stickers');
 
-      // Download the file
+      // Ensure the stickers folder exists
+      if (!fs.existsSync(stickerFolder)) {
+        fs.mkdirSync(stickerFolder);
+      }
+
+      // Define file names with path
+      const webpFileName = path.join(stickerFolder, path.basename(filePath, path.extname(filePath)) + '.webp');
+      const pngFileName = path.join(stickerFolder, path.basename(filePath, path.extname(filePath)) + '.png');
+
+      // Download the sticker in .webp format
       await new Promise((resolve, reject) => {
         request(downloadUrl)
           .pipe(fs.createWriteStream(webpFileName))
@@ -3495,7 +3509,7 @@ bot.onText(/\/getsticker/, async (msg) => {
       // Send the PNG file as a document
       await bot.sendDocument(chatId, pngFileName);
 
-      // Remove the files after sending
+      // Delete the files after sending
       fs.unlinkSync(webpFileName);
       fs.unlinkSync(pngFileName);
 
@@ -3507,6 +3521,50 @@ bot.onText(/\/getsticker/, async (msg) => {
     bot.sendMessage(chatId, 'Please reply to a sticker message to use this command.');
   }
 });
+
+// bot.onText(/\/getsticker/, async (msg) => {
+//   const chatId = msg.chat.id;
+
+//   if (msg.reply_to_message && msg.reply_to_message.sticker) {
+//     const sticker = msg.reply_to_message.sticker;
+//     const fileId = sticker.file_id;
+
+//     try {
+//       // Get the file path
+//       const file = await bot.getFile(fileId);
+//       const filePath = file.file_path;
+
+//       // Construct the download URL
+//       const downloadUrl = `https://api.telegram.org/file/bot${bot.token}/${filePath}`;
+//       const webpFileName = path.basename(filePath, path.extname(filePath)) + '.webp';
+//       const pngFileName = path.basename(filePath, path.extname(filePath)) + '.png';
+
+//       // Download the file
+//       await new Promise((resolve, reject) => {
+//         request(downloadUrl)
+//           .pipe(fs.createWriteStream(webpFileName))
+//           .on('finish', resolve)
+//           .on('error', reject);
+//       });
+
+//       // Convert the WebP file to PNG
+//       await sharp(webpFileName).toFile(pngFileName);
+
+//       // Send the PNG file as a document
+//       await bot.sendDocument(chatId, pngFileName);
+
+//       // Remove the files after sending
+//       fs.unlinkSync(webpFileName);
+//       fs.unlinkSync(pngFileName);
+
+//     } catch (error) {
+//       console.error('Error downloading or sending the sticker:', error.message);
+//       bot.sendMessage(chatId, 'Error downloading or sending the sticker.');
+//     }
+//   } else {
+//     bot.sendMessage(chatId, 'Please reply to a sticker message to use this command.');
+//   }
+// });
 
 // bot.onText(/\/getsticker/, async (msg) => {
 //   const chatId = msg.chat.id;
