@@ -2875,7 +2875,7 @@ bot.onText(/\/info(?: (\d+))?/, async (msg, match) => {
 
     // Check if the target user is the developer
     if (targetUserId == DEV_ID) {
-      caption += '➻ ᴛʜɪs ᴜsᴇʀ ɪs ᴍʏ ᴏᴡɴᴇʀ';
+      caption += '\n➻ ᴛʜɪs ᴜsᴇʀ ɪs ᴍʏ ᴏᴡɴᴇʀ';
     }
 
     // If the target user has a profile photo, send it with the caption
