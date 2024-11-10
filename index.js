@@ -2867,8 +2867,8 @@ bot.onText(/\/info/, async (msg) => {
     `;
 
     // Check if user is the developer
-    if (repliedUserId == DEV_ID || issuerId == DEV_ID) {
-      caption += '\n ➻ ᴛʜɪs ᴜsᴇʀ ɪs ᴛʜᴇ ᴅᴇᴠᴇʟᴏᴘᴇʀ';
+    if (repliedUserId == DEV_ID) {
+      caption += '\n ➻ ᴛʜɪs ᴜsᴇʀ ɪꜱ ᴍʏ ᴏᴡɴᴇʀ';
     }
 
     if (photos.length > 0) {
