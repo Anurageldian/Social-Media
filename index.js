@@ -3105,15 +3105,15 @@ bot.onText(/\/unpinall/, async (msg) => {
   const userId = msg.from.id;
 
   try {
-    // Check if user is the developer
+    // If the command issuer is the developer, bypass admin checks
     if (userId === DEV_ID) {
-      // Developer can unpin all messages regardless of admin status
       await bot.unpinAllChatMessages(chatId);
       return bot.sendMessage(chatId, "All pinned messages have been unpinned by the developer.");
     }
 
-    // Check if user is an admin with pinning permissions
+    // Check if the command issuer is an admin with 'can_pin_messages'
     const chatMember = await bot.getChatMember(chatId, userId);
+    
     if (chatMember.status === "administrator" || chatMember.status === "creator") {
       if (chatMember.can_pin_messages) {
         await bot.unpinAllChatMessages(chatId);
@@ -3129,6 +3129,7 @@ bot.onText(/\/unpinall/, async (msg) => {
     await bot.sendMessage(chatId, "Failed to unpin messages. Please try again later.");
   }
 });
+
 
 
 
