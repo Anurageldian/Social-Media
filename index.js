@@ -3679,10 +3679,14 @@ bot.onText(/\/getsticker/, async (msg) => {
 });
 
 //chat info
-
 bot.onText(/\/chatinfo/, async (msg) => {
   const chatId = msg.chat.id;
   const chat = msg.chat;
+
+  // Check if the command is issued in a group (or supergroup)
+  if (chat.type !== 'group' && chat.type !== 'supergroup') {
+    return bot.sendMessage(chatId, 'This command can only be used in groups or supergroups.');
+  }
 
   try {
     // Gather basic chat information
@@ -3690,24 +3694,34 @@ bot.onText(/\/chatinfo/, async (msg) => {
     const chatTitle = chat.title || 'No Title';
     const chatDescription = chat.description || 'No Description';
     const chatMembersCount = chat.members_count || 'N/A';
-    const chatInviteLink = chat.invite_link || 'No invite link available';
 
-    // Check if the chat has a photo
-    const photo = chat.photo ? chat.photo.small_file_id : null; // Get small photo file_id for use
-    // Chat's accent color ID
+    // Accent color and max reactions count
     const accentColor = chat.accent_color_id || 'No accent color';
-    // Max reactions count for reactions
     const maxReactionCount = chat.max_reaction_count || 'N/A';
+
     // Check if the chat is a forum
     const isForum = chat.is_forum ? 'Yes' : 'No';
 
     // Check if join by request is enabled
     const joinByRequest = chat.join_by_request ? 'Yes' : 'No';
 
-    // Get the pinned message (if available)
+    // Retrieve pinned message
     let pinnedMessage = 'No pinned message';
     if (chat.pinned_message) {
-      pinnedMessage = chat.pinned_message.text || 'No text in pinned message';
+      pinnedMessage = chat.pinned_message.text || 'No pinned text';
+    }
+
+    // Retrieve invite link (if available)
+    let inviteLink = 'No invite link';
+    if (chat.invite_link) {
+      inviteLink = chat.invite_link;
+    }
+
+    // Retrieve group profile photo
+    let profilePhotoUrl = 'No profile photo';
+    const groupPhoto = await bot.getChatPhoto(chatId);
+    if (groupPhoto) {
+      profilePhotoUrl = `https://api.telegram.org/file/bot${bot.token}/${groupPhoto.big_file_id}`;
     }
 
     // Construct the caption with all gathered information
@@ -3718,19 +3732,19 @@ bot.onText(/\/chatinfo/, async (msg) => {
  ➻ ᴄʜᴀᴛ ᴛɪᴛʟᴇ: ${chatTitle}
  ➻ ᴄʜᴀᴛ ᴅᴇsᴄʀɪᴘᴛɪᴏɴ: ${chatDescription}
  ➻ ᴄʜᴀᴛ ᴍᴇᴍʙᴇʀs ᴄᴏᴜɴᴛ: ${chatMembersCount}
- ➻ ᴄʜᴀᴛ ɪɴᴠɪᴛᴇ ʟɪɴᴋ: ${chatInviteLink}
  ➻ ᴀᴄᴄᴇɴᴛ ᴄᴏʟᴏʀ: ${accentColor}
  ➻ ᴍᴀx ʀᴇᴀᴄᴛɪᴏɴs: ${maxReactionCount}
  ➻ ɪs ɪᴛ ᴀ ғᴏʀᴜᴍ?: ${isForum}
  ➻ ᴊᴏɪɴ ʙʏ ʀᴇǫᴜᴇsᴛ: ${joinByRequest}
  ➻ ᴘɪɴɴᴇᴅ ᴍᴇssᴀɢᴇ: ${pinnedMessage}
+ ➻ ɪɴᴠɪᴛᴇ ʟɪɴᴋ: ${inviteLink}
     `;
 
-    if (photo) {
-      // Send the profile photo along with the caption
-      await bot.sendPhoto(chatId, photo, { caption, parse_mode: 'Markdown' });
+    // Send group profile photo along with the info caption
+    if (profilePhotoUrl !== 'No profile photo') {
+      await bot.sendPhoto(chatId, profilePhotoUrl, { caption, parse_mode: 'Markdown' });
     } else {
-      // Send the info without the photo if no photo is available
+      // If no profile photo, just send the caption
       await bot.sendMessage(chatId, caption, { parse_mode: 'Markdown' });
     }
 
