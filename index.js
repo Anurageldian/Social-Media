@@ -3719,9 +3719,11 @@ bot.onText(/\/chatinfo/, async (msg) => {
 
     // Retrieve group profile photo
     let profilePhotoUrl = 'No profile photo';
-    const chatInfo = await bot.getChat(chatId);
-    if (chatInfo.photo) {
-      profilePhotoUrl = `https://api.telegram.org/file/bot${bot.token}/${chatInfo.photo.small_file_id}`;
+    if (chat.photo) {
+      // Get file_id of the profile photo
+      const fileId = chat.photo.small_file_id;
+      const file = await bot.getFile(fileId); // Retrieve the file info
+      profilePhotoUrl = `https://api.telegram.org/file/bot${bot.token}/${file.file_path}`; // Construct the URL
     }
 
     // Construct the caption with all gathered information
@@ -3753,6 +3755,7 @@ bot.onText(/\/chatinfo/, async (msg) => {
     await bot.sendMessage(chatId, 'Failed to fetch chat information. Please try again later.');
   }
 });
+
 
 
 // bot.onText(/\/getsticker/, async (msg) => {
