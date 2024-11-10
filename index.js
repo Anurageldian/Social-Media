@@ -2932,14 +2932,14 @@ bot.onText(/\/info(?: (\d+))?/, async (msg, match) => {
 
     // Check if the target user is the developer
     if (targetUserId == DEV_ID) {
-      caption += '\n ➻ ᴛʜɪs ᴜsᴇʀ ɪs ᴛʜᴇ ᴅᴇᴠᴇʟᴏᴘᴇʀ';
+      caption += '\n ➻ ᴛʜɪs ᴜsᴇʀ ɪs ᴍʏ ᴏᴡɴᴇʀ';
     }
 
     if (photos.length > 0) {
       const recentPhoto = photos[0][0].file_id;
-      await bot.sendPhoto(chatId, recentPhoto, { caption, parse_mode: 'Markdown' });
+      await bot.sendPhoto(chatId, recentPhoto, { reply_to_message_id: msg.message_id }, { caption, parse_mode: 'Markdown' });
     } else {
-      await bot.sendMessage(chatId, caption, { parse_mode: 'Markdown' });
+      await bot.sendMessage(chatId, caption, { reply_to_message_id: msg.message_id }, { parse_mode: 'Markdown' });
     }
   } catch (error) {
     console.error('Error fetching user information:', error.message);
