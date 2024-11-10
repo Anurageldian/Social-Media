@@ -3098,6 +3098,39 @@ bot.onText(/\/info(?: (\d+))?/, async (msg, match) => {
 //     await bot.sendMessage(chatId, 'Failed to fetch user profile photos. Please try again later.');
 //   }
 // });
+
+//unpinall
+bot.onText(/\/unpinall/, async (msg) => {
+  const chatId = msg.chat.id;
+  const userId = msg.from.id;
+
+  try {
+    // Get the chat member's status
+    const chatMember = await bot.getChatMember(chatId, userId);
+
+    // Check if the user is an admin with the 'can_pin_messages' permission
+    const isAdmin = ["administrator", "creator"].includes(chatMember.status);
+    const canPinMessages = chatMember.can_pin_messages || chatMember.status === "creator";
+
+    if (!isAdmin || !canPinMessages) {
+      return bot.sendMessage(chatId, "You must be an admin with 'can_pin_messages' rights to use this command.");
+    }
+
+    // Unpin all messages
+    const result = await bot.unpinAllChatMessages(chatId);
+
+    if (result) {
+      bot.sendMessage(chatId, "All pinned messages have been successfully unpinned.");
+    } else {
+      bot.sendMessage(chatId, "Failed to unpin all messages.");
+    }
+  } catch (error) {
+    console.error("Error unpinning all messages:", error);
+    bot.sendMessage(chatId, "Unable to unpin all messages. Ensure I have the required permissions.");
+  }
+});
+
+
 //list files for the ids 
 bot.onText(/\/listfiles/, async (msg) => {
   let chatId = msg.chat.id;
