@@ -175,7 +175,7 @@ bot.onText(/\/start/, async (msg) => {
    // Fetch system uptime
   const uptimeSeconds = os.uptime();
   const formattedUptime = formatUptime(uptimeSeconds); // Use the formatUptime function from utils.js
-  const STICKER_ID = "CAACAgIAAyEFAASFOt6LAAIF5Gcwxhv8fMgV1fm9fcGsmhYqjkUuAAJOMQACGMIJSDPYnqknc-L2NgQ";
+  const STICKER_ID = "CAACAgIAAyEFAASFOt6LAAIF52cxroUFXjt5-kC5Ihib3C_P8t_nAAJGPAACA6kIS9hsvJLYFjcSNgQ";
 // Get current date and time formatted as per your requirement
  let currentDate;
     try {
