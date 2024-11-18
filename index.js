@@ -4620,14 +4620,15 @@ bot.on('callback_query', async (mil) => {
     await bot.deleteMessage(chatid, msgid);
     await getYoutubeAudio(bot, chatid, downloadUrl, title, usrnm);
   } else if (data.startsWith('ytmp3')) {
-        await bot.deleteMessage(chatid, msgid);
-        await getYoutubeAudio(bot, chatid, url, usrnm);
-    } 
-    // MP4 download
-    else if (data.startsWith('ytmp4')) {
-        await bot.deleteMessage(chatid, msgid);
-        await getYoutubeVideo(bot, chatid, url, usrnm);
-    
+    await bot.deleteMessage(chatid, msgid);
+    await getYoutubeAudio(bot, chatid, url, usrnm);
+  } else if (data.startsWith('ytmp4')) {
+    await bot.deleteMessage(chatid, msgid);
+    await getYoutubeVideo(bot, chatid, url, usrnm);
+  } else {
+    // Handle any unexpected cases here (optional)
+    await bot.answerCallbackQuery(callbackQueryId, { text: 'Invalid option selected', show_alert: true });
+  }
 }); // Correctly closing the bot.on callback
 
 
