@@ -655,15 +655,33 @@ bot.onText(/\/id/, (msg) => {
 });
 
 
-// Download YouTube content
 
+// Function to verify download URL
+async function verifyDownloadUrl(url) {
+    try {
+        const response = await axios.head(url);  // Make a HEAD request to verify the file
+        const contentType = response.headers['content-type'];
+        return contentType && (contentType.includes('audio') || contentType.includes('video'));
+    } catch (error) {
+        console.error('Error verifying URL:', error);
+        return false;
+    }
+}
+
+// Function to get and send YouTube Audio (MP3)
 async function getYoutubeAudio(bot, chatid, url, usrnm) {
     try {
         const result = await ytmp3(url);
+        console.log('MP3 Result:', result); // Debugging the result
         if (result.status) {
-            // Result contains a download link
             const audioUrl = result.download;
-            await bot.sendAudio(chatid, audioUrl, { caption: 'Here is your audio file!' });
+            console.log('Audio URL:', audioUrl); // Ensure this is a valid URL
+            const isValidUrl = await verifyDownloadUrl(audioUrl);
+            if (isValidUrl) {
+                await bot.sendAudio(chatid, audioUrl, { caption: 'Here is your audio file!' });
+            } else {
+                await bot.sendMessage(chatid, 'The audio file could not be verified.');
+            }
         } else {
             await bot.sendMessage(chatid, 'Error: ' + result.result);
         }
@@ -673,13 +691,20 @@ async function getYoutubeAudio(bot, chatid, url, usrnm) {
     }
 }
 
+// Function to get and send YouTube Video (MP4)
 async function getYoutubeVideo(bot, chatid, url, usrnm) {
     try {
         const result = await ytmp4(url);
+        console.log('MP4 Result:', result); // Debugging the result
         if (result.status) {
-            // Result contains a download link
             const videoUrl = result.download;
-            await bot.sendVideo(chatid, videoUrl, { caption: 'Here is your video file!' });
+            console.log('Video URL:', videoUrl); // Ensure this is a valid URL
+            const isValidUrl = await verifyDownloadUrl(videoUrl);
+            if (isValidUrl) {
+                await bot.sendVideo(chatid, videoUrl, { caption: 'Here is your video file!' });
+            } else {
+                await bot.sendMessage(chatid, 'The video file could not be verified.');
+            }
         } else {
             await bot.sendMessage(chatid, 'Error: ' + result.result);
         }
