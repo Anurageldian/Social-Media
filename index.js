@@ -656,6 +656,39 @@ bot.onText(/\/id/, (msg) => {
 
 
 // Download YouTube content
+
+async function getYoutubeAudio(bot, chatid, url, usrnm) {
+    try {
+        const result = await ytmp3(url);
+        if (result.status) {
+            // Result contains a download link
+            const audioUrl = result.download;
+            await bot.sendAudio(chatid, audioUrl, { caption: 'Here is your audio file!' });
+        } else {
+            await bot.sendMessage(chatid, 'Error: ' + result.result);
+        }
+    } catch (error) {
+        console.error('Error downloading audio:', error);
+        await bot.sendMessage(chatid, 'An error occurred while downloading the audio.');
+    }
+}
+
+async function getYoutubeVideo(bot, chatid, url, usrnm) {
+    try {
+        const result = await ytmp4(url);
+        if (result.status) {
+            // Result contains a download link
+            const videoUrl = result.download;
+            await bot.sendVideo(chatid, videoUrl, { caption: 'Here is your video file!' });
+        } else {
+            await bot.sendMessage(chatid, 'Error: ' + result.result);
+        }
+    } catch (error) {
+        console.error('Error downloading video:', error);
+        await bot.sendMessage(chatid, 'An error occurred while downloading the video.');
+    }
+}
+
 const { ytmp4 } = require('@vreden/youtube_scraper');
 
 async function getYoutubeVideo(bot, chatId, videoUrl, username) {
