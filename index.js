@@ -4627,8 +4627,7 @@ bot.on('callback_query', async (mil) => {
     else if (data.startsWith('ytmp4')) {
         await bot.deleteMessage(chatid, msgid);
         await getYoutubeVideo(bot, chatid, url, usrnm);
-    }
-});
+    
 }); // Correctly closing the bot.on callback
 
 
