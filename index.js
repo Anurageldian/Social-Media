@@ -656,32 +656,50 @@ bot.onText(/\/id/, (msg) => {
 
 
 
-// Function to verify download URL
-async function verifyDownloadUrl(url) {
-    try {
-        const response = await axios.head(url);  // Make a HEAD request to verify the file
-        const contentType = response.headers['content-type'];
-        return contentType && (contentType.includes('audio') || contentType.includes('video'));
-    } catch (error) {
-        console.error('Error verifying URL:', error);
-        return false;
-    }
+const { ytmp3, ytmp4 } = require('@vreden/youtube_scraper');
+
+// Folder to store downloaded files
+const downloadFolder = './content';
+
+// Ensure the download folder exists
+if (!fs.existsSync(downloadFolder)) {
+    fs.mkdirSync(downloadFolder);
+}
+
+// Function to download a file and save it locally
+async function downloadFile(url, filePath) {
+    const writer = fs.createWriteStream(filePath);
+    const response = await axios.get(url, { responseType: 'stream' });
+    response.data.pipe(writer);
+
+    return new Promise((resolve, reject) => {
+        writer.on('finish', () => resolve(filePath));
+        writer.on('error', reject);
+    });
 }
 
 // Function to get and send YouTube Audio (MP3)
 async function getYoutubeAudio(bot, chatid, url, usrnm) {
     try {
+        console.log('Starting MP3 download...');
         const result = await ytmp3(url);
         console.log('MP3 Result:', result); // Debugging the result
+
         if (result.status) {
             const audioUrl = result.download;
             console.log('Audio URL:', audioUrl); // Ensure this is a valid URL
-            const isValidUrl = await verifyDownloadUrl(audioUrl);
-            if (isValidUrl) {
-                await bot.sendAudio(chatid, audioUrl, { caption: 'Here is your audio file!' });
-            } else {
-                await bot.sendMessage(chatid, 'The audio file could not be verified.');
-            }
+
+            // Define the file path
+            const filePath = path.join(downloadFolder, `${usrnm}_audio.mp3`);
+
+            // Download the file to the server
+            await downloadFile(audioUrl, filePath);
+
+            // Send the file to the user
+            await bot.sendAudio(chatid, filePath, { caption: 'Here is your audio file!' });
+
+            // Delete the file after sending to the user
+            fs.unlinkSync(filePath);
         } else {
             await bot.sendMessage(chatid, 'Error: ' + result.result);
         }
@@ -694,17 +712,25 @@ async function getYoutubeAudio(bot, chatid, url, usrnm) {
 // Function to get and send YouTube Video (MP4)
 async function getYoutubeVideo(bot, chatid, url, usrnm) {
     try {
+        console.log('Starting MP4 download...');
         const result = await ytmp4(url);
         console.log('MP4 Result:', result); // Debugging the result
+
         if (result.status) {
             const videoUrl = result.download;
             console.log('Video URL:', videoUrl); // Ensure this is a valid URL
-            const isValidUrl = await verifyDownloadUrl(videoUrl);
-            if (isValidUrl) {
-                await bot.sendVideo(chatid, videoUrl, { caption: 'Here is your video file!' });
-            } else {
-                await bot.sendMessage(chatid, 'The video file could not be verified.');
-            }
+
+            // Define the file path
+            const filePath = path.join(downloadFolder, `${usrnm}_video.mp4`);
+
+            // Download the file to the server
+            await downloadFile(videoUrl, filePath);
+
+            // Send the file to the user
+            await bot.sendVideo(chatid, filePath, { caption: 'Here is your video file!' });
+
+            // Delete the file after sending to the user
+            fs.unlinkSync(filePath);
         } else {
             await bot.sendMessage(chatid, 'Error: ' + result.result);
         }
@@ -713,36 +739,6 @@ async function getYoutubeVideo(bot, chatid, url, usrnm) {
         await bot.sendMessage(chatid, 'An error occurred while downloading the video.');
     }
 }
-
-const { ytmp4 } = require('@vreden/youtube_scraper');
-
-async function getYoutubeVideo(bot, chatId, videoUrl, username) {
-    try {
-        const result = await ytmp4(videoUrl);
-        if (result.status) {
-            await bot.sendMessage(chatId, `📹 Video Download:\nTitle: ${result.metadata.title}\nResolution: ${result.metadata.resolution}\n[Download MP4](${result.download})`, { parse_mode: 'Markdown' });
-        } else {
-            await bot.sendMessage(chatId, `⚠️ Error: ${result.result}`);
-        }
-    } catch (error) {
-        await bot.sendMessage(chatId, `❌ An error occurred: ${error.message}`);
-    }
-}
-const { ytmp3 } = require('@vreden/youtube_scraper');
-
-async function getYoutubeAudio(bot, chatId, videoUrl, username) {
-    try {
-        const result = await ytmp3(videoUrl);
-        if (result.status) {
-            await bot.sendMessage(chatId, `🎵 Audio Download:\nTitle: ${result.metadata.title}\nDuration: ${result.metadata.duration}\n[Download MP3](${result.download})`, { parse_mode: 'Markdown' });
-        } else {
-            await bot.sendMessage(chatId, `⚠️ Error: ${result.result}`);
-        }
-    } catch (error) {
-        await bot.sendMessage(chatId, `❌ An error occurred: ${error.message}`);
-    }
-}
-
 
 
 // //to generate user id in chat or private
