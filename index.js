@@ -545,22 +545,30 @@ bot.onText(/(https?:\/\/)?(www\.)?(open\.spotify\.com|spotify\.?com)\/playlist\/
 
 
 // Youtube Regex
+// Match MP3 and MP4 download requests from YouTube links
 bot.onText(/^(?:https?:\/\/)?(?:www\.|m\.|music\.)?youtu\.?be(?:\.com)?\/?.*(?:watch|embed)?(?:.*v=|v\/|\/)([\w\-_]+)\&?/, async (msg, match) => {
-  let getban = await getBanned(msg.chat.id);
-  if (!getban.status) return bot.sendMessage(msg.chat.id, `You have been banned\n\nReason : ${getban.reason}\n\nDo you want to be able to use bots again? Please contact the owner to request removal of the ban\nOwner : @firespower`)
-  let userId = msg.from.id.toString();
-  if (userLocks[userId]) {
-    return;
-  }
-  userLocks[userId] = true;
-  try {
-    if (match[0].includes("/live/")) return bot.sendMessage(msg.chat.id, `Cannot download livestream video`)
-    await bot.sendMessage(logChannelId, `[ Usage Log ]\n◇ FIRST NAME : ${msg.from.first_name ? msg.from.first_name : "-"}\n◇ LAST NAME : ${msg.from.last_name ? msg.from.last_name : "-"}\n◇ USERNAME : ${msg.from.username ? "@" + msg.from.username : "-"}\n◇ ID : ${msg.from.id}\n\nContent: ${msg.text.slice(0, 1000)}`, { disable_web_page_preview: true })
-    await getYoutube(bot, msg.chat.id, match[0], msg.chat.username)
-  } finally {
-    userLocks[userId] = false;
-  }
-})
+    let getban = await getBanned(msg.chat.id);
+    if (!getban.status) return bot.sendMessage(msg.chat.id, `You have been banned\n\nReason : ${getban.reason}\n\nDo you want to be able to use bots again? Please contact the owner to request removal of the ban\nOwner : @firespower`)
+  
+    let userId = msg.from.id.toString();
+    if (userLocks[userId]) {
+        return;
+    }
+  
+    userLocks[userId] = true;
+    try {
+        if (match[0].includes("/live/")) return bot.sendMessage(msg.chat.id, `Cannot download livestream video`);
+        await bot.sendMessage(logChannelId, `[ Usage Log ]\n◇ FIRST NAME : ${msg.from.first_name ? msg.from.first_name : "-"}\n◇ LAST NAME : ${msg.from.last_name ? msg.from.last_name : "-"}\n◇ USERNAME : ${msg.from.username ? "@" + msg.from.username : "-"}\n◇ ID : ${msg.from.id}\n\nContent: ${msg.text.slice(0, 1000)}`, { disable_web_page_preview: true });
+        
+        // Call the YouTube audio/video functions
+        const videoId = match[1]; // Extract video ID
+        await getYoutubeAudio(bot, msg.chat.id, `https://www.youtube.com/watch?v=${videoId}`, msg.from.username); // MP3 download
+        await getYoutubeVideo(bot, msg.chat.id, `https://www.youtube.com/watch?v=${videoId}`, msg.from.username); // MP4 download
+    } finally {
+        userLocks[userId] = false;
+    }
+});
+
 
 // Facebook Regex
 bot.onText(/^https?:\/\/(www\.)?(m\.)?facebook\.com\/.+/, async (msg, match) => {
@@ -648,111 +656,35 @@ bot.onText(/\/id/, (msg) => {
 
 
 // Download YouTube content
-async function getYoutube(bot, chatId, url, userName) {
-    const load = await bot.sendMessage(chatId, 'Loading, please wait...');
+const { ytmp4 } = require('youtube_scraper');
+
+async function getYoutubeVideo(bot, chatId, videoUrl, username) {
     try {
-        // Fetch video details
-        const videoDetails = await youtubeScraper.videoInfo(url);
-
-        // Generate options for video and audio
-        const options = [];
-        for (const format of videoDetails.formats) {
-            const { mimeType, url: downloadUrl, contentLength } = format;
-
-            // Determine type and size
-            const isAudio = mimeType.startsWith('audio/');
-            const sizeMB = (Number(contentLength) / (1024 * 1024)).toFixed(2);
-
-            // Skip large files
-            if (sizeMB > 50) continue;
-
-            options.push([
-                {
-                    text: `${isAudio ? 'Audio' : 'Video'} - ${sizeMB} MB`,
-                    callback_data: `${isAudio ? 'yta' : 'ytv'} ${downloadUrl} ${videoDetails.title}`,
-                },
-            ]);
+        const result = await ytmp4(videoUrl);
+        if (result.status) {
+            await bot.sendMessage(chatId, `📹 Video Download:\nTitle: ${result.metadata.title}\nResolution: ${result.metadata.resolution}\n[Download MP4](${result.download})`, { parse_mode: 'Markdown' });
+        } else {
+            await bot.sendMessage(chatId, `⚠️ Error: ${result.result}`);
         }
+    } catch (error) {
+        await bot.sendMessage(chatId, `❌ An error occurred: ${error.message}`);
+    }
+}
+const { ytmp3 } = require('youtube_scraper');
 
-        if (options.length === 0) {
-            return bot.editMessageText(
-                'No suitable download options found (all are larger than 50 MB).',
-                { chat_id: chatId, message_id: load.message_id }
-            );
+async function getYoutubeAudio(bot, chatId, videoUrl, username) {
+    try {
+        const result = await ytmp3(videoUrl);
+        if (result.status) {
+            await bot.sendMessage(chatId, `🎵 Audio Download:\nTitle: ${result.metadata.title}\nDuration: ${result.metadata.duration}\n[Download MP3](${result.download})`, { parse_mode: 'Markdown' });
+        } else {
+            await bot.sendMessage(chatId, `⚠️ Error: ${result.result}`);
         }
-
-        // Send options to the user
-        await bot.sendMessage(chatId, `Choose a format for: *${videoDetails.title}*`, {
-            reply_markup: {
-                inline_keyboard: options,
-            },
-            parse_mode: 'Markdown',
-        });
-
-        await bot.deleteMessage(chatId, load.message_id);
-    } catch (err) {
-        console.error(err);
-        await bot.sendMessage(
-            String(process.env.DEV_ID),
-            `[ERROR]\nUser: @${userName}\nURL: ${url}\nError: ${err.message}`
-        );
-        await bot.editMessageText('An error occurred while processing your request.', {
-            chat_id: chatId,
-            message_id: load.message_id,
-        });
-    }
-}
-async function getYoutubeVideo(bot, chatId, url, title, userName) {
-    const load = await bot.sendMessage(chatId, 'Downloading video, please wait...');
-    try {
-        const buffer = await getBuffer(url);
-        const sanitizedTitle = filterAlphanumericWithDash(title);
-        const filePath = `content/${sanitizedTitle}.mp4`;
-
-        fs.writeFileSync(filePath, buffer);
-
-        await bot.sendVideo(chatId, filePath, { caption: `*${title}*`, parse_mode: 'Markdown' });
-        fs.unlinkSync(filePath);
-
-        await bot.deleteMessage(chatId, load.message_id);
-    } catch (err) {
-        console.error(err);
-        await bot.sendMessage(
-            String(process.env.DEV_ID),
-            `[ERROR]\nUser: @${userName}\nDownload URL: ${url}\nError: ${err.message}`
-        );
-        await bot.editMessageText('An error occurred while downloading the video.', {
-            chat_id: chatId,
-            message_id: load.message_id,
-        });
+    } catch (error) {
+        await bot.sendMessage(chatId, `❌ An error occurred: ${error.message}`);
     }
 }
 
-async function getYoutubeAudio(bot, chatId, url, title, userName) {
-    const load = await bot.sendMessage(chatId, 'Downloading audio, please wait...');
-    try {
-        const buffer = await getBuffer(url);
-        const sanitizedTitle = filterAlphanumericWithDash(title);
-        const filePath = `content/${sanitizedTitle}.mp3`;
-
-        fs.writeFileSync(filePath, buffer);
-
-        await bot.sendAudio(chatId, filePath, { caption: `*${title}*`, parse_mode: 'Markdown' });
-        fs.unlinkSync(filePath);
-
-        await bot.deleteMessage(chatId, load.message_id);
-    } catch (err) {
-        console.error(err);
-        await bot.sendMessage(
-            String(process.env.DEV_ID),
-            `[ERROR]\nUser: @${userName}\nDownload URL: ${url}\nError: ${err.message}`
-        );
-        await bot.editMessageText('An error occurred while downloading the audio.', {
-            chat_id: chatId,
-            message_id: load.message_id,
-        });
-    }
-}
 
 
 // //to generate user id in chat or private
@@ -4687,7 +4619,16 @@ bot.on('callback_query', async (mil) => {
     const [_, downloadUrl, title] = data.split(' ');
     await bot.deleteMessage(chatid, msgid);
     await getYoutubeAudio(bot, chatid, downloadUrl, title, usrnm);
-  }
+  } else if (data.startsWith('ytmp3')) {
+        await bot.deleteMessage(chatid, msgid);
+        await getYoutubeAudio(bot, chatid, url, usrnm);
+    } 
+    // MP4 download
+    else if (data.startsWith('ytmp4')) {
+        await bot.deleteMessage(chatid, msgid);
+        await getYoutubeVideo(bot, chatid, url, usrnm);
+    }
+});
 }); // Correctly closing the bot.on callback
 
 
