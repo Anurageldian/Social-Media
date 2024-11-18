@@ -4666,15 +4666,15 @@ bot.on('callback_query', async (mil) => {
   } else if (data.startsWith('fba')) {
     await bot.deleteMessage(chatid, msgid);
     await getFacebookAudio(bot, chatid, usrnm);
-   }else if (data.startsWith('ytv')) {
-    let args = url.split(' ');
-    await bot.deleteMessage(chatid, msgid);
-    await getYoutubeVideo(bot, chatid, args[0], args[1], usrnm);
-  } else if (data.startsWith('yta')) {
-    let args = url.split(' ');
-    await bot.deleteMessage(chatid, msgid);
-    await getYoutubeAudio(bot, chatid, args[0], args[1], usrnm);
- } else if (data.startsWith('tourl1')) {
+  } //else if (data.startsWith('ytv')) {
+  //   let args = url.split(' ');
+  //   await bot.deleteMessage(chatid, msgid);
+  //   await getYoutubeVideo(bot, chatid, args[0], args[1], usrnm);
+  // } else if (data.startsWith('yta')) {
+  //   let args = url.split(' ');
+  //   await bot.deleteMessage(chatid, msgid);
+  //   await getYoutubeAudio(bot, chatid, args[0], args[1], usrnm);
+  // } else if (data.startsWith('tourl1')) {
     await bot.deleteMessage(chatid, msgid);
     await telegraphUpload(bot, chatid, url, usrnm);
   } else if (data.startsWith('tourl2')) {
@@ -4694,7 +4694,7 @@ bot.on('callback_query', async (mil) => {
     const [_, downloadUrl, title] = data.split(' ');
     await bot.deleteMessage(chatid, msgid);
     await getYoutubeAudio(bot, chatid, downloadUrl, title, usrnm);
-
-})
+  }
+}); // Corrected closing brace
 
 process.on('uncaughtException', console.error)
