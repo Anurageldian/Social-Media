@@ -4636,6 +4636,7 @@ bot.on('callback_query', async (mil) => {
   let msgid = mil.message.message_id;
   let usrnm = mil.message.chat.username;
   let callbackQueryId = mil.id;
+
   if (data.startsWith('tta')) {
     await bot.deleteMessage(chatid, msgid);
     await tiktokAudio(bot, chatid, url, usrnm);
@@ -4666,15 +4667,7 @@ bot.on('callback_query', async (mil) => {
   } else if (data.startsWith('fba')) {
     await bot.deleteMessage(chatid, msgid);
     await getFacebookAudio(bot, chatid, usrnm);
-  } //else if (data.startsWith('ytv')) {
-  //   let args = url.split(' ');
-  //   await bot.deleteMessage(chatid, msgid);
-  //   await getYoutubeVideo(bot, chatid, args[0], args[1], usrnm);
-  // } else if (data.startsWith('yta')) {
-  //   let args = url.split(' ');
-  //   await bot.deleteMessage(chatid, msgid);
-  //   await getYoutubeAudio(bot, chatid, args[0], args[1], usrnm);
-  // } else if (data.startsWith('tourl1')) {
+  } else if (data.startsWith('tourl1')) {
     await bot.deleteMessage(chatid, msgid);
     await telegraphUpload(bot, chatid, url, usrnm);
   } else if (data.startsWith('tourl2')) {
@@ -4695,6 +4688,7 @@ bot.on('callback_query', async (mil) => {
     await bot.deleteMessage(chatid, msgid);
     await getYoutubeAudio(bot, chatid, downloadUrl, title, usrnm);
   }
-}); // Corrected closing brace
+}); // Correctly closing the bot.on callback
+
 
 process.on('uncaughtException', console.error)
