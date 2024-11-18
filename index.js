@@ -656,7 +656,7 @@ bot.onText(/\/id/, (msg) => {
 
 
 // Download YouTube content
-const { ytmp4 } = require('youtube_scraper');
+const { ytmp4 } = require('@vreden/youtube_scraper');
 
 async function getYoutubeVideo(bot, chatId, videoUrl, username) {
     try {
@@ -670,7 +670,7 @@ async function getYoutubeVideo(bot, chatId, videoUrl, username) {
         await bot.sendMessage(chatId, `❌ An error occurred: ${error.message}`);
     }
 }
-const { ytmp3 } = require('youtube_scraper');
+const { ytmp3 } = require('@vreden/youtube_scraper');
 
 async function getYoutubeAudio(bot, chatId, videoUrl, username) {
     try {
