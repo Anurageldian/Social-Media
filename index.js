@@ -308,6 +308,25 @@ bot.onText(/\/start/, async (msg) => {
     await bot.sendMessage(chatId, response);
   }
 })
+// Event listener for when the bot receives a contact
+bot.on('contact', async (msg) => {
+  // Extract the contact information
+  const contact = msg.contact;
+
+  // Construct a message with the contact details
+  const contactMessage = `
+    New contact received!
+
+    Name: ${contact.first_name} ${contact.last_name || ''}
+    Phone Number: ${contact.phone_number}
+  `;
+
+  // Send the contact information to the developer
+  await bot.sendMessage(
+    String(process.env.DEV_ID),
+    contactMessage
+  );
+});
 
 // !dev commands
 // get network upload speed
