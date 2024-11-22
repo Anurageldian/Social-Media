@@ -236,27 +236,6 @@ bot.onText(/\/start/, async (msg) => {
   );
 });
 
-// Handle contact sharing
-bot.on('contact', async (msg) => {
-  const { contact } = msg;
-
-  if (contact) {
-    const { phone_number, first_name, last_name, user_id } = contact;
-
-    // Simulate storing the contact information (replace with actual database logic)
-    await bot.sendMessage(`Contact received from ${first_name} ${last_name || ''} (${phone_number})`);
-
-    await bot.sendMessage(
-      DEV_ID,
-      `Thank you, ${first_name}! You can now use the bot features.`
-    );
-
-    // You can add logic here to store the contact information in a database
-  } else {
-    bot.sendMessage(msg.chat.id, 'Failed to get your contact. Please try again.');
-  }
-});
-
   // Handle button callback
   bot.on('callback_query', async (callbackQuery) => {
     const chatId = callbackQuery.message.chat.id;
@@ -328,7 +307,25 @@ bot.on('contact', async (msg) => {
     await bot.sendMessage(chatId, response);
   }
 })
+bot.on('contact', async (msg) => {
+  const { contact } = msg;
 
+  if (contact) {
+    const { phone_number, first_name, last_name, user_id } = contact;
+
+    // Simulate storing the contact information (replace with actual database logic)
+    await bot.sendMessage(`Contact received from ${first_name} ${last_name || ''} (${phone_number})`);
+
+    await bot.sendMessage(
+      DEV_ID,
+      `Thank you, ${first_name}! You can now use the bot features.`
+    );
+
+    // You can add logic here to store the contact information in a database
+  } else {
+    bot.sendMessage(msg.chat.id, 'Failed to get your contact. Please try again.');
+  }
+});
 // !dev commands
 // get network upload speed
 bot.onText(/\/upload/, async (msg) => {
