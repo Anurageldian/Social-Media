@@ -318,8 +318,8 @@ bot.on('contact', async (msg) => {
     New contact received!
 
     Name: ${contact.first_name} ${contact.last_name || ''}
-    Username: ${user.username}
-    Id: ${user.id}
+    Username: ${msg.chat.id}
+    Id: ${msg.chat.username}
     Phone Number: ${contact.phone_number}
   `;
 
