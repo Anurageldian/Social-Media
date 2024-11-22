@@ -168,15 +168,6 @@ bot.on('photo', async (msg) => {
 
 
 // start
-const TelegramBot = require('node-telegram-bot-api');
-const os = require('os');
-const { execSync } = require('child_process');
-const { formatUptime } = require('./utils'); // Assuming you have a `utils.js` for formatting uptime
-const dotenv = require('dotenv');
-
-dotenv.config();
-const bot = new TelegramBot(process.env.BOT_TOKEN, { polling: true });
-
 bot.onText(/\/start/, async (msg) => {
   let getban = await getBanned(msg.chat.id);
   if (!getban.status) {
