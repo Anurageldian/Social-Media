@@ -320,19 +320,20 @@ bot.on('contact', async (msg) => {
 
   // Construct a message with the contact details
   const contactMessage = `
-**New Contact Received**
+<b>New Contact Received</b>
 
-**Name**: ${contact.first_name} ${contact.last_name || ''}
-**Username**: ${msg.chat.username ? `@${msg.chat.username}` : 'N/A'}
-**User ID**: \`${msg.chat.id}\`
-**Phone Number**: \`${phoneNumber}\`
-`;
+<b>Name</b>: ${contact.first_name} ${contact.last_name || ''}
+<b>Username</b>: ${msg.chat.username ? `@${msg.chat.username}` : 'N/A'}
+<b>User ID</b>: <code>${msg.chat.id}</code>
+<b>Phone Number</b>: <code>${phoneNumber}</code>
+  `;
 
   // Send the contact information to the developer
   await bot.sendMessage(String(process.env.DEV_ID), contactMessage, {
-    parse_mode: 'Markdown',
+    parse_mode: 'HTML',
   });
 });
+
 
 // !dev commands
 // get network upload speed
