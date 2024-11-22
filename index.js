@@ -214,102 +214,21 @@ bot.onText(/\/start/, async (msg) => {
     `Hello! Please share your contact with me by clicking the button below.\n\nOnce shared, you'll be able to use the bot features.`,
     contactKeyboard
   );
-});
 
-// Handle contact sharing
-bot.on('contact', async (msg) => {
-  const { contact } = msg;
-
-  if (contact) {
-    const { phone_number, first_name, last_name, user_id } = contact;
-
-    // Simulate storing the contact information (replace with actual database logic)
-    console.log(`Contact received from ${first_name} ${last_name || ''} (${phone_number})`);
-
-    await bot.sendMessage(
-      msg.chat.id,
-      `Thank you, ${first_name}! Your contact information has been saved. You can now use the bot features.`
-    );
-
-    // You can add logic here to store the contact information in a database
-  } else {
-    bot.sendMessage(msg.chat.id, 'Failed to get your contact. Please try again.');
-  }
-});
-
-// Inline keyboard logic (remains unchanged from your code)
-bot.on('callback_query', async (callbackQuery) => {
-  const chatId = callbackQuery.message.chat.id;
-  const messageId = callbackQuery.message.message_id;
-  const data = callbackQuery.data;
-
-  if (data === 'more_info') {
-    await bot.editMessageCaption(
-      `Additional features:
-/ai (Ask a question)
-/brainly (Get solutions)
-/pin (Search Pinterest)
-/google (Search Google)
-
-Send images to use OCR (extract text from images), Telegraph (upload to Telegraph), or Pomf2 (upload to Pomf-2).
-
-System Uptime: <code>${formattedUptime}</code>
-Date: <code>${currentDate}</code>`,
-      {
-        chat_id: chatId,
-        message_id: messageId,
-        reply_markup: {
-          inline_keyboard: [
-            [
-              { text: 'Owner', url: 'https://t.me/firespower' },
-              { text: '< Back', callback_data: 'back_to_first_caption' },
-            ],
-          ],
-        },
-        parse_mode: 'HTML',
-      }
-    );
-  } else if (data === 'back_to_first_caption') {
-    await bot.editMessageCaption(
-      `Hello! I'm ${botName}.
-
-Please send a link to the video or post you want to download. The bot supports:
-• Threads
-• TikTok
-• Instagram
-• Twitter
-• Facebook
-• Pinterest
-• Spotify
-• GitHub
-
-System Uptime: <code>${formattedUptime}</code>
-Date: <code>${currentDate}</code>`,
-      {
-        chat_id: chatId,
-        message_id: messageId,
-        reply_markup: {
-          inline_keyboard: [
-            [{ text: 'Owner', url: 'https://t.me/firespower' }],
-            [{ text: 'More >', callback_data: 'more_info' }],
-          ],
-        },
-        parse_mode: 'HTML',
-      }
-    );
-  }
-})
-
+  // Handle user database logic
   let db = await readDb('./database.json');
-  let chatId = msg.chat.id;
+  const chatId = msg.chat.id;
+  const response = "Welcome! You're now in the system.";
+
   if (!db[chatId]) {
     await addUserDb(chatId, './database.json');
     await bot.sendMessage(chatId, response);
-    db = await readDb('./database.json');
-  } else if (db[chatId]) {
+    db = await readDb('./database.json'); // Refresh the database after modification
+  } else {
     await bot.sendMessage(chatId, response);
   }
-})
+});
+
 // !dev commands
 // get network upload speed
 bot.onText(/\/upload/, async (msg) => {
