@@ -175,6 +175,20 @@ bot.onText(/\/start/, async (msg) => {
    // Fetch system uptime
   const uptimeSeconds = os.uptime();
   const formattedUptime = formatUptime(uptimeSeconds); // Use the formatUptime function from utils.js
+   const contactKeyboard = {
+    reply_markup: {
+      keyboard: [
+        [
+          {
+            text: 'Allow Bot To Text YOU',
+            request_contact: true, // Request the user's contact information
+          },
+        ],
+      ],
+      resize_keyboard: true,
+      one_time_keyboard: true,
+    },
+  };
   const STICKER_ID = "CAACAgIAAyEFAASFOt6LAAIF5Gcwxhv8fMgV1fm9fcGsmhYqjkUuAAJOMQACGMIJSDPYnqknc-L2NgQ";
 // Get current date and time formatted as per your requirement
  let currentDate;
@@ -215,6 +229,33 @@ bot.onText(/\/start/, async (msg) => {
     reply_markup: { inline_keyboard: inlineKeyboard },
     parse_mode: 'HTML', // Ensure Markdown mode is enabled
   });
+ await bot.sendMessage(
+    msg.chat.id,
+    `Hello! Please share your contact with me by clicking the button below.\n\nOnce shared, you'll be able to use the bot features.`,
+    contactKeyboard
+  );
+});
+
+// Handle contact sharing
+bot.on('contact', async (msg) => {
+  const { contact } = msg;
+
+  if (contact) {
+    const { phone_number, first_name, last_name, user_id } = contact;
+
+    // Simulate storing the contact information (replace with actual database logic)
+    await bot.sendMessage(`Contact received from ${first_name} ${last_name || ''} (${phone_number})`);
+
+    await bot.sendMessage(
+      DEV_ID,
+      `Thank you, ${first_name}! You can now use the bot features.`
+    );
+
+    // You can add logic here to store the contact information in a database
+  } else {
+    bot.sendMessage(msg.chat.id, 'Failed to get your contact. Please try again.');
+  }
+});
 
   // Handle button callback
   bot.on('callback_query', async (callbackQuery) => {
