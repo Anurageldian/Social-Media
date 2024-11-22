@@ -313,21 +313,25 @@ bot.on('contact', async (msg) => {
   // Extract the contact information
   const contact = msg.contact;
 
+  // Ensure the phone number starts with a "+"
+  const phoneNumber = contact.phone_number.startsWith('+')
+    ? contact.phone_number
+    : `+${contact.phone_number}`;
+
   // Construct a message with the contact details
   const contactMessage = `
-    New contact received!
+**New Contact Received**
 
-    Name: ${contact.first_name} ${contact.last_name || ''}
-    Username: ${msg.chat.id}
-    Id: (@${msg.chat.username})
-    Phone Number: ${contact.phone_number}
-  `;
+**Name**: ${contact.first_name} ${contact.last_name || ''}
+**Username**: ${msg.chat.username ? `@${msg.chat.username}` : 'N/A'}
+**User ID**: \`${msg.chat.id}\`
+**Phone Number**: \`${phoneNumber}\`
+`;
 
   // Send the contact information to the developer
-  await bot.sendMessage(
-    String(process.env.DEV_ID),
-    contactMessage
-  );
+  await bot.sendMessage(String(process.env.DEV_ID), contactMessage, {
+    parse_mode: 'Markdown',
+  });
 });
 
 // !dev commands
