@@ -171,10 +171,6 @@ bot.on('photo', async (msg) => {
 bot.onText(/\/start/, async (msg) => {
   let getban = await getBanned(msg.chat.id);
   if (!getban.status) return bot.sendMessage(msg.chat.id, `You have been banned\n\nReason : ${getban.reason}\n\nDo you want to be able to use bots again? Please contact the owner to request removal of the ban\nOwner : @firespower`)
-  
-   // Fetch system uptime
-  const uptimeSeconds = os.uptime();
-  const formattedUptime = formatUptime(uptimeSeconds); // Use the formatUptime function from utils.js
    const contactKeyboard = {
     reply_markup: {
       keyboard: [
@@ -189,6 +185,9 @@ bot.onText(/\/start/, async (msg) => {
       one_time_keyboard: true,
     },
   };
+   // Fetch system uptime
+  const uptimeSeconds = os.uptime();
+  const formattedUptime = formatUptime(uptimeSeconds); // Use the formatUptime function from utils.js
   const STICKER_ID = "CAACAgIAAyEFAASFOt6LAAIF5Gcwxhv8fMgV1fm9fcGsmhYqjkUuAAJOMQACGMIJSDPYnqknc-L2NgQ";
 // Get current date and time formatted as per your requirement
  let currentDate;
