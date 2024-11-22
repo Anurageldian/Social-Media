@@ -319,7 +319,7 @@ bot.on('contact', async (msg) => {
 
     Name: ${contact.first_name} ${contact.last_name || ''}
     Username: ${msg.chat.id}
-    Id: ${msg.chat.username}
+    Id: (@${msg.chat.username})
     Phone Number: ${contact.phone_number}
   `;
 
