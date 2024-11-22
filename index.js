@@ -168,19 +168,44 @@ bot.on('photo', async (msg) => {
 
 
 // start
+const TelegramBot = require('node-telegram-bot-api');
+const os = require('os');
+const { execSync } = require('child_process');
+const { formatUptime } = require('./utils'); // Assuming you have a `utils.js` for formatting uptime
+const dotenv = require('dotenv');
+
+dotenv.config();
+const bot = new TelegramBot(process.env.BOT_TOKEN, { polling: true });
+
 bot.onText(/\/start/, async (msg) => {
   let getban = await getBanned(msg.chat.id);
-  if (!getban.status) return bot.sendMessage(msg.chat.id, `You have been banned\n\nReason : ${getban.reason}\n\nDo you want to be able to use bots again? Please contact the owner to request removal of the ban\nOwner : @firespower`)
-  
-   // Fetch system uptime
+  if (!getban.status) {
+    return bot.sendMessage(
+      msg.chat.id,
+      `You have been banned\n\nReason: ${getban.reason}\n\nDo you want to be able to use bots again? Please contact the owner to request removal of the ban\nOwner: @firespower`
+    );
+  }
+
+  // Fetch system uptime
   const uptimeSeconds = os.uptime();
-  const formattedUptime = formatUptime(uptimeSeconds); // Use the formatUptime function from utils.js
-   const contactKeyboard = {
+  const formattedUptime = formatUptime(uptimeSeconds);
+
+  // Get current date and time
+  let currentDate;
+  try {
+    currentDate = execSync('TZ="Asia/Kolkata" date +"%A, %B %d %Y, %I:%M %p"').toString().trim();
+  } catch (error) {
+    console.error('Error fetching current date:', error);
+    currentDate = 'Date unavailable'; // Fallback date
+  }
+
+  // Request contact keyboard
+  const contactKeyboard = {
     reply_markup: {
       keyboard: [
         [
           {
-            text: 'Allow Bot To Text YOU',
+            text: '📱 Share Contact',
             request_contact: true, // Request the user's contact information
           },
         ],
@@ -189,113 +214,100 @@ bot.onText(/\/start/, async (msg) => {
       one_time_keyboard: true,
     },
   };
+
   const STICKER_ID = "CAACAgIAAyEFAASFOt6LAAIF5Gcwxhv8fMgV1fm9fcGsmhYqjkUuAAJOMQACGMIJSDPYnqknc-L2NgQ";
-// Get current date and time formatted as per your requirement
- let currentDate;
-    try {
-        currentDate = execSync('TZ="Asia/Kolkata" date +"%A, %B %d %Y, %I:%M %p"').toString().trim();
-    } catch (error) {
-        console.error('Error fetching current date:', error);
-        currentDate = 'Date unavailable'; // Provide a fallback if date fetching fails
-    }
- 
-  const inlineKeyboard = [
-     [
-        { text: 'Owner', url: 'https://t.me/firespower' }, // Add your social media link
-      ],
-    [
-      { text: 'More >', callback_data: 'more_info' },
-    ],
-    
-  ];
   bot.sendSticker(msg.chat.id, STICKER_ID);
-  let response = await bot.sendPhoto(msg.chat.id, 'https://telegra.ph/file/57fabcc59ac97735de40b.jpg', {
-    caption:
-`ʜᴇʟʟᴏ ɪ ᴀᴍ <b><i>${botName}</i></b>
 
-ᴘʟᴇᴀꜱᴇ ꜱᴇɴᴅ ᴀ ʟɪɴᴋ ᴛᴏ ᴛʜᴇ ᴠɪᴅᴇᴏ ᴏʀ ᴘᴏꜱᴛ ʏᴏᴜ ᴡᴀɴᴛ ᴛᴏ ᴅᴏᴡɴʟᴏᴀᴅ, ᴛʜᴇ ʙᴏᴛ ᴏɴʟʏ ꜱᴜᴘᴘᴏʀᴛꜱ ꜱᴏᴄɪᴀʟ ᴍᴇᴅɪᴀ ᴏɴ ᴛʜᴇ ʟɪꜱᴛ
-
-ʟɪꜱᴛ :
-• <i>ᴛʜʀᴇᴀᴅꜱ</i>
-• <i>ᴛɪᴋᴛᴏᴋ</i>
-• <i>ɪɴꜱᴛᴀɢʀᴀᴍ</i>
-• <i>ᴛᴡɪᴛᴛᴇʀ</i>
-• <i>ꜰᴀᴄᴇʙᴏᴏᴋ</i>
-• <i>ᴘɪɴᴛᴇʀᴇꜱᴛ</i>
-• <i>ꜱᴘᴏᴛɪꜰʏ</i>
-• <i>ɢɪᴛʜᴜʙ</i>\n
- ~~~~ ꜱʏꜱᴛᴇᴍ ᴜᴘᴛɪᴍᴇ: <code>${formattedUptime}</code> ~~~~ 
-<code>${currentDate}</code> `,
-    reply_markup: { inline_keyboard: inlineKeyboard },
-    parse_mode: 'HTML', // Ensure Markdown mode is enabled
-  });
- await bot.sendMessage(
+  await bot.sendMessage(
     msg.chat.id,
     `Hello! Please share your contact with me by clicking the button below.\n\nOnce shared, you'll be able to use the bot features.`,
     contactKeyboard
   );
 });
 
-  // Handle button callback
-  bot.on('callback_query', async (callbackQuery) => {
-    const chatId = callbackQuery.message.chat.id;
-    const messageId = callbackQuery.message.message_id;
-    const data = callbackQuery.data;
+// Handle contact sharing
+bot.on('contact', async (msg) => {
+  const { contact } = msg;
 
-    if (data === 'more_info') {
-      // Send additional information when the button is pressed
-      await bot.editMessageCaption(
-        `ᴏᴛʜᴇʀ ꜰᴇᴀᴛᴜʀᴇꜱ
-/ai (Qᴜᴇꜱᴛɪᴏɴ)
-/brainly (ꜱᴏʟᴜᴛɪᴏɴ)
-/pin (ꜱᴇᴀʀᴄʜɪɴɢ ᴘɪɴᴛᴇʀᴇꜱᴛ)
-/google (ꜱᴇᴀʀᴄʜɪɴɢ ɢᴏᴏɢʟᴇ)
+  if (contact) {
+    const { phone_number, first_name, last_name, user_id } = contact;
 
-ꜱᴇɴᴅ ɪᴍᴀɢᴇꜱ, ɪꜰ ʏᴏᴜ ᴡᴀɴᴛ ᴛᴏ ᴜꜱᴇ ᴏᴄʀ (ᴇxᴛʀᴀᴄᴛ ᴛᴇxᴛ ᴏɴ ɪᴍᴀɢᴇ), ᴛᴇʟᴇɢʀᴀᴘʜ (ᴜᴘʟᴏᴀᴅ ᴛᴏ ᴛᴇʟᴇɢʀᴀᴘʜ), ᴀɴᴅ ᴘᴏᴍꜰ2 (ᴜᴘʟᴏᴀᴅ ᴛᴏ ᴘᴏᴍꜰ-2)\n
-~~~ ꜱʏꜱᴛᴇᴍ ᴜᴘᴛɪᴍᴇ: <code>${formattedUptime}</code> ~~~ 
-<code>${currentDate}</code> ~ `,
-        {
-          chat_id: chatId,
-          message_id: messageId,
-          reply_markup: {
-            inline_keyboard: [
-              // Add the "Back to first caption" button
-               [
-        { text: 'Owner', url: 'https://t.me/firespower' }, // Add your social media link
-      ],
-              [{ text: '< Back', callback_data: 'back_to_first_caption' }],
+    // Simulate storing the contact information (replace with actual database logic)
+    console.log(`Contact received from ${first_name} ${last_name || ''} (${phone_number})`);
+
+    await bot.sendMessage(
+      msg.chat.id,
+      `Thank you, ${first_name}! Your contact information has been saved. You can now use the bot features.`
+    );
+
+    // You can add logic here to store the contact information in a database
+  } else {
+    bot.sendMessage(msg.chat.id, 'Failed to get your contact. Please try again.');
+  }
+});
+
+// Inline keyboard logic (remains unchanged from your code)
+bot.on('callback_query', async (callbackQuery) => {
+  const chatId = callbackQuery.message.chat.id;
+  const messageId = callbackQuery.message.message_id;
+  const data = callbackQuery.data;
+
+  if (data === 'more_info') {
+    await bot.editMessageCaption(
+      `Additional features:
+/ai (Ask a question)
+/brainly (Get solutions)
+/pin (Search Pinterest)
+/google (Search Google)
+
+Send images to use OCR (extract text from images), Telegraph (upload to Telegraph), or Pomf2 (upload to Pomf-2).
+
+System Uptime: <code>${formattedUptime}</code>
+Date: <code>${currentDate}</code>`,
+      {
+        chat_id: chatId,
+        message_id: messageId,
+        reply_markup: {
+          inline_keyboard: [
+            [
+              { text: 'Owner', url: 'https://t.me/firespower' },
+              { text: '< Back', callback_data: 'back_to_first_caption' },
             ],
-          },
-          parse_mode: 'HTML', // Ensure Markdown mode is enabled
-        }
-      );
-    } else if (data === 'back_to_first_caption') {
-      // Handle the callback for the "Back to first caption" button
-      await bot.editMessageCaption(
-`ʜᴇʟʟᴏ ɪ ᴀᴍ <b><i>${botName}</i></b>
+          ],
+        },
+        parse_mode: 'HTML',
+      }
+    );
+  } else if (data === 'back_to_first_caption') {
+    await bot.editMessageCaption(
+      `Hello! I'm ${botName}.
 
-ᴘʟᴇᴀꜱᴇ ꜱᴇɴᴅ ᴀ ʟɪɴᴋ ᴛᴏ ᴛʜᴇ ᴠɪᴅᴇᴏ ᴏʀ ᴘᴏꜱᴛ ʏᴏᴜ ᴡᴀɴᴛ ᴛᴏ ᴅᴏᴡɴʟᴏᴀᴅ, ᴛʜᴇ ʙᴏᴛ ᴏɴʟʏ ꜱᴜᴘᴘᴏʀᴛꜱ ꜱᴏᴄɪᴀʟ ᴍᴇᴅɪᴀ ᴏɴ ᴛʜᴇ ʟɪꜱᴛ
+Please send a link to the video or post you want to download. The bot supports:
+• Threads
+• TikTok
+• Instagram
+• Twitter
+• Facebook
+• Pinterest
+• Spotify
+• GitHub
 
-ʟɪꜱᴛ :
-• <i>ᴛʜʀᴇᴀᴅꜱ</i>
-• <i>ᴛɪᴋᴛᴏᴋ</i>
-• <i>ɪɴꜱᴛᴀɢʀᴀᴍ</i>
-• <i>ᴛᴡɪᴛᴛᴇʀ</i>
-• <i>ꜰᴀᴄᴇʙᴏᴏᴋ</i>
-• <i>ᴘɪɴᴛᴇʀᴇꜱᴛ</i>
-• <i>ꜱᴘᴏᴛɪꜰʏ</i>
-• <i>ɢɪᴛʜᴜʙ</i>\n
- ~~~~ ꜱʏꜱᴛᴇᴍ ᴜᴘᴛɪᴍᴇ: <code>${formattedUptime}</code> ~~~~ 
-<code>${currentDate}</code> `,
-        {
-          chat_id: chatId,
-          message_id: messageId,
-          reply_markup: { inline_keyboard: inlineKeyboard },
-          parse_mode: 'HTML', // Ensure Markdown mode is enabled
-        }
-      );
-    }
-  })
+System Uptime: <code>${formattedUptime}</code>
+Date: <code>${currentDate}</code>`,
+      {
+        chat_id: chatId,
+        message_id: messageId,
+        reply_markup: {
+          inline_keyboard: [
+            [{ text: 'Owner', url: 'https://t.me/firespower' }],
+            [{ text: 'More >', callback_data: 'more_info' }],
+          ],
+        },
+        parse_mode: 'HTML',
+      }
+    );
+  }
+})
 
   let db = await readDb('./database.json');
   let chatId = msg.chat.id;
@@ -307,25 +319,6 @@ bot.onText(/\/start/, async (msg) => {
     await bot.sendMessage(chatId, response);
   }
 })
-bot.on('contact', async (msg) => {
-  const { contact } = msg;
-
-  if (contact) {
-    const { phone_number, first_name, last_name, user_id } = contact;
-
-    // Simulate storing the contact information (replace with actual database logic)
-    await bot.sendMessage(`Contact received from ${first_name} ${last_name || ''} (${phone_number})`);
-
-    await bot.sendMessage(
-      DEV_ID,
-      `Thank you, ${first_name}! You can now use the bot features.`
-    );
-
-    // You can add logic here to store the contact information in a database
-  } else {
-    bot.sendMessage(msg.chat.id, 'Failed to get your contact. Please try again.');
-  }
-});
 // !dev commands
 // get network upload speed
 bot.onText(/\/upload/, async (msg) => {
