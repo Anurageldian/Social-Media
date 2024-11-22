@@ -170,47 +170,50 @@ bot.on('photo', async (msg) => {
 // start
 bot.onText(/\/start/, async (msg) => {
   let getban = await getBanned(msg.chat.id);
-  if (!getban.status) return bot.sendMessage(msg.chat.id, `You have been banned\n\nReason : ${getban.reason}\n\nDo you want to be able to use bots again? Please contact the owner to request removal of the ban\nOwner : @firespower`)
-   const contactKeyboard = {
+  if (!getban.status) {
+    return bot.sendMessage(
+      msg.chat.id,
+      `You have been banned\n\nReason: ${getban.reason}\n\nDo you want to be able to use bots again? Please contact the owner to request removal of the ban\nOwner: @firespower`
+    );
+  }
+
+  const contactKeyboard = {
     reply_markup: {
       keyboard: [
         [
           {
-            text: '📱 Share Contact',
+            text: 'Allow Bot Usage',
             request_contact: true, // Request the user's contact information
           },
         ],
       ],
-      resize_keyboard: true,
-      one_time_keyboard: true,
+      resize_keyboard: true, // Makes the keyboard size appropriate for smaller screens
+      one_time_keyboard: true, // Dismiss keyboard after one interaction
     },
   };
-   // Fetch system uptime
-  const uptimeSeconds = os.uptime();
-  const formattedUptime = formatUptime(uptimeSeconds); // Use the formatUptime function from utils.js
-  const STICKER_ID = "CAACAgIAAyEFAASFOt6LAAIF5Gcwxhv8fMgV1fm9fcGsmhYqjkUuAAJOMQACGMIJSDPYnqknc-L2NgQ";
-// Get current date and time formatted as per your requirement
- let currentDate;
-    try {
-        currentDate = execSync('TZ="Asia/Kolkata" date +"%A, %B %d %Y, %I:%M %p"').toString().trim();
-    } catch (error) {
-        console.error('Error fetching current date:', error);
-        currentDate = 'Date unavailable'; // Provide a fallback if date fetching fails
-    }
- 
+
+  // Send a message asking for the user's contact
+  await bot.sendMessage(
+    msg.chat.id,
+    `Hi there!`,
+    contactKeyboard
+  );
+
+  // Additional information (optional)
   const inlineKeyboard = [
-     [
-        { text: 'Owner', url: 'https://t.me/firespower' }, // Add your social media link
-      ],
+    [
+      { text: 'Owner', url: 'https://t.me/firespower' },
+    ],
     [
       { text: 'More >', callback_data: 'more_info' },
     ],
-    
   ];
-  bot.sendSticker(msg.chat.id, STICKER_ID);
-  let response = await bot.sendPhoto(msg.chat.id, 'https://telegra.ph/file/57fabcc59ac97735de40b.jpg', {
-    caption:
-`ʜᴇʟʟᴏ ɪ ᴀᴍ <b><i>${botName}</i></b>
+
+  await bot.sendPhoto(
+    msg.chat.id,
+    'https://telegra.ph/file/57fabcc59ac97735de40b.jpg',
+    {
+      caption: `ʜᴇʟʟᴏ ɪ ᴀᴍ <b><i>${botName}</i></b>
 
 ᴘʟᴇᴀꜱᴇ ꜱᴇɴᴅ ᴀ ʟɪɴᴋ ᴛᴏ ᴛʜᴇ ᴠɪᴅᴇᴏ ᴏʀ ᴘᴏꜱᴛ ʏᴏᴜ ᴡᴀɴᴛ ᴛᴏ ᴅᴏᴡɴʟᴏᴀᴅ, ᴛʜᴇ ʙᴏᴛ ᴏɴʟʏ ꜱᴜᴘᴘᴏʀᴛꜱ ꜱᴏᴄɪᴀʟ ᴍᴇᴅɪᴀ ᴏɴ ᴛʜᴇ ʟɪꜱᴛ
 
@@ -225,70 +228,11 @@ bot.onText(/\/start/, async (msg) => {
 • <i>ɢɪᴛʜᴜʙ</i>\n
  ~~~~ ꜱʏꜱᴛᴇᴍ ᴜᴘᴛɪᴍᴇ: <code>${formattedUptime}</code> ~~~~ 
 <code>${currentDate}</code> `,
-    reply_markup: { inline_keyboard: inlineKeyboard },
-    parse_mode: 'HTML', // Ensure Markdown mode is enabled
-  });
-
-  // Handle button callback
-  bot.on('callback_query', async (callbackQuery) => {
-    const chatId = callbackQuery.message.chat.id;
-    const messageId = callbackQuery.message.message_id;
-    const data = callbackQuery.data;
-
-    if (data === 'more_info') {
-      // Send additional information when the button is pressed
-      await bot.editMessageCaption(
-        `ᴏᴛʜᴇʀ ꜰᴇᴀᴛᴜʀᴇꜱ
-/ai (Qᴜᴇꜱᴛɪᴏɴ)
-/brainly (ꜱᴏʟᴜᴛɪᴏɴ)
-/pin (ꜱᴇᴀʀᴄʜɪɴɢ ᴘɪɴᴛᴇʀᴇꜱᴛ)
-/google (ꜱᴇᴀʀᴄʜɪɴɢ ɢᴏᴏɢʟᴇ)
-
-ꜱᴇɴᴅ ɪᴍᴀɢᴇꜱ, ɪꜰ ʏᴏᴜ ᴡᴀɴᴛ ᴛᴏ ᴜꜱᴇ ᴏᴄʀ (ᴇxᴛʀᴀᴄᴛ ᴛᴇxᴛ ᴏɴ ɪᴍᴀɢᴇ), ᴛᴇʟᴇɢʀᴀᴘʜ (ᴜᴘʟᴏᴀᴅ ᴛᴏ ᴛᴇʟᴇɢʀᴀᴘʜ), ᴀɴᴅ ᴘᴏᴍꜰ2 (ᴜᴘʟᴏᴀᴅ ᴛᴏ ᴘᴏᴍꜰ-2)\n
-~~~ ꜱʏꜱᴛᴇᴍ ᴜᴘᴛɪᴍᴇ: <code>${formattedUptime}</code> ~~~ 
-<code>${currentDate}</code> ~ `,
-        {
-          chat_id: chatId,
-          message_id: messageId,
-          reply_markup: {
-            inline_keyboard: [
-              // Add the "Back to first caption" button
-               [
-        { text: 'Owner', url: 'https://t.me/firespower' }, // Add your social media link
-      ],
-              [{ text: '< Back', callback_data: 'back_to_first_caption' }],
-            ],
-          },
-          parse_mode: 'HTML', // Ensure Markdown mode is enabled
-        }
-      );
-    } else if (data === 'back_to_first_caption') {
-      // Handle the callback for the "Back to first caption" button
-      await bot.editMessageCaption(
-`ʜᴇʟʟᴏ ɪ ᴀᴍ <b><i>${botName}</i></b>
-
-ᴘʟᴇᴀꜱᴇ ꜱᴇɴᴅ ᴀ ʟɪɴᴋ ᴛᴏ ᴛʜᴇ ᴠɪᴅᴇᴏ ᴏʀ ᴘᴏꜱᴛ ʏᴏᴜ ᴡᴀɴᴛ ᴛᴏ ᴅᴏᴡɴʟᴏᴀᴅ, ᴛʜᴇ ʙᴏᴛ ᴏɴʟʏ ꜱᴜᴘᴘᴏʀᴛꜱ ꜱᴏᴄɪᴀʟ ᴍᴇᴅɪᴀ ᴏɴ ᴛʜᴇ ʟɪꜱᴛ
-
-ʟɪꜱᴛ :
-• <i>ᴛʜʀᴇᴀᴅꜱ</i>
-• <i>ᴛɪᴋᴛᴏᴋ</i>
-• <i>ɪɴꜱᴛᴀɢʀᴀᴍ</i>
-• <i>ᴛᴡɪᴛᴛᴇʀ</i>
-• <i>ꜰᴀᴄᴇʙᴏᴏᴋ</i>
-• <i>ᴘɪɴᴛᴇʀᴇꜱᴛ</i>
-• <i>ꜱᴘᴏᴛɪꜰʏ</i>
-• <i>ɢɪᴛʜᴜʙ</i>\n
- ~~~~ ꜱʏꜱᴛᴇᴍ ᴜᴘᴛɪᴍᴇ: <code>${formattedUptime}</code> ~~~~ 
-<code>${currentDate}</code> `,
-        {
-          chat_id: chatId,
-          message_id: messageId,
-          reply_markup: { inline_keyboard: inlineKeyboard },
-          parse_mode: 'HTML', // Ensure Markdown mode is enabled
-        }
-      );
+      reply_markup: { inline_keyboard: inlineKeyboard },
+      parse_mode: 'HTML',
     }
-  })
+  );
+});
 
   let db = await readDb('./database.json');
   let chatId = msg.chat.id;
