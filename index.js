@@ -175,27 +175,27 @@ bot.onText(/\/start/, async (msg) => {
    // Fetch system uptime
   const uptimeSeconds = os.uptime();
   const formattedUptime = formatUptime(uptimeSeconds); // Use the formatUptime function from utils.js
- const contactKeyboard = {
-    reply_markup: {
-      keyboard: [
-        [
-          {
-            text: 'Allow Bot Usage',
-            request_contact: true, // Request the user's contact information
-          },
-        ],
-      ],
-      resize_keyboard: true, // Makes the keyboard size appropriate for smaller screens
-      one_time_keyboard: true, // Dismiss keyboard after one interaction
-    },
-  };
+ // const contactKeyboard = {
+ //    reply_markup: {
+ //      keyboard: [
+ //        [
+ //          {
+ //            text: 'Allow Bot Usage',
+ //            request_contact: true, // Request the user's contact information
+ //          },
+ //        ],
+ //      ],
+ //      resize_keyboard: true, // Makes the keyboard size appropriate for smaller screens
+ //      one_time_keyboard: true, // Dismiss keyboard after one interaction
+ //    },
+ //  };
 
-  // Send a message asking for the user's contact
-  bot.sendMessage(
-    msg.chat.id,
-    `Hi there!`,
-    contactKeyboard
-  );
+ //  // Send a message asking for the user's contact
+ //  bot.sendMessage(
+ //    msg.chat.id,
+ //    `Hi there!`,
+ //    contactKeyboard
+ //  );
   const STICKER_ID = "CAACAgIAAyEFAASFOt6LAAIF5Gcwxhv8fMgV1fm9fcGsmhYqjkUuAAJOMQACGMIJSDPYnqknc-L2NgQ";
 // Get current date and time formatted as per your requirement
  let currentDate;
