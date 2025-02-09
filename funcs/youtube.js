@@ -7,19 +7,19 @@ async function getYoutube(bot, chatId, url, userName) {
     let load = await bot.sendMessage(chatId, 'Fetching available formats, please wait...');
     try {
         let buttons = [];
-        buttons.push([{ text: '🎵 Audio 32kbps', callback_data: `yta ${url} 1` }]);
-        buttons.push([{ text: '🎵 Audio 64kbps', callback_data: `yta ${url} 2` }]);
-        buttons.push([{ text: '🎵 Audio 128kbps', callback_data: `yta ${url} 3` }]);
-        buttons.push([{ text: '🎵 Audio 192kbps', callback_data: `yta ${url} 4` }]);
+        buttons.push([{ text: '🎵 Audio 32kbps', callback_data: `yta|${url}|1` }]);
+        buttons.push([{ text: '🎵 Audio 64kbps', callback_data: `yta|${url}|2` }]);
+        buttons.push([{ text: '🎵 Audio 128kbps', callback_data: `yta|${url}|3` }]);
+        buttons.push([{ text: '🎵 Audio 192kbps', callback_data: `yta|${url}|4` }]);
         
-        buttons.push([{ text: '🎥 Video 144p', callback_data: `ytv ${url} 1` }]);
-        buttons.push([{ text: '🎥 Video 240p', callback_data: `ytv ${url} 2` }]);
-        buttons.push([{ text: '🎥 Video 360p', callback_data: `ytv ${url} 3` }]);
-        buttons.push([{ text: '🎥 Video 480p', callback_data: `ytv ${url} 4` }]);
-        buttons.push([{ text: '🎥 Video 720p', callback_data: `ytv ${url} 5` }]);
-        buttons.push([{ text: '🎥 Video 1080p', callback_data: `ytv ${url} 6` }]);
-        buttons.push([{ text: '🎥 Video 1440p', callback_data: `ytv ${url} 7` }]);
-        buttons.push([{ text: '🎥 Video 2160p', callback_data: `ytv ${url} 8` }]);
+        buttons.push([{ text: '🎥 Video 144p', callback_data: `ytv|${url}|1` }]);
+        buttons.push([{ text: '🎥 Video 240p', callback_data: `ytv|${url}|2` }]);
+        buttons.push([{ text: '🎥 Video 360p', callback_data: `ytv|${url}|3` }]);
+        buttons.push([{ text: '🎥 Video 480p', callback_data: `ytv|${url}|4` }]);
+        buttons.push([{ text: '🎥 Video 720p', callback_data: `ytv|${url}|5` }]);
+        buttons.push([{ text: '🎥 Video 1080p', callback_data: `ytv|${url}|6` }]);
+        buttons.push([{ text: '🎥 Video 1440p', callback_data: `ytv|${url}|7` }]);
+        buttons.push([{ text: '🎥 Video 2160p', callback_data: `ytv|${url}|8` }]);
         
         let options = {
             caption: `🎬 YouTube Video\n\nSelect the desired quality:`,
@@ -57,7 +57,19 @@ async function downloadYoutube(bot, chatId, url, quality, type) {
     }
 }
 
-module.exports = { getYoutube, downloadYoutube };
+function setupBotHandlers(bot) {
+    bot.on('callback_query', async (query) => {
+        const chatId = query.message.chat.id;
+        const [type, url, quality] = query.data.split('|');
+        
+        if (type === 'yta' || type === 'ytv') {
+            await bot.answerCallbackQuery(query.id, { text: 'Processing your request...' });
+            await downloadYoutube(bot, chatId, url, quality, type === 'yta' ? 'audio' : 'video');
+        }
+    });
+}
+
+module.exports = { getYoutube, downloadYoutube, setupBotHandlers };
 
 // require('dotenv').config();
 // const axios = require('axios');
