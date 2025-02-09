@@ -4610,11 +4610,11 @@ bot.on('callback_query', async (mil) => {
    }else if (data.startsWith('ytv')) {
     let args = url.split(' ');
     await bot.deleteMessage(chatid, msgid);
-    await getYoutubeVideo(bot, chatid, args[0], args[1], usrnm);
+    await downloadYoutube(bot, chatid, args[0], args[1], usrnm);
   } else if (data.startsWith('yta')) {
     let args = url.split(' ');
     await bot.deleteMessage(chatid, msgid);
-    await getYoutubeAudio(bot, chatid, args[0], args[1], usrnm);
+    await downloadYoutube(bot, chatid, args[0], args[1], usrnm);
  } else if (data.startsWith('tourl1')) {
     await bot.deleteMessage(chatid, msgid);
     await telegraphUpload(bot, chatid, url, usrnm);
