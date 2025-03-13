@@ -591,24 +591,49 @@ bot.onText(/(https?:\/\/)?(www\.)?(open\.spotify\.com|spotify\.?com)\/playlist\/
   }
 })
 
-
 // Youtube Regex
-bot.onText(/^(?:https?:\/\/)?(?:www\.|m\.|music\.)?youtu\.?be(?:\.com)?\/?.*(?:watch|embed)?(?:.*v=|v\/|\/)([\w\-_]+)\&?/, async (msg, match) => {
+// bot.onText(/^(?:https?:\/\/)?(?:www\.|m\.|music\.)?youtu\.?be(?:\.com)?\/?.*(?:watch|embed)?(?:.*v=|v\/|\/)([\w\-_]+)\&?/, async (msg, match) => {
+//   let getban = await getBanned(msg.chat.id);
+//   if (!getban.status) return bot.sendMessage(msg.chat.id, `You have been banned\n\nReason : ${getban.reason}\n\nDo you want to be able to use bots again? Please contact the owner to request removal of the ban\nOwner : @firespower`)
+//   let userId = msg.from.id.toString();
+//   if (userLocks[userId]) {
+//     return;
+//   }
+//   userLocks[userId] = true;
+//   try {
+//     if (match[0].includes("/live/")) return bot.sendMessage(msg.chat.id, `Cannot download livestream video`)
+//     await bot.sendMessage(logChannelId, `[ Usage Log ]\n◇ FIRST NAME : ${msg.from.first_name ? msg.from.first_name : "-"}\n◇ LAST NAME : ${msg.from.last_name ? msg.from.last_name : "-"}\n◇ USERNAME : ${msg.from.username ? "@" + msg.from.username : "-"}\n◇ ID : ${msg.from.id}\n\nContent: ${msg.text.slice(0, 1000)}`, { disable_web_page_preview: true })
+//     await getYoutube(bot, msg.chat.id, match[0], msg.chat.username)
+//   } finally {
+//     userLocks[userId] = false;
+//   }
+// })
+
+bot.onText(/^(?:https?:\/\/)?(?:www\.|m\.|music\.)?(?:youtube\.com|youtu\.be)\/(?:watch\?v=|embed\/|v\/|shorts\/|live\/)?([\w\-]+)/, async (msg, match) => {
   let getban = await getBanned(msg.chat.id);
-  if (!getban.status) return bot.sendMessage(msg.chat.id, `You have been banned\n\nReason : ${getban.reason}\n\nDo you want to be able to use bots again? Please contact the owner to request removal of the ban\nOwner : @firespower`)
-  let userId = msg.from.id.toString();
-  if (userLocks[userId]) {
-    return;
+  if (!getban.status) {
+    return bot.sendMessage(msg.chat.id, `You have been banned\n\nReason : ${getban.reason}\n\nDo you want to be able to use bots again? Please contact the owner to request removal of the ban\nOwner : @firespower`);
   }
+  
+  let userId = msg.from.id.toString();
+  if (userLocks[userId]) return;
+  
   userLocks[userId] = true;
   try {
-    if (match[0].includes("/live/")) return bot.sendMessage(msg.chat.id, `Cannot download livestream video`)
-    await bot.sendMessage(logChannelId, `[ Usage Log ]\n◇ FIRST NAME : ${msg.from.first_name ? msg.from.first_name : "-"}\n◇ LAST NAME : ${msg.from.last_name ? msg.from.last_name : "-"}\n◇ USERNAME : ${msg.from.username ? "@" + msg.from.username : "-"}\n◇ ID : ${msg.from.id}\n\nContent: ${msg.text.slice(0, 1000)}`, { disable_web_page_preview: true })
-    await getYoutube(bot, msg.chat.id, match[0], msg.chat.username)
+    const videoId = match[1]; // Extracted video ID
+    
+    if (msg.text.includes("/live/")) {
+      return bot.sendMessage(msg.chat.id, `Cannot download livestream video`);
+    }
+    
+    await bot.sendMessage(logChannelId, `[ Usage Log ]\n◇ FIRST NAME : ${msg.from.first_name || "-"}\n◇ LAST NAME : ${msg.from.last_name || "-"}\n◇ USERNAME : ${msg.from.username ? "@" + msg.from.username : "-"}\n◇ ID : ${msg.from.id}\n\nContent: ${msg.text.slice(0, 1000)}`, { disable_web_page_preview: true });
+    
+    await getYoutube(bot, msg.chat.id, videoId, msg.chat.username); // Pass video ID instead of full URL
   } finally {
     userLocks[userId] = false;
   }
 })
+
 
 // Facebook Regex
 bot.onText(/^https?:\/\/(www\.)?(m\.)?facebook\.com\/.+/, async (msg, match) => {
