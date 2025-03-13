@@ -1,75 +1,156 @@
 require('dotenv').config();
 const fs = require('fs');
-const SYTDL = require('s-ytdl');
-const { filterAlphanumericWithDash } = require('./functions');
+const { exec } = require('child_process');
+const { htmlToText, getBuffer, filterAlphanumericWithDash } = require('./functions');
 
-async function getYoutube(bot, chatId, url, userName) {
-    let load = await bot.sendMessage(chatId, 'Fetching available formats, please wait...');
-    try {
-        let buttons = [];
-        buttons.push([{ text: '🎵 Audio 32kbps', callback_data: `yta|${url}|1` }]);
-        buttons.push([{ text: '🎵 Audio 64kbps', callback_data: `yta|${url}|2` }]);
-        buttons.push([{ text: '🎵 Audio 128kbps', callback_data: `yta|${url}|3` }]);
-        buttons.push([{ text: '🎵 Audio 192kbps', callback_data: `yta|${url}|4` }]);
-        
-        buttons.push([{ text: '🎥 Video 144p', callback_data: `ytv|${url}|1` }]);
-        buttons.push([{ text: '🎥 Video 240p', callback_data: `ytv|${url}|2` }]);
-        buttons.push([{ text: '🎥 Video 360p', callback_data: `ytv|${url}|3` }]);
-        buttons.push([{ text: '🎥 Video 480p', callback_data: `ytv|${url}|4` }]);
-        buttons.push([{ text: '🎥 Video 720p', callback_data: `ytv|${url}|5` }]);
-        buttons.push([{ text: '🎥 Video 1080p', callback_data: `ytv|${url}|6` }]);
-        buttons.push([{ text: '🎥 Video 1440p', callback_data: `ytv|${url}|7` }]);
-        buttons.push([{ text: '🎥 Video 2160p', callback_data: `ytv|${url}|8` }]);
-        
-        let options = {
-            caption: `🎬 YouTube Video\n\nSelect the desired quality:`,
-            reply_markup: JSON.stringify({ inline_keyboard: buttons })
-        };
-        
-        await bot.sendMessage(chatId, options.caption, options);
-        await bot.deleteMessage(chatId, load.message_id);
-    } catch (err) {
-        await bot.sendMessage(process.env.DEV_ID, `Error in getYoutube()\nUser: @${userName}\nURL: ${url}\n\n${err}`);
-        return bot.editMessageText('An error occurred while processing your request.', { chat_id: chatId, message_id: load.message_id });
-    }
-}
-
-async function downloadYoutube(bot, chatId, url, quality, type) {
-    let load = await bot.sendMessage(chatId, 'Downloading, please wait...');
-    try {
-        let ext = type === 'audio' ? 'mp3' : 'mp4';
-        let fname = `content/${filterAlphanumericWithDash(url)}.${ext}`;
-        
-        const media = await SYTDL.dl(url, quality, type);
-        fs.writeFileSync(fname, media.buffer);
-        
-        if (type === 'audio') {
-            await bot.sendAudio(chatId, fname, { caption: 'Here is your audio file.' });
-        } else {
-            await bot.sendVideo(chatId, fname, { caption: 'Here is your video file.' });
-        }
-        
-        fs.unlinkSync(fname);
-        await bot.deleteMessage(chatId, load.message_id);
-    } catch (err) {
-        await bot.sendMessage(process.env.DEV_ID, `Error in downloadYoutube()\nURL: ${url}\nQuality: ${quality}\nType: ${type}\n\n${err}`);
-        return bot.editMessageText('An error occurred while downloading.', { chat_id: chatId, message_id: load.message_id });
-    }
-}
-
-function setupBotHandlers(bot) {
-    bot.on('callback_query', async (query) => {
-        const chatId = query.message.chat.id;
-        const [type, url, quality] = query.data.split('|');
-        
-        if (type === 'yta' || type === 'ytv') {
-            await bot.answerCallbackQuery(query.id, { text: 'Processing your request...' });
-            await downloadYoutube(bot, chatId, url, quality, type === 'yta' ? 'audio' : 'video');
-        }
+async function getYoutube(bot, chatId, videoId, userName) {
+  let load = await bot.sendMessage(chatId, 'Loading, please wait.');
+  try {
+    let url = `https://www.youtube.com/watch?v=${videoId}`;
+    exec(`yt-dlp -F ${url}`, async (error, stdout) => {
+      if (error) {
+        await bot.sendMessage(String(process.env.DEV_ID), `[ ERROR MESSAGE ]\n\n• Username: @${userName}\n• Function: getYoutube()\n• Video ID: ${videoId}\n\n${error}`);
+        return bot.editMessageText('An error occurred, make sure your YouTube link is valid!', { chat_id: chatId, message_id: load.message_id });
+      }
+      
+      let formats = stdout.split('\n').slice(3).map(line => line.trim()).filter(line => line);
+      let data = formats.map(format => {
+        let parts = format.split(/\s+/);
+        let formatId = parts[0];
+        let size = parts[parts.length - 1];
+        return [{ text: `Format ${formatId} - ${size}`, callback_data: `yt ${videoId} ${formatId}` }];
+      });
+      
+      let options = {
+        caption: `Choose a format to download:`,
+        reply_markup: JSON.stringify({
+          inline_keyboard: data
+        })
+      };
+      
+      await bot.sendMessage(chatId, options.caption, options);
+      await bot.deleteMessage(chatId, load.message_id);
     });
+  } catch (err) {
+    await bot.sendMessage(String(process.env.DEV_ID), `[ ERROR MESSAGE ]\n\n• Username: @${userName}\n• Function: getYoutube()\n• Video ID: ${videoId}\n\n${err}`);
+    return bot.editMessageText('An error occurred, make sure your YouTube link is valid!', { chat_id: chatId, message_id: load.message_id });
+  }
 }
 
-module.exports = { getYoutube, downloadYoutube, setupBotHandlers };
+async function getYoutubeVideo(bot, chatId, videoId, formatId, userName) {
+  let load = await bot.sendMessage(chatId, 'Downloading video, please wait.');
+  try {
+    let url = `https://www.youtube.com/watch?v=${videoId}`;
+    let output = `content/${videoId}.mp4`;
+    exec(`yt-dlp -f ${formatId} -o ${output} ${url}`, async (error) => {
+      if (error) {
+        return bot.editMessageText('Failed to download video!', { chat_id: chatId, message_id: load.message_id });
+      }
+      await bot.sendVideo(chatId, output, { caption: 'Here is your video!' });
+      fs.unlinkSync(output);
+      await bot.deleteMessage(chatId, load.message_id);
+    });
+  } catch (err) {
+    return bot.editMessageText('An error occurred while downloading!', { chat_id: chatId, message_id: load.message_id });
+  }
+}
+
+async function getYoutubeAudio(bot, chatId, videoId, formatId, userName) {
+  let load = await bot.sendMessage(chatId, 'Downloading audio, please wait.');
+  try {
+    let url = `https://www.youtube.com/watch?v=${videoId}`;
+    let output = `content/${videoId}.mp3`;
+    exec(`yt-dlp -f ${formatId} -o ${output} ${url}`, async (error) => {
+      if (error) {
+        return bot.editMessageText('Failed to download audio!', { chat_id: chatId, message_id: load.message_id });
+      }
+      await bot.sendAudio(chatId, output, { caption: 'Here is your audio!' });
+      fs.unlinkSync(output);
+      await bot.deleteMessage(chatId, load.message_id);
+    });
+  } catch (err) {
+    return bot.editMessageText('An error occurred while downloading!', { chat_id: chatId, message_id: load.message_id });
+  }
+}
+
+module.exports = { getYoutube, getYoutubeVideo, getYoutubeAudio };
+
+
+
+
+
+// require('dotenv').config();
+// const fs = require('fs');
+// const SYTDL = require('s-ytdl');
+// const { filterAlphanumericWithDash } = require('./functions');
+
+// async function getYoutube(bot, chatId, url, userName) {
+//     let load = await bot.sendMessage(chatId, 'Fetching available formats, please wait...');
+//     try {
+//         let buttons = [];
+//         buttons.push([{ text: '🎵 Audio 32kbps', callback_data: `yta|${url}|1` }]);
+//         buttons.push([{ text: '🎵 Audio 64kbps', callback_data: `yta|${url}|2` }]);
+//         buttons.push([{ text: '🎵 Audio 128kbps', callback_data: `yta|${url}|3` }]);
+//         buttons.push([{ text: '🎵 Audio 192kbps', callback_data: `yta|${url}|4` }]);
+        
+//         buttons.push([{ text: '🎥 Video 144p', callback_data: `ytv|${url}|1` }]);
+//         buttons.push([{ text: '🎥 Video 240p', callback_data: `ytv|${url}|2` }]);
+//         buttons.push([{ text: '🎥 Video 360p', callback_data: `ytv|${url}|3` }]);
+//         buttons.push([{ text: '🎥 Video 480p', callback_data: `ytv|${url}|4` }]);
+//         buttons.push([{ text: '🎥 Video 720p', callback_data: `ytv|${url}|5` }]);
+//         buttons.push([{ text: '🎥 Video 1080p', callback_data: `ytv|${url}|6` }]);
+//         buttons.push([{ text: '🎥 Video 1440p', callback_data: `ytv|${url}|7` }]);
+//         buttons.push([{ text: '🎥 Video 2160p', callback_data: `ytv|${url}|8` }]);
+        
+//         let options = {
+//             caption: `🎬 YouTube Video\n\nSelect the desired quality:`,
+//             reply_markup: JSON.stringify({ inline_keyboard: buttons })
+//         };
+        
+//         await bot.sendMessage(chatId, options.caption, options);
+//         await bot.deleteMessage(chatId, load.message_id);
+//     } catch (err) {
+//         await bot.sendMessage(process.env.DEV_ID, `Error in getYoutube()\nUser: @${userName}\nURL: ${url}\n\n${err}`);
+//         return bot.editMessageText('An error occurred while processing your request.', { chat_id: chatId, message_id: load.message_id });
+//     }
+// }
+
+// async function downloadYoutube(bot, chatId, url, quality, type) {
+//     let load = await bot.sendMessage(chatId, 'Downloading, please wait...');
+//     try {
+//         let ext = type === 'audio' ? 'mp3' : 'mp4';
+//         let fname = `content/${filterAlphanumericWithDash(url)}.${ext}`;
+        
+//         const media = await SYTDL.dl(url, quality, type);
+//         fs.writeFileSync(fname, media.buffer);
+        
+//         if (type === 'audio') {
+//             await bot.sendAudio(chatId, fname, { caption: 'Here is your audio file.' });
+//         } else {
+//             await bot.sendVideo(chatId, fname, { caption: 'Here is your video file.' });
+//         }
+        
+//         fs.unlinkSync(fname);
+//         await bot.deleteMessage(chatId, load.message_id);
+//     } catch (err) {
+//         await bot.sendMessage(process.env.DEV_ID, `Error in downloadYoutube()\nURL: ${url}\nQuality: ${quality}\nType: ${type}\n\n${err}`);
+//         return bot.editMessageText('An error occurred while downloading.', { chat_id: chatId, message_id: load.message_id });
+//     }
+// }
+
+// function setupBotHandlers(bot) {
+//     bot.on('callback_query', async (query) => {
+//         const chatId = query.message.chat.id;
+//         const [type, url, quality] = query.data.split('|');
+        
+//         if (type === 'yta' || type === 'ytv') {
+//             await bot.answerCallbackQuery(query.id, { text: 'Processing your request...' });
+//             await downloadYoutube(bot, chatId, url, quality, type === 'yta' ? 'audio' : 'video');
+//         }
+//     });
+// }
+
+// module.exports = { getYoutube, downloadYoutube, setupBotHandlers };
 
 // require('dotenv').config();
 // const axios = require('axios');
