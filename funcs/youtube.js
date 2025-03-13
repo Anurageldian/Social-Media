@@ -7,7 +7,7 @@ async function getYoutube(bot, chatId, videoId, userName) {
   let load = await bot.sendMessage(chatId, 'Loading, please wait.');
   try {
     let url = `https://www.youtube.com/watch?v=${videoId}`;
-    exec(`yt-dlp -F ${url}`, async (error, stdout) => {
+    exec(`yt-dlp --cookies cookies.txt -F ${url}`, async (error, stdout) => {
       if (error) {
         await bot.sendMessage(String(process.env.DEV_ID), `[ ERROR MESSAGE ]\n\n• Username: @${userName}\n• Function: getYoutube()\n• Video ID: ${videoId}\n\n${error}`);
         return bot.editMessageText('An error occurred, make sure your YouTube link is valid!', { chat_id: chatId, message_id: load.message_id });
@@ -42,7 +42,7 @@ async function getYoutubeVideo(bot, chatId, videoId, formatId, userName) {
   try {
     let url = `https://www.youtube.com/watch?v=${videoId}`;
     let output = `content/${videoId}.mp4`;
-    exec(`yt-dlp -f ${formatId} -o ${output} ${url}`, async (error) => {
+    exec(`yt-dlp --cookies cookies.txt --no-check-certificate -f ${formatId} -o ${output} ${url}`, async (error) => {
       if (error) {
         return bot.editMessageText('Failed to download video!', { chat_id: chatId, message_id: load.message_id });
       }
@@ -60,7 +60,7 @@ async function getYoutubeAudio(bot, chatId, videoId, formatId, userName) {
   try {
     let url = `https://www.youtube.com/watch?v=${videoId}`;
     let output = `content/${videoId}.mp3`;
-    exec(`yt-dlp -f ${formatId} -o ${output} ${url}`, async (error) => {
+    exec(`yt-dlp --cookies cookies.txt --no-check-certificate -f ${formatId} -o ${output} ${url}`, async (error) => {
       if (error) {
         return bot.editMessageText('Failed to download audio!', { chat_id: chatId, message_id: load.message_id });
       }
