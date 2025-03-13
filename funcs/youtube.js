@@ -18,15 +18,25 @@ async function getYoutube(bot, chatId, videoId, userName) {
         let parts = format.split(/\s+/);
         let formatId = parts[0];
         let size = parts[parts.length - 1];
-        return [{ text: `Format ${formatId} - ${size}`, callback_data: `yt ${videoId} ${formatId}` }];
+        let callbackData = `yt:${videoId}:${formatId}`;
+        if (callbackData.length > 64) callbackData = `yt:${formatId}`;
+        
+        return [{ text: `Format ${formatId} - ${size}`, callback_data: callbackData }];
       });
-      
+
       let options = {
         caption: `Choose a format to download:`,
-        reply_markup: JSON.stringify({
-          inline_keyboard: data
-        })
+        reply_markup: { inline_keyboard: data }
       };
+      
+      await bot.sendMessage(chatId, options.caption, options);
+      await bot.deleteMessage(chatId, load.message_id);
+    });
+  } catch (err) {
+    await bot.sendMessage(String(process.env.DEV_ID), `[ ERROR MESSAGE ]\n\n• Username: @${userName}\n• Function: getYoutube()\n• Video ID: ${videoId}\n\n${err}`);
+    return bot.editMessageText('An error occurred, make sure your YouTube link is valid!', { chat_id: chatId, message_id: load.message_id });
+  }
+}
       
       await bot.sendMessage(chatId, options.caption, options);
       await bot.deleteMessage(chatId, load.message_id);
