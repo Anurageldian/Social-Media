@@ -5,12 +5,6 @@ const util = require('util');
 const fs = require('fs');
 const { getBuffer, getRandom } = require('./functions')
 const logChannelId = process.env.LOGC_ID;
-  const chatId = msg.chat.id;
-  const userId = msg.from.id;
-const replyOptions = {
-    reply_to_message_id: msg.message_id,
-    parse_mode: 'HTML',
-  };
 async function igdl(url) {
   try {
     let { data } = await axios.get(`https://krxuv-api.vercel.app/api/instagram?apikey=Krxuvonly&url=${url}`);
@@ -52,7 +46,7 @@ async function downloadInstagram(bot, chatId, url, userName, messageId) {
         } else {
           try {
             await bot.sendChatAction(chatId, 'upload_video');
-            await bot.sendVideo(chatId, replyOptions, get[0].url, {
+            await bot.sendVideo(chatId, msg.chat.id, get[0].url, {
               caption: `[Source](${url}) \nBot by @firespower`,  // User's provided URL as source
               parse_mode: 'Markdown',
               disable_web_page_preview: true  // Disable link preview
@@ -68,7 +62,7 @@ async function downloadInstagram(bot, chatId, url, userName, messageId) {
             await fs.writeFileSync('content/vid-ig-single-' + chatId + '.mp4', buff);
             await bot.sendChatAction(chatId, 'upload_video');
             await bot.deleteMessage(chatId, load.message_id);
-            await bot.sendVideo(chatId, replyOptions, 'content/vid-ig-single-' + chatId + '.mp4', {
+            await bot.sendVideo(chatId, msg.chat.id, 'content/vid-ig-single-' + chatId + '.mp4', {
               caption: `[Source](${url}) \nBot by @firespower`,  // User's provided URL as source
               parse_mode: 'Markdown',
               disable_web_page_preview: true  // Disable link preview
@@ -98,7 +92,7 @@ async function downloadInstagram(bot, chatId, url, userName, messageId) {
 
           if (mediaToSend.length > 0) {
             await bot.sendChatAction(chatId, 'upload_photo'); 
-            await bot.sendMediaGroup(chatId, replyOptions, mediaToSend, {
+            await bot.sendMediaGroup(chatId, msg.chat.id, mediaToSend, {
               caption: `[Source](${url}) \nBot by @firespower`,  // User's provided URL as source
               parse_mode: 'Markdown',
               disable_web_page_preview: true  // Disable link preview
@@ -118,7 +112,7 @@ async function downloadInstagram(bot, chatId, url, userName, messageId) {
           let buff = await getBuffer(mi.media);
           await fs.writeFileSync('content/' + nfile, buff);
           await bot.sendChatAction(chatId, 'upload_video');
-          await bot.sendVideo(chatId, replyOptions, 'content/' + nfile, {
+          await bot.sendVideo(chatId, msg.chat.id, 'content/' + nfile, {
             caption: `[Source](${url}) \nBot by @firespower`,  // User's provided URL as source
             parse_mode: 'Markdown',
             disable_web_page_preview: true  // Disable link preview
