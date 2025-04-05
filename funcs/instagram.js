@@ -5,7 +5,9 @@ const util = require('util');
 const fs = require('fs');
 const { getBuffer, getRandom } = require('./functions')
 const logChannelId = process.env.LOGC_ID;
-  const replyOptions = {
+  const chatId = msg.chat.id;
+  const userId = msg.from.id;
+const replyOptions = {
     reply_to_message_id: msg.message_id,
     parse_mode: 'HTML',
   };
