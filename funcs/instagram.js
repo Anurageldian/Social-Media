@@ -47,7 +47,7 @@ async function downloadInstagram(bot, chatId, url, userName, messageId) {
         } else {
           try {
             await bot.sendChatAction(chatId, 'upload_video');
-            await bot.sendVideo(chatId, get[0].url, {
+            await bot.sendVideo(chatId, reply_to_message_id: msg.message_id, get[0].url, {
               caption: `[Source](${url}) \nBot by @firespower`,  // User's provided URL as source
               parse_mode: 'Markdown',
               disable_web_page_preview: true  // Disable link preview
@@ -63,7 +63,7 @@ async function downloadInstagram(bot, chatId, url, userName, messageId) {
             await fs.writeFileSync('content/vid-ig-single-' + chatId + '.mp4', buff);
             await bot.sendChatAction(chatId, 'upload_video');
             await bot.deleteMessage(chatId, load.message_id);
-            await bot.sendVideo(chatId, 'content/vid-ig-single-' + chatId + '.mp4', {
+            await bot.sendVideo(chatId, reply_to_message_id: msg.message_id, 'content/vid-ig-single-' + chatId + '.mp4', {
               caption: `[Source](${url}) \nBot by @firespower`,  // User's provided URL as source
               parse_mode: 'Markdown',
               disable_web_page_preview: true  // Disable link preview
@@ -93,7 +93,7 @@ async function downloadInstagram(bot, chatId, url, userName, messageId) {
 
           if (mediaToSend.length > 0) {
             await bot.sendChatAction(chatId, 'upload_photo'); 
-            await bot.sendMediaGroup(chatId, mediaToSend, {
+            await bot.sendMediaGroup(chatId, reply_to_message_id: msg.message_id, mediaToSend, {
               caption: `[Source](${url}) \nBot by @firespower`,  // User's provided URL as source
               parse_mode: 'Markdown',
               disable_web_page_preview: true  // Disable link preview
@@ -113,7 +113,7 @@ async function downloadInstagram(bot, chatId, url, userName, messageId) {
           let buff = await getBuffer(mi.media);
           await fs.writeFileSync('content/' + nfile, buff);
           await bot.sendChatAction(chatId, 'upload_video');
-          await bot.sendVideo(chatId, 'content/' + nfile, {
+          await bot.sendVideo(chatId, reply_to_message_id: msg.message_id,'content/' + nfile, {
             caption: `[Source](${url}) \nBot by @firespower`,  // User's provided URL as source
             parse_mode: 'Markdown',
             disable_web_page_preview: true  // Disable link preview
