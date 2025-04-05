@@ -5,10 +5,10 @@ const util = require('util');
 const fs = require('fs');
 const { getBuffer, getRandom } = require('./functions')
 const logChannelId = process.env.LOGC_ID;
-  // const replyOptions = {
-  //   reply_to_message_id: msg.message_id,
-  //   parse_mode: 'HTML',
-  // };
+  const replyOptions = {
+    reply_to_message_id: msg.message_id,
+    parse_mode: 'HTML',
+  };
 async function igdl(url) {
   try {
     let { data } = await axios.get(`https://krxuv-api.vercel.app/api/instagram?apikey=Krxuvonly&url=${url}`);
