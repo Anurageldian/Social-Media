@@ -30,21 +30,21 @@ function escapeMarkdownV2(text) {
 }
 
 async function downloadInstagram(bot, chatId, url, userName, messageId) {
-  let load = await bot.sendMessage(chatId, 'Loading, please wait.');
+  let load = await bot.sendMessage(chatId, 'Loading, please wait...');
 
   try {
     let get = await igdl(url);
     if (!get[0]) {
       return bot.editMessageText('Failed to get data, make sure your Instagram link is valid!', { chat_id: chatId, message_id: load.message_id });
-    } else if (get[0]) {
+    } else {
       let res = [];
       let res2 = [];
 
       const escapedUrl = escapeMarkdownV2(url);
-      const caption = `> Source: [${escapedUrl}](${escapedUrl})\n> Bot by @firespower`;
+      const caption = `[Source](${escapedUrl})\n> Bot by @firespower`;
 
-      if (get.length == 1) {
-        if (get[0].type == 'Photo') {
+      if (get.length === 1) {
+        if (get[0].type === 'Photo') {
           await bot.sendChatAction(chatId, 'upload_photo');
           await bot.deleteMessage(chatId, load.message_id);
           return bot.sendPhoto(chatId, get[0].thumbnail, {
@@ -67,22 +67,26 @@ async function downloadInstagram(bot, chatId, url, userName, messageId) {
               disable_web_page_preview: true
             });
           } catch (err) {
-            let buff = await getBuffer(get[0].url);
-            await fs.writeFileSync('content/vid-ig-single-' + chatId + '.mp4', buff);
+            const buff = await getBuffer(get[0].url);
+            const tempFile = `content/vid-ig-single-${chatId}.mp4`;
+            fs.writeFileSync(tempFile, buff);
+
             await bot.sendChatAction(chatId, 'upload_video');
             await bot.deleteMessage(chatId, load.message_id);
-            await bot.sendVideo(chatId, 'content/vid-ig-single-' + chatId + '.mp4', {
+            await bot.sendVideo(chatId, tempFile, {
               caption,
               parse_mode: 'MarkdownV2',
               disable_web_page_preview: true
             });
+
             await bot.sendChatAction(logChannelId, 'upload_video');
-            await bot.sendVideo(logChannelId, 'content/vid-ig-single-' + chatId + '.mp4', {
+            await bot.sendVideo(logChannelId, tempFile, {
               caption,
               parse_mode: 'MarkdownV2',
               disable_web_page_preview: true
             });
-            await fs.unlinkSync('content/vid-ig-single-' + chatId + '.mp4');
+
+            fs.unlinkSync(tempFile);
           }
         }
       } else {
@@ -109,22 +113,24 @@ async function downloadInstagram(bot, chatId, url, userName, messageId) {
 
         res.length = 0;
         for (let mi of res2) {
-          let nfile = await getRandom('.mp4');
-          let buff = await getBuffer(mi.media);
-          await fs.writeFileSync('content/' + nfile, buff);
+          const nfile = await getRandom('.mp4');
+          const buff = await getBuffer(mi.media);
+          const path = `content/${nfile}`;
+
+          fs.writeFileSync(path, buff);
           await bot.sendChatAction(chatId, 'upload_video');
-          await bot.sendVideo(chatId, 'content/' + nfile, {
+          await bot.sendVideo(chatId, path, {
             caption,
             parse_mode: 'MarkdownV2',
             disable_web_page_preview: true
           });
           await bot.sendChatAction(logChannelId, 'upload_video');
-          await bot.sendVideo(logChannelId, 'content/' + nfile, {
+          await bot.sendVideo(logChannelId, path, {
             caption,
             parse_mode: 'MarkdownV2',
             disable_web_page_preview: true
           });
-          await fs.unlinkSync('content/' + nfile);
+          fs.unlinkSync(path);
         }
 
         await bot.deleteMessage(chatId, load.message_id);
@@ -132,7 +138,7 @@ async function downloadInstagram(bot, chatId, url, userName, messageId) {
     }
   } catch (err) {
     await bot.sendChatAction(logChannelId, 'typing');
-    await bot.sendMessage(logChannelId, `[ ERROR MESSAGE ]\n\n• Username: @${userName}\n• File: funcs/instagram.js\n• Function: downloadInstagram()\n• Url: ${url}\n\n${err}`.trim());
+    await bot.sendMessage(logChannelId, `[ ERROR MESSAGE ]\n\n• Username: @${userName}\n• File: funcs/instagram.js\n• Function: downloadInstagram()\n• Url: ${url}\n\n${err}`);
     return bot.editMessageText('An error occurred, make sure your Instagram link is valid!', { chat_id: chatId, message_id: load.message_id });
   }
 }
@@ -140,6 +146,7 @@ async function downloadInstagram(bot, chatId, url, userName, messageId) {
 module.exports = {
   downloadInstagram
 };
+
 
 // require('dotenv').config()
 // const axios = require('axios');
