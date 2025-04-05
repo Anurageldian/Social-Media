@@ -7,6 +7,10 @@ const { getBuffer, getRandom } = require('./functions');
 
 const logChannelId = process.env.LOGC_ID;
 
+function escapeMarkdownV2(text) {
+  return text.replace(/([_*[\]()~`>#+\-=|{}.!\\])/g, '\\$1');
+}
+
 async function igdl(url) {
   try {
     let { data } = await axios.get(`https://krxuv-api.vercel.app/api/instagram?apikey=Krxuvonly&url=${url}`);
@@ -36,46 +40,49 @@ async function downloadInstagram(bot, chatId, url, userName, messageId) {
       let res = [];
       let res2 = [];
 
+      const caption = `> Source: [${escapeMarkdownV2(url)}](${escapeMarkdownV2(url)})\n> Bot by @firespower`;
+
       if (get.length == 1) {
         if (get[0].type == 'Photo') {
           await bot.sendChatAction(chatId, 'upload_photo');
           await bot.deleteMessage(chatId, load.message_id);
           return bot.sendPhoto(chatId, get[0].thumbnail, {
-            caption: `> Source: [${url}](${url})\n> Bot by @firespower`,
-            parse_mode: 'Markdown',
+            caption,
+            parse_mode: 'MarkdownV2',
             disable_web_page_preview: true
           });
         } else {
           try {
             await bot.sendChatAction(chatId, 'upload_video');
             await bot.sendVideo(chatId, get[0].url, {
-              caption: `> Source: [${url}](${url})\n> Bot by @firespower`,
-              parse_mode: 'Markdown',
+              caption,
+              parse_mode: 'MarkdownV2',
               disable_web_page_preview: true
             });
             await bot.sendChatAction(logChannelId, 'upload_video');
             await bot.sendVideo(logChannelId, get[0].url, {
-              caption: `> Source: [${url}](${url})\n> Bot by @firespower`,
-              parse_mode: 'Markdown',
+              caption,
+              parse_mode: 'MarkdownV2',
               disable_web_page_preview: true
             });
           } catch (err) {
             let buff = await getBuffer(get[0].url);
-            await fs.writeFileSync('content/vid-ig-single-' + chatId + '.mp4', buff);
+            let filename = `content/vid-ig-single-${chatId}.mp4`;
+            await fs.writeFileSync(filename, buff);
             await bot.sendChatAction(chatId, 'upload_video');
             await bot.deleteMessage(chatId, load.message_id);
-            await bot.sendVideo(chatId, 'content/vid-ig-single-' + chatId + '.mp4', {
-              caption: `> Source: [${url}](${url})\n> Bot by @firespower`,
-              parse_mode: 'Markdown',
+            await bot.sendVideo(chatId, filename, {
+              caption,
+              parse_mode: 'MarkdownV2',
               disable_web_page_preview: true
             });
             await bot.sendChatAction(logChannelId, 'upload_video');
-            await bot.sendVideo(logChannelId, 'content/vid-ig-single-' + chatId + '.mp4', {
-              caption: `> Source: [${url}](${url})\n> Bot by @firespower`,
-              parse_mode: 'Markdown',
+            await bot.sendVideo(logChannelId, filename, {
+              caption,
+              parse_mode: 'MarkdownV2',
               disable_web_page_preview: true
             });
-            await fs.unlinkSync('content/vid-ig-single-' + chatId + '.mp4');
+            await fs.unlinkSync(filename);
           }
         }
       } else {
@@ -104,20 +111,21 @@ async function downloadInstagram(bot, chatId, url, userName, messageId) {
         for (let mi of res2) {
           let nfile = await getRandom('.mp4');
           let buff = await getBuffer(mi.media);
-          await fs.writeFileSync('content/' + nfile, buff);
+          let filePath = 'content/' + nfile;
+          await fs.writeFileSync(filePath, buff);
           await bot.sendChatAction(chatId, 'upload_video');
-          await bot.sendVideo(chatId, 'content/' + nfile, {
-            caption: `> Source: [${url}](${url})\n> Bot by @firespower`,
-            parse_mode: 'Markdown',
+          await bot.sendVideo(chatId, filePath, {
+            caption,
+            parse_mode: 'MarkdownV2',
             disable_web_page_preview: true
           });
           await bot.sendChatAction(logChannelId, 'upload_video');
-          await bot.sendVideo(logChannelId, 'content/' + nfile, {
-            caption: `> Source: [${url}](${url})\n> Bot by @firespower`,
-            parse_mode: 'Markdown',
+          await bot.sendVideo(logChannelId, filePath, {
+            caption,
+            parse_mode: 'MarkdownV2',
             disable_web_page_preview: true
           });
-          await fs.unlinkSync('content/' + nfile);
+          await fs.unlinkSync(filePath);
         }
 
         await bot.deleteMessage(chatId, load.message_id);
