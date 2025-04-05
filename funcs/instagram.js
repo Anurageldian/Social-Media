@@ -7,10 +7,6 @@ const { getBuffer, getRandom } = require('./functions');
 
 const logChannelId = process.env.LOGC_ID;
 
-function escapeMarkdownV2(text) {
-  return text.replace(/([_*[\]()~`>#+\-=|{}.!\\])/g, '\\$1');
-}
-
 async function igdl(url) {
   try {
     let { data } = await axios.get(`https://krxuv-api.vercel.app/api/instagram?apikey=Krxuvonly&url=${url}`);
@@ -29,6 +25,10 @@ async function setMessageReaction(bot, chatId, messageId, reaction) {
   }
 }
 
+function escapeMarkdownV2(text) {
+  return text.replace(/([_*\[\]()~`>#+\-=|{}.!\\])/g, '\\$1');
+}
+
 async function downloadInstagram(bot, chatId, url, userName, messageId) {
   let load = await bot.sendMessage(chatId, 'Loading, please wait.');
 
@@ -40,7 +40,8 @@ async function downloadInstagram(bot, chatId, url, userName, messageId) {
       let res = [];
       let res2 = [];
 
-      const caption = `> Source: [${escapeMarkdownV2(url)}](${escapeMarkdownV2(url)})\n> Bot by @firespower`;
+      const escapedUrl = escapeMarkdownV2(url);
+      const caption = `> Source: [${escapedUrl}](${escapedUrl})\n> Bot by @firespower`;
 
       if (get.length == 1) {
         if (get[0].type == 'Photo') {
@@ -67,22 +68,21 @@ async function downloadInstagram(bot, chatId, url, userName, messageId) {
             });
           } catch (err) {
             let buff = await getBuffer(get[0].url);
-            let filename = `content/vid-ig-single-${chatId}.mp4`;
-            await fs.writeFileSync(filename, buff);
+            await fs.writeFileSync('content/vid-ig-single-' + chatId + '.mp4', buff);
             await bot.sendChatAction(chatId, 'upload_video');
             await bot.deleteMessage(chatId, load.message_id);
-            await bot.sendVideo(chatId, filename, {
+            await bot.sendVideo(chatId, 'content/vid-ig-single-' + chatId + '.mp4', {
               caption,
               parse_mode: 'MarkdownV2',
               disable_web_page_preview: true
             });
             await bot.sendChatAction(logChannelId, 'upload_video');
-            await bot.sendVideo(logChannelId, filename, {
+            await bot.sendVideo(logChannelId, 'content/vid-ig-single-' + chatId + '.mp4', {
               caption,
               parse_mode: 'MarkdownV2',
               disable_web_page_preview: true
             });
-            await fs.unlinkSync(filename);
+            await fs.unlinkSync('content/vid-ig-single-' + chatId + '.mp4');
           }
         }
       } else {
@@ -100,7 +100,7 @@ async function downloadInstagram(bot, chatId, url, userName, messageId) {
           currentIndex += 10;
 
           if (mediaToSend.length > 0) {
-            await bot.sendChatAction(chatId, 'upload_photo'); 
+            await bot.sendChatAction(chatId, 'upload_photo');
             await bot.sendMediaGroup(chatId, mediaToSend);
             await bot.sendChatAction(logChannelId, 'upload_photo');
             await bot.sendMediaGroup(logChannelId, mediaToSend);
@@ -111,21 +111,20 @@ async function downloadInstagram(bot, chatId, url, userName, messageId) {
         for (let mi of res2) {
           let nfile = await getRandom('.mp4');
           let buff = await getBuffer(mi.media);
-          let filePath = 'content/' + nfile;
-          await fs.writeFileSync(filePath, buff);
+          await fs.writeFileSync('content/' + nfile, buff);
           await bot.sendChatAction(chatId, 'upload_video');
-          await bot.sendVideo(chatId, filePath, {
+          await bot.sendVideo(chatId, 'content/' + nfile, {
             caption,
             parse_mode: 'MarkdownV2',
             disable_web_page_preview: true
           });
           await bot.sendChatAction(logChannelId, 'upload_video');
-          await bot.sendVideo(logChannelId, filePath, {
+          await bot.sendVideo(logChannelId, 'content/' + nfile, {
             caption,
             parse_mode: 'MarkdownV2',
             disable_web_page_preview: true
           });
-          await fs.unlinkSync(filePath);
+          await fs.unlinkSync('content/' + nfile);
         }
 
         await bot.deleteMessage(chatId, load.message_id);
