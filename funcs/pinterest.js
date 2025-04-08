@@ -29,16 +29,36 @@ async function pindl(url) {
 }
 
 async function pinSearch(bot, chatId, query, userName) {
-  if (!query) return bot.sendMessage(chatId, 'What images are you looking for on Pinterest? example\n/pin anime');
-  let load = await bot.sendMessage(chatId, 'Loading, please wait');
-  try {
-    let get = await axios.get(`https://www.pinterest.com/resource/BaseSearchResource/get/?source_url=/search/pins/?q=${query}&data={"options":{"isPrefetch":false,"query":"${query}","scope":"pins","no_fetch_context_on_resource":false},"context":{}}`);
-    let json = await get.data;
-    let data = json.resource_response.data.results;
-    if (!data.length) return bot.editMessageText(`Query "${query}" not found!`, { chat_id: chatId, message_id: load.message_id });
+  if (!query) return bot.sendMessage(chatId, 'What images are you looking for on Pinterest?\nExample: /pin anime');
+  
+  const load = await bot.sendMessage(chatId, '🔎 Searching Pinterest...');
 
-    const imgUrl = data[~~(Math.random() * data.length)].images.orig.url;
-    const caption = `> Bot by @firespower`;
+  try {
+    const response = await axios.get(`https://www.pinterest.com/search/pins/?q=${encodeURIComponent(query)}`, {
+      headers: {
+        'User-Agent': 'Mozilla/5.0'
+      }
+    });
+
+    const $ = cheerio.load(response.data);
+    const scriptTag = $('script[id="__PWS_DATA__"]').html();
+    if (!scriptTag) throw new Error('No data found in script');
+
+    const json = JSON.parse(scriptTag);
+    const pins = json.props?.initialReduxState?.pins;
+
+    if (!pins || Object.keys(pins).length === 0) {
+      return bot.editMessageText(`No results found for "${query}"`, {
+        chat_id: chatId,
+        message_id: load.message_id
+      });
+    }
+
+    const pinList = Object.values(pins);
+    const randomPin = pinList[Math.floor(Math.random() * pinList.length)];
+    const imgUrl = randomPin.images.orig.url;
+
+    const caption = `\\> Bot by @firespower`;
 
     await bot.sendPhoto(chatId, imgUrl, {
       caption,
@@ -52,11 +72,13 @@ async function pinSearch(bot, chatId, query, userName) {
 
     return bot.deleteMessage(chatId, load.message_id);
   } catch (err) {
-    await bot.sendMessage(logChannelId, `[ ERROR MESSAGE ]\n\n• Username: @${userName}\n• File: funcs/pinterest.js\n• Function: pinSearch()\n• Query: ${query}\n\n${err}`.trim());
-    return bot.editMessageText('An error occurred!', { chat_id: chatId, message_id: load.message_id });
+    await bot.sendMessage(logChannelId, `[ ERROR MESSAGE ]\n\n• Username: @${userName}\n• Function: pinSearch()\n• Query: ${query}\n\n${err.message || err}`.trim());
+    return bot.editMessageText('An error occurred while searching!', {
+      chat_id: chatId,
+      message_id: load.message_id
+    });
   }
 }
-
 async function pinterest(bot, chatId, url, userName) {
   let load = await bot.sendMessage(chatId, 'Loading.');
   try {
