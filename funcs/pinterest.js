@@ -38,7 +38,7 @@ async function pinSearch(bot, chatId, query, userName) {
     if (!data.length) return bot.editMessageText(`Query "${query}" not found!`, { chat_id: chatId, message_id: load.message_id });
 
     const imgUrl = data[~~(Math.random() * data.length)].images.orig.url;
-    const caption = `\\> Bot by @firespower`;
+    const caption = `> Bot by @firespower`;
 
     await bot.sendPhoto(chatId, imgUrl, {
       caption,
@@ -69,7 +69,7 @@ async function pinterest(bot, chatId, url, userName) {
     }
 
     const escapedUrl = escapeMarkdownV2(url);
-    const caption = `[Source](${escapedUrl})\n\\> Bot by @firespower`;
+    const caption = `[Source](${escapedUrl})\n> Bot by @firespower`;
 
     const mediaOptions = {
       caption,
