@@ -3,113 +3,36 @@ const { Downloader } = require('spotify-downloader');
 // Initialize the downloader
 const downloader = new Downloader();
 
-// Regex for Spotify Track
-bot.onText(/(https?:\/\/)?(www\.)?(open\.spotify\.com|spotify\.?com)\/track\/.+/, async (msg, match) => {
-  let getban = await getBanned(msg.chat.id);
-  if (!getban.status) return bot.sendMessage(msg.chat.id, `You have been banned\n\nReason : ${getban.reason}\n\nDo you want to be able to use bots again? Please contact the owner to request removal of the ban\nOwner : @firespower`)
-  
-  let userId = msg.from.id.toString();
-  if (userLocks[userId]) {
-    return;
-  }
-  userLocks[userId] = true;
+// Function to download the Spotify track
+async function downloadSpotifyTrack(url, savePath) {
   try {
-    await bot.sendMessage(logChannelId, `[ Usage Log ]\n◇ FIRST NAME : ${msg.from.first_name ? msg.from.first_name : "-"}\n◇ LAST NAME : ${msg.from.last_name ? msg.from.last_name : "-"}\n◇ USERNAME : ${msg.from.username ? "@" + msg.from.username : "-"}\n◇ ID : ${msg.from.id}\n\nContent: ${msg.text.slice(0, 1000)}`, { disable_web_page_preview: true });
+    // Download track
+    const track = await downloader.download(url);
 
-    // Extract Spotify Track URL
-    const trackUrl = match[0];
-    const savePath = `./downloads/${msg.from.id}_track.mp3`; // Save path for the track
-
-    // Download the track
-    const track = await downloader.download(trackUrl);
+    // Save the track to a specific location
     const trackStream = track.createStream();
     const fileStream = require('fs').createWriteStream(savePath);
     trackStream.pipe(fileStream);
 
     fileStream.on('finish', () => {
-      bot.sendMessage(msg.chat.id, `Your Spotify track has been downloaded!`);
-      bot.sendDocument(msg.chat.id, savePath);
+      console.log('Download complete!');
     });
 
     fileStream.on('error', (err) => {
-      bot.sendMessage(msg.chat.id, `Error downloading track: ${err.message}`);
-    });
-  } finally {
-    userLocks[userId] = false;
-  }
-});
-
-// Regex for Spotify Album
-bot.onText(/(https?:\/\/)?(www\.)?(open\.spotify\.com|spotify\.?com)\/album\/.+/, async (msg, match) => {
-  let getban = await getBanned(msg.chat.id);
-  if (!getban.status) return bot.sendMessage(msg.chat.id, `You have been banned\n\nReason : ${getban.reason}\n\nDo you want to be able to use bots again? Please contact the owner to request removal of the ban\nOwner : @firespower`)
-  
-  let userId = msg.from.id.toString();
-  if (userLocks[userId]) {
-    return;
-  }
-  userLocks[userId] = true;
-  try {
-    await bot.sendMessage(logChannelId, `[ Usage Log ]\n◇ FIRST NAME : ${msg.from.first_name ? msg.from.first_name : "-"}\n◇ LAST NAME : ${msg.from.last_name ? msg.from.last_name : "-"}\n◇ USERNAME : ${msg.from.username ? "@" + msg.from.username : "-"}\n◇ ID : ${msg.from.id}\n\nContent: ${msg.text.slice(0, 1000)}`, { disable_web_page_preview: true });
-
-    // Extract Spotify Album URL
-    const albumUrl = match[0];
-    const savePath = `./downloads/${msg.from.id}_album.zip`; // Save path for the album
-
-    // Download the album (This requires handling multiple tracks in an album)
-    const album = await downloader.download(albumUrl);
-    const albumStream = album.createStream();
-    const fileStream = require('fs').createWriteStream(savePath);
-    albumStream.pipe(fileStream);
-
-    fileStream.on('finish', () => {
-      bot.sendMessage(msg.chat.id, `Your Spotify album has been downloaded!`);
-      bot.sendDocument(msg.chat.id, savePath);
+      console.error('Error downloading the track:', err);
     });
 
-    fileStream.on('error', (err) => {
-      bot.sendMessage(msg.chat.id, `Error downloading album: ${err.message}`);
-    });
-  } finally {
-    userLocks[userId] = false;
+  } catch (err) {
+    console.error('Error:', err);
   }
-});
+}
 
-// Regex for Spotify Playlist
-bot.onText(/(https?:\/\/)?(www\.)?(open\.spotify\.com|spotify\.?com)\/playlist\/.+/, async (msg, match) => {
-  let getban = await getBanned(msg.chat.id);
-  if (!getban.status) return bot.sendMessage(msg.chat.id, `You have been banned\n\nReason : ${getban.reason}\n\nDo you want to be able to use bots again? Please contact the owner to request removal of the ban\nOwner : @firespower`)
-  
-  let userId = msg.from.id.toString();
-  if (userLocks[userId]) {
-    return;
-  }
-  userLocks[userId] = true;
-  try {
-    await bot.sendMessage(logChannelId, `[ Usage Log ]\n◇ FIRST NAME : ${msg.from.first_name ? msg.from.first_name : "-"}\n◇ LAST NAME : ${msg.from.last_name ? msg.from.last_name : "-"}\n◇ USERNAME : ${msg.from.username ? "@" + msg.from.username : "-"}\n◇ ID : ${msg.from.id}\n\nContent: ${msg.text.slice(0, 1000)}`, { disable_web_page_preview: true });
+// Example Spotify track URL (replace with actual URL)
+const spotifyUrl = 'https://open.spotify.com/track/5LrN7yUQAzvthd4QujgPFr';
+const savePath = 'path_to_save_song.mp3';
 
-    // Extract Spotify Playlist URL
-    const playlistUrl = match[0];
-    const savePath = `./downloads/${msg.from.id}_playlist.zip`; // Save path for the playlist
-
-    // Download the playlist (This requires handling multiple tracks in a playlist)
-    const playlist = await downloader.download(playlistUrl);
-    const playlistStream = playlist.createStream();
-    const fileStream = require('fs').createWriteStream(savePath);
-    playlistStream.pipe(fileStream);
-
-    fileStream.on('finish', () => {
-      bot.sendMessage(msg.chat.id, `Your Spotify playlist has been downloaded!`);
-      bot.sendDocument(msg.chat.id, savePath);
-    });
-
-    fileStream.on('error', (err) => {
-      bot.sendMessage(msg.chat.id, `Error downloading playlist: ${err.message}`);
-    });
-  } finally {
-    userLocks[userId] = false;
-  }
-});
+// Download the track
+downloadSpotifyTrack(spotifyUrl, savePath);
 
 // require('dotenv').config()
 // const axios = require('axios');
