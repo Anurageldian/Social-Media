@@ -5,74 +5,153 @@ const util = require('util');
 const { getBuffer, filterAlphanumericWithDash } = require('./functions');
 const fs = require('fs');
 
+const Spotify = require('spotifydl-core').default
 
-const { exec } = require('child_process')
-const path = require('path')
-const { v4: uuidv4 } = require('uuid')
-
-const DOWNLOAD_ROOT = path.resolve(__dirname, '..', 'downloads')
-
-function getOutputDir() {
-	const id = uuidv4()
-	const dir = path.join(DOWNLOAD_ROOT, id)
-	fs.mkdirSync(dir, { recursive: true })
-	return dir
+cred = {
+	clientId: process.env.SPOTIFY_CLIENT_ID,
+	clientSecret: process.env.SPOTIFY_CLIENT_SECRET,
 }
+const spotify = new Spotify(cred)
 
-function getMP3Files(dir) {
-	return fs.readdirSync(dir).filter(file => file.endsWith('.mp3'))
-}
-
-async function sendMP3Files(bot, chatId, dir) {
-	const files = getMP3Files(dir)
-	if (!files.length) {
-		await bot.sendMessage(chatId, 'No audio files found after download.')
+async function downloadTrackFromSpotify(bot, chatId, url) {
+	try {
+		const data = await spotify.getTrack(url).catch((err) => {
+			console.log(err)
+		})
+		bot.sendMessage(
+			chatId,
+			`Downloading track "${data.name}" by "${data.artists[0]}"`
+		).catch((err) => {
+			console.log(err)
+		})
+	} catch (err) {
+		console.log(err)
+		bot.sendMessage(
+			chatId,
+			'Error finding track, make sure the link is correct'
+		)
 		return
 	}
-
-	for (const file of files) {
-		const filePath = path.join(dir, file)
-		const stream = fs.createReadStream(filePath)
-		await bot.sendAudio(chatId, stream, {
-			title: path.basename(file, '.mp3'),
-		}).catch(err => {
-			console.log('Send error:', err)
-			bot.sendMessage(chatId, 'Error sending audio.')
-		})
-	}
-
-	// Cleanup
-	fs.rmSync(dir, { recursive: true, force: true })
-}
-
-function runSpotDL(bot, chatId, url, typeText) {
-	const outputDir = getOutputDir()
-	const command = `spotdl "${url}" --output "${outputDir}/%(title)s.%(ext)s"`
-
-	bot.sendMessage(chatId, `Downloading ${typeText} via spotDL...`)
-
-	exec(command, async (error, stdout, stderr) => {
-		if (error) {
-			console.error(`spotDL error:`, error)
-			await bot.sendMessage(chatId, `Failed to download ${typeText}.`)
-			return
+	const buffer = await spotify.downloadTrack(url).catch((err) => {
+		console.log(err)
+		bot.sendMessage(chatId, 'Error downloading track')
+	})
+	bot.sendAudio(
+		chatId,
+		buffer,
+		{
+			title: data.name,
+			performer: data.artists[0],
+		},
+		{
+			filename: `${data.name}.mp3`,
+			contentType: 'audio/mpeg',
 		}
-		await sendMP3Files(bot, chatId, outputDir)
+	).catch((err) => {
+		console.log(err)
+		bot.sendMessage(chatId, 'Error sending track')
 	})
 }
 
-// ─── Functions ───────────────────────────────────────────
+async function downloadAlbumFromSpotify(bot, chatId, url) {
+	try {
+		const albumData = await spotify.getAlbum(url).catch((err) => {
+			console.log(err)
+		})
+		const albumFormat = albumData.name.split(' - ')
+		const albumName = albumFormat[0]
+		const albumArtist = albumFormat[1]
+		bot.sendMessage(
+			chatId,
+			`Downloading album "${albumName}" by "${albumArtist}"`
+		).catch((err) => {
+			console.log(err)
+		})
+	} catch (err) {
+		console.log(err)
+		bot.sendMessage(
+			chatId,
+			'Error finding album, make sure the link is correct'
+		)
+		return
+	}
+	const buffer = await spotify.downloadAlbum(url).catch((err) => {
+		console.log(err)
+		bot.sendMessage(chatId, 'Error downloading album').catch((err) => {
+			console.log(err)
+		})
+	})
 
-function downloadTrackFromSpotify(bot, chatId, url) {
-	runSpotDL(bot, chatId, url, 'track')
+	for (let i = 0; i < albumData.tracks.length; i++) {
+		const track = albumData.tracks[i]
+		const trackData = await spotify.getTrack(track)
+		bot.sendAudio(
+			chatId,
+			buffer[i],
+			{
+				title: trackData.name,
+				performer: trackData.artists[0],
+			},
+			{
+				filename: `${trackData.name}.mp3`,
+				contentType: 'audio/mpeg',
+			}
+		).catch((err) => {
+			console.log(err)
+			bot.sendMessage(chatId, 'Error sending track').catch((err) => {
+				console.log(err)
+			})
+		})
+	}
 }
 
-function downloadAlbumFromSpotify(bot, chatId, url) {
-	runSpotDL(bot, chatId, url, 'album')
-}
+async function downloadPlaylistFromSpotify(bot, chatId, url) {
+	try {
+		const playlistData = await spotify.getPlaylist(url).catch((err) => {
+			console.log(err)
+		})
+		bot.sendMessage(
+			chatId,
+			`Downloading playlist "${playlistData.name}"`
+		).catch((err) => {
+			console.log(err)
+		})
+	} catch (err) {
+		console.log(err)
+		bot.sendMessage(
+			chatId,
+			'Error finding playlist, make sure the link is correct'
+		)
+		return
+	}
+	const buffer = await spotify.downloadPlaylist(url).catch((err) => {
+		console.log(err)
+		bot.sendMessage(chatId, 'Error downloading playlist').catch((err) => {
+			console.log(err)
+		})
+	})
 
-function downloadPlaylistFromSpotify(bot, chatId, url) {
-	runSpotDL(bot, chatId, url, 'playlist')
+	for (let i = 0; i < playlistData.tracks.length; i++) {
+		const track = playlistData.tracks[i]
+		const trackData = await spotify.getTrack(track)
+		bot.sendAudio(
+			chatId,
+			buffer[i],
+			{
+				title: trackData.name,
+				performer: trackData.artists[0],
+			},
+			{
+				filename: `${trackData.name}.mp3`,
+				contentType: 'audio/mpeg',
+			}
+		).catch((err) => {
+			console.log(err)
+			bot.sendMessage(chatId, 'Error sending track').catch((err) => {
+				console.log(err)
+			})
+		})
+	}
 }
 
 module.exports = {
@@ -80,7 +159,6 @@ module.exports = {
 	downloadAlbumFromSpotify,
 	downloadPlaylistFromSpotify,
 }
-
 // require('dotenv').config()
 // const axios = require('axios');
 // const { parse } = require('spotify-uri');
