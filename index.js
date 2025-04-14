@@ -31,9 +31,12 @@ let {
   downloadTwitterAudio
 } = require('./funcs/twitter')
 let {
- getPlaylistSpotify,
-  getAlbumsSpotify,
-  getSpotifySong
+ // getPlaylistSpotify,
+ //  getAlbumsSpotify,
+ //  getSpotifySong
+  downloadTrackFromSpotify,
+	downloadAlbumFromSpotify,
+	downloadPlaylistFromSpotify
 } = require('./funcs/spotify')
 let {
   downloadInstagram
@@ -549,7 +552,7 @@ bot.onText(/(https?:\/\/)?(www\.)?(open\.spotify\.com|spotify\.?com)\/track\/.+/
   userLocks[userId] = true;
   try {
     await bot.sendMessage(logChannelId, `[ Usage Log ]\n◇ FIRST NAME : ${msg.from.first_name ? msg.from.first_name : "-"}\n◇ LAST NAME : ${msg.from.last_name ? msg.from.last_name : "-"}\n◇ USERNAME : ${msg.from.username ? "@" + msg.from.username : "-"}\n◇ ID : ${msg.from.id}\n\nContent: ${msg.text.slice(0, 1000)}`, { disable_web_page_preview: true })
-    await getSpotifySong(bot, msg.chat.id, match[0], msg.chat.username)
+    await downloadTrackFromSpotify(bot, msg.chat.id, match[0], msg.chat.username)
   } finally {
     userLocks[userId] = false;
   }
@@ -566,7 +569,7 @@ bot.onText(/(https?:\/\/)?(www\.)?(open\.spotify\.com|spotify\.?com)\/album\/.+/
   userLocks[userId] = true;
   try {
     await bot.sendMessage(logChannelId, `[ Usage Log ]\n◇ FIRST NAME : ${msg.from.first_name ? msg.from.first_name : "-"}\n◇ LAST NAME : ${msg.from.last_name ? msg.from.last_name : "-"}\n◇ USERNAME : ${msg.from.username ? "@" + msg.from.username : "-"}\n◇ ID : ${msg.from.id}\n\nContent: ${msg.text.slice(0, 1000)}`, { disable_web_page_preview: true })
-    await getAlbumsSpotify(bot, msg.chat.id, match[0], msg.chat.username)
+    await downloadAlbumFromSpotify(bot, msg.chat.id, match[0], msg.chat.username)
   } finally {
     userLocks[userId] = false;
   }
@@ -585,7 +588,7 @@ bot.onText(/(https?:\/\/)?(www\.)?(open\.spotify\.com|spotify\.?com)\/playlist\/
   userLocks[userId] = true;
   try {
     await bot.sendMessage(logChannelId, `[ Usage Log ]\n◇ FIRST NAME : ${msg.from.first_name ? msg.from.first_name : "-"}\n◇ LAST NAME : ${msg.from.last_name ? msg.from.last_name : "-"}\n◇ USERNAME : ${msg.from.username ? "@" + msg.from.username : "-"}\n◇ ID : ${msg.from.id}\n\nContent: ${msg.text.slice(0, 1000)}`, { disable_web_page_preview: true })
-    await getPlaylistSpotify(bot, msg.chat.id, match[0], msg.chat.username)
+    await downloadPlaylistFromSpotify(bot, msg.chat.id, match[0], msg.chat.username)
   } finally {
     userLocks[userId] = false;
   }
