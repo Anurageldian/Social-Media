@@ -5,12 +5,14 @@ const util = require('util');
 const { getBuffer, filterAlphanumericWithDash } = require('./functions');
 const fs = require('fs');
 
+
 const Spotify = require('spotifydl-core').default
 
-cred = {
+const cred = {
 	clientId: process.env.SPOTIFY_CLIENT_ID,
 	clientSecret: process.env.SPOTIFY_CLIENT_SECRET,
 }
+
 const spotify = new Spotify(cred)
 
 async function downloadTrackFromSpotify(bot, chatId, url) {
@@ -18,39 +20,49 @@ async function downloadTrackFromSpotify(bot, chatId, url) {
 		const data = await spotify.getTrack(url).catch((err) => {
 			console.log(err)
 		})
-		bot.sendMessage(
+
+		if (!data) {
+			await bot.sendMessage(chatId, 'Failed to retrieve track metadata')
+			return
+		}
+
+		await bot.sendMessage(
 			chatId,
 			`Downloading track "${data.name}" by "${data.artists[0]}"`
-		).catch((err) => {
+		)
+
+		let buffer = await spotify.downloadTrack(url).catch((err) => {
 			console.log(err)
 		})
+
+		if (!buffer) {
+			await bot.sendMessage(chatId, 'Retrying download...')
+			buffer = await spotify.downloadTrack(url).catch((err) => {
+				console.log(err)
+			})
+		}
+
+		if (!buffer) {
+			await bot.sendMessage(chatId, 'Failed to download the track')
+			return
+		}
+
+		await bot.sendAudio(
+			chatId,
+			buffer,
+			{
+				title: data.name,
+				performer: data.artists[0],
+			},
+			{
+				filename: `${data.name}.mp3`,
+				contentType: 'audio/mpeg',
+			}
+		)
 	} catch (err) {
 		console.log(err)
-		bot.sendMessage(
-			chatId,
-			'Error finding track, make sure the link is correct'
-		)
-		return
+		await bot.sendMessage(chatId, 'Unexpected error occurred while downloading the track')
 	}
-	const buffer = await spotify.downloadTrack(url).catch((err) => {
-		console.log(err)
-		bot.sendMessage(chatId, 'Error downloading track')
-	})
-	bot.sendAudio(
-		chatId,
-		buffer,
-		{
-			title: data.name,
-			performer: data.artists[0],
-		},
-		{
-			filename: `${data.name}.mp3`,
-			contentType: 'audio/mpeg',
-		}
-	).catch((err) => {
-		console.log(err)
-		bot.sendMessage(chatId, 'Error sending track')
-	})
 }
 
 async function downloadAlbumFromSpotify(bot, chatId, url) {
@@ -58,50 +70,54 @@ async function downloadAlbumFromSpotify(bot, chatId, url) {
 		const albumData = await spotify.getAlbum(url).catch((err) => {
 			console.log(err)
 		})
-		const albumFormat = albumData.name.split(' - ')
-		const albumName = albumFormat[0]
-		const albumArtist = albumFormat[1]
-		bot.sendMessage(
-			chatId,
-			`Downloading album "${albumName}" by "${albumArtist}"`
-		).catch((err) => {
-			console.log(err)
-		})
-	} catch (err) {
-		console.log(err)
-		bot.sendMessage(
-			chatId,
-			'Error finding album, make sure the link is correct'
-		)
-		return
-	}
-	const buffer = await spotify.downloadAlbum(url).catch((err) => {
-		console.log(err)
-		bot.sendMessage(chatId, 'Error downloading album').catch((err) => {
-			console.log(err)
-		})
-	})
 
-	for (let i = 0; i < albumData.tracks.length; i++) {
-		const track = albumData.tracks[i]
-		const trackData = await spotify.getTrack(track)
-		bot.sendAudio(
+		if (!albumData) {
+			await bot.sendMessage(chatId, 'Failed to retrieve album metadata')
+			return
+		}
+
+		await bot.sendMessage(
 			chatId,
-			buffer[i],
-			{
-				title: trackData.name,
-				performer: trackData.artists[0],
-			},
-			{
-				filename: `${trackData.name}.mp3`,
-				contentType: 'audio/mpeg',
-			}
-		).catch((err) => {
+			`Downloading album "${albumData.name}" with ${albumData.tracks.length} tracks...`
+		)
+
+		const buffer = await spotify.downloadAlbum(url).catch((err) => {
 			console.log(err)
-			bot.sendMessage(chatId, 'Error sending track').catch((err) => {
+		})
+
+		if (!buffer || buffer.length !== albumData.tracks.length) {
+			await bot.sendMessage(chatId, 'Failed to download one or more tracks from the album')
+			return
+		}
+
+		for (let i = 0; i < albumData.tracks.length; i++) {
+			const track = albumData.tracks[i]
+
+			const trackData = await spotify.getTrack(track).catch((err) => {
 				console.log(err)
 			})
-		})
+
+			if (!trackData) continue
+
+			await bot.sendAudio(
+				chatId,
+				buffer[i],
+				{
+					title: trackData.name,
+					performer: trackData.artists[0],
+				},
+				{
+					filename: `${trackData.name}.mp3`,
+					contentType: 'audio/mpeg',
+				}
+			).catch((err) => {
+				console.log(err)
+				bot.sendMessage(chatId, `Error sending "${trackData.name}"`)
+			})
+		}
+	} catch (err) {
+		console.log(err)
+		await bot.sendMessage(chatId, 'Unexpected error occurred while downloading the album')
 	}
 }
 
@@ -110,47 +126,54 @@ async function downloadPlaylistFromSpotify(bot, chatId, url) {
 		const playlistData = await spotify.getPlaylist(url).catch((err) => {
 			console.log(err)
 		})
-		bot.sendMessage(
-			chatId,
-			`Downloading playlist "${playlistData.name}"`
-		).catch((err) => {
-			console.log(err)
-		})
-	} catch (err) {
-		console.log(err)
-		bot.sendMessage(
-			chatId,
-			'Error finding playlist, make sure the link is correct'
-		)
-		return
-	}
-	const buffer = await spotify.downloadPlaylist(url).catch((err) => {
-		console.log(err)
-		bot.sendMessage(chatId, 'Error downloading playlist').catch((err) => {
-			console.log(err)
-		})
-	})
 
-	for (let i = 0; i < playlistData.tracks.length; i++) {
-		const track = playlistData.tracks[i]
-		const trackData = await spotify.getTrack(track)
-		bot.sendAudio(
+		if (!playlistData) {
+			await bot.sendMessage(chatId, 'Failed to retrieve playlist metadata')
+			return
+		}
+
+		await bot.sendMessage(
 			chatId,
-			buffer[i],
-			{
-				title: trackData.name,
-				performer: trackData.artists[0],
-			},
-			{
-				filename: `${trackData.name}.mp3`,
-				contentType: 'audio/mpeg',
-			}
-		).catch((err) => {
+			`Downloading playlist "${playlistData.name}" with ${playlistData.tracks.length} tracks...`
+		)
+
+		const buffer = await spotify.downloadPlaylist(url).catch((err) => {
 			console.log(err)
-			bot.sendMessage(chatId, 'Error sending track').catch((err) => {
+		})
+
+		if (!buffer || buffer.length !== playlistData.tracks.length) {
+			await bot.sendMessage(chatId, 'Failed to download one or more tracks from the playlist')
+			return
+		}
+
+		for (let i = 0; i < playlistData.tracks.length; i++) {
+			const track = playlistData.tracks[i]
+
+			const trackData = await spotify.getTrack(track).catch((err) => {
 				console.log(err)
 			})
-		})
+
+			if (!trackData) continue
+
+			await bot.sendAudio(
+				chatId,
+				buffer[i],
+				{
+					title: trackData.name,
+					performer: trackData.artists[0],
+				},
+				{
+					filename: `${trackData.name}.mp3`,
+					contentType: 'audio/mpeg',
+				}
+			).catch((err) => {
+				console.log(err)
+				bot.sendMessage(chatId, `Error sending "${trackData.name}"`)
+			})
+		}
+	} catch (err) {
+		console.log(err)
+		await bot.sendMessage(chatId, 'Unexpected error occurred while downloading the playlist')
 	}
 }
 
@@ -159,6 +182,7 @@ module.exports = {
 	downloadAlbumFromSpotify,
 	downloadPlaylistFromSpotify,
 }
+
 // require('dotenv').config()
 // const axios = require('axios');
 // const { parse } = require('spotify-uri');
