@@ -135,6 +135,8 @@ const caption = `[Source](${escapedUrl})\n> Bot by @firespower`;
 async function downloadTwitterHigh(bot, chatId, userName) {
   let load = await bot.sendMessage(chatId, 'Loading, please wait.');
   let db = await readDb('./database.json');
+	const escapedUrl = escapeMarkdownV2(url);
+const caption = `[Source](${escapedUrl})\n> Bot by @firespower`;
   try {
     await bot.sendVideo(chatId, db[chatId].twhd, {
               caption,
@@ -163,6 +165,8 @@ async function downloadTwitterHigh(bot, chatId, userName) {
 async function downloadTwitterLow(bot, chatId, userName) {
   let load = await bot.sendMessage(chatId, 'Loading, please wait.');
   let db = await readDb('./database.json');
+	const escapedUrl = escapeMarkdownV2(url);
+const caption = `[Source](${escapedUrl})\n> Bot by @firespower`;
   try {
     await bot.sendVideo(chatId, db[chatId].twsd, {
               caption,
@@ -191,6 +195,8 @@ async function downloadTwitterLow(bot, chatId, userName) {
 async function downloadTwitterAudio(bot, chatId, userName) {
   let load = await bot.sendMessage(chatId, 'Loading, please wait.');
   let db = await readDb('./database.json');
+	const escapedUrl = escapeMarkdownV2(url);
+const caption = `[Source](${escapedUrl})\n> Bot by @firespower`;
   try {
     let buff = await getBuffer(db[chatId].twaud)
     await fs.writeFileSync('content/Twitt_audio_' + chatId + '.mp3', buff);
