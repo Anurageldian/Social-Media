@@ -4099,6 +4099,141 @@ bot.onText(/\/getsticker/, async (msg) => {
   }
 });
 
+// NIGHT MODE 
+
+// const fs = require('fs');
+// const path = require('path');
+// const TelegramBot = require('node-telegram-bot-api');
+
+// const bot = new TelegramBot('YOUR_BOT_TOKEN', { polling: true });
+
+const NIGHT_START_HOUR = 0; // 12 AM IST
+const NIGHT_END_HOUR = 6;   // 6 AM IST
+
+const JSON_PATH = path.join(__dirname, 'nightmode.json');
+
+// Load JSON
+function loadNightModeGroups() {
+  try {
+    const data = fs.readFileSync(JSON_PATH);
+    return JSON.parse(data).enabledGroups || [];
+  } catch (err) {
+    return [];
+  }
+}
+
+// Save JSON
+function saveNightModeGroups(groupIds) {
+  fs.writeFileSync(JSON_PATH, JSON.stringify({ enabledGroups: groupIds }, null, 2));
+}
+
+function isNightModeActiveIST() {
+  const now = new Date();
+  const utcHour = now.getUTCHours();
+  const istHour = (utcHour + 5 + 30 / 60) % 24;
+  return istHour >= NIGHT_START_HOUR && istHour < NIGHT_END_HOUR;
+}
+
+async function setGroupLock(chatId, lock) {
+  const permissions = lock
+    ? {
+        can_send_messages: false,
+        can_send_media_messages: false,
+        can_send_polls: false,
+        can_send_other_messages: false,
+        can_add_web_page_previews: false,
+        can_change_info: false,
+        can_invite_users: false,
+        can_pin_messages: false,
+      }
+    : {
+        can_send_messages: true,
+        can_send_media_messages: true,
+        can_send_polls: true,
+        can_send_other_messages: true,
+        can_add_web_page_previews: true,
+        can_change_info: false,
+        can_invite_users: true,
+        can_pin_messages: false,
+      };
+
+  try {
+    await bot.setChatPermissions(chatId, permissions);
+  } catch (error) {
+    console.error(`Permission update failed in ${chatId}:`, error.message);
+  }
+}
+
+// Command: /nightmode
+bot.onText(/\/nightmode/, async (msg) => {
+  const chatId = msg.chat.id;
+
+  const member = await bot.getChatMember(chatId, msg.from.id);
+  if (!['creator', 'administrator'].includes(member.status)) return;
+
+  const enabledGroups = loadNightModeGroups();
+  const enabled = enabledGroups.includes(chatId);
+  const statusText = enabled ? '✅ Enabled' : '❌ Disabled';
+
+  bot.sendMessage(chatId, `🌙 *Night Mode*\nStatus: ${statusText}`, {
+    parse_mode: 'Markdown',
+    reply_markup: {
+      inline_keyboard: [
+        [
+          {
+            text: enabled ? 'Disable Night Mode' : 'Enable Night Mode',
+            callback_data: `toggle_nightmode:${enabled ? 'off' : 'on'}`,
+          },
+        ],
+      ],
+    },
+  });
+});
+
+// Handle toggling
+bot.on('callback_query', async (query) => {
+  const chatId = query.message.chat.id;
+  const userId = query.from.id;
+
+  const member = await bot.getChatMember(chatId, userId);
+  if (!['creator', 'administrator'].includes(member.status)) {
+    return bot.answerCallbackQuery(query.id, { text: 'Admins only.', show_alert: true });
+  }
+
+  const data = query.data;
+  if (data.startsWith('toggle_nightmode:')) {
+    const action = data.split(':')[1];
+    const enabledGroups = loadNightModeGroups();
+    let updatedGroups = [...enabledGroups];
+
+    if (action === 'on' && !enabledGroups.includes(chatId)) {
+      updatedGroups.push(chatId);
+    } else if (action === 'off') {
+      updatedGroups = updatedGroups.filter(id => id !== chatId);
+    }
+
+    saveNightModeGroups(updatedGroups);
+
+    bot.editMessageText(`🌙 *Night Mode*\nStatus: ${action === 'on' ? '✅ Enabled' : '❌ Disabled'}`, {
+      chat_id: chatId,
+      message_id: query.message.message_id,
+      parse_mode: 'Markdown',
+    });
+
+    bot.answerCallbackQuery(query.id);
+  }
+});
+
+// Scheduler (runs every minute)
+setInterval(() => {
+  const enabledGroups = loadNightModeGroups();
+  const active = isNightModeActiveIST();
+
+  enabledGroups.forEach(chatId => {
+    setGroupLock(chatId, active);
+  });
+}, 60 * 1000);
+
 //chat info
 // bot.onText(/\/chatinfo/, async (msg) => {
 //   const chatId = msg.chat.id;
