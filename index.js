@@ -4240,9 +4240,12 @@ bot.on('callback_query', async (query) => {
 
     if (action === 'on' && !enabledGroups.includes(chatId)) {
       updatedGroups.push(chatId);
+      if (isNightModeActiveIST()) {
+        await setGroupLock(chatId, true); // 🔒 Lock now if it's currently night
+      }
     } else if (action === 'off') {
       updatedGroups = updatedGroups.filter(id => id !== chatId);
-      await setGroupLock(chatId, false); // 🔓 Unlock the group immediately
+      await setGroupLock(chatId, false); // 🔓 Unlock immediately
     }
 
     saveNightModeGroups(updatedGroups);
