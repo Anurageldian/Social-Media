@@ -4191,6 +4191,38 @@ bot.onText(/\/nightmode/, async (msg) => {
 });
 
 // Handle toggling
+// bot.on('callback_query', async (query) => {
+//   const chatId = query.message.chat.id;
+//   const userId = query.from.id;
+
+//   const member = await bot.getChatMember(chatId, userId);
+//   if (!['creator', 'administrator'].includes(member.status)) {
+//     return bot.answerCallbackQuery(query.id, { text: 'Admins only.', show_alert: true });
+//   }
+
+//   const data = query.data;
+//   if (data.startsWith('toggle_nightmode:')) {
+//     const action = data.split(':')[1];
+//     const enabledGroups = loadNightModeGroups();
+//     let updatedGroups = [...enabledGroups];
+
+//     if (action === 'on' && !enabledGroups.includes(chatId)) {
+//       updatedGroups.push(chatId);
+//     } else if (action === 'off') {
+//       updatedGroups = updatedGroups.filter(id => id !== chatId);
+//     }
+
+//     saveNightModeGroups(updatedGroups);
+
+//     bot.editMessageText(`🌙 *Night Mode*\nStatus: ${action === 'on' ? '✅ Enabled' : '❌ Disabled'}`, {
+//       chat_id: chatId,
+//       message_id: query.message.message_id,
+//       parse_mode: 'Markdown',
+//     });
+
+//     bot.answerCallbackQuery(query.id);
+//   }
+// });
 bot.on('callback_query', async (query) => {
   const chatId = query.message.chat.id;
   const userId = query.from.id;
@@ -4210,6 +4242,7 @@ bot.on('callback_query', async (query) => {
       updatedGroups.push(chatId);
     } else if (action === 'off') {
       updatedGroups = updatedGroups.filter(id => id !== chatId);
+      await setGroupLock(chatId, false); // 🔓 Unlock the group immediately
     }
 
     saveNightModeGroups(updatedGroups);
@@ -4224,15 +4257,38 @@ bot.on('callback_query', async (query) => {
   }
 });
 
+
 // Scheduler (runs every minute)
+let lastNightModeState = null;
+
 setInterval(() => {
   const enabledGroups = loadNightModeGroups();
-  const active = isNightModeActiveIST();
+  const isNight = isNightModeActiveIST();
 
-  enabledGroups.forEach(chatId => {
-    setGroupLock(chatId, active);
-  });
+  if (lastNightModeState !== isNight) {
+    // Night mode state changed
+    enabledGroups.forEach(async (chatId) => {
+      await setGroupLock(chatId, isNight);
+
+      const message = isNight
+        ? "🌙 *Night Mode Activated*\nChat is now locked for non-admins until 6 AM IST."
+        : "🌅 *Night Mode Ended*\nChat is now open to all members.";
+
+      bot.sendMessage(chatId, message, { parse_mode: "Markdown" });
+    });
+
+    lastNightModeState = isNight;
+  }
 }, 60 * 1000);
+
+// setInterval(() => {
+//   const enabledGroups = loadNightModeGroups();
+//   const active = isNightModeActiveIST();
+
+//   enabledGroups.forEach(chatId => {
+//     setGroupLock(chatId, active);
+//   });
+// }, 60 * 1000);
 
 //chat info
 // bot.onText(/\/chatinfo/, async (msg) => {
