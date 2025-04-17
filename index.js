@@ -3974,11 +3974,12 @@ bot.onText(/\/dev/, async (msg) => {
       // Send additional information when the button is pressed
       await bot.editMessageCaption(
         `ᴏᴛʜᴇʀ ᴄᴏᴍᴍᴀɴᴅꜱ
-/upload (Upload Speed)
-/download (Download speed)
-/senddb (Send Database)
-/listfiles (List Files All Users)
-/deletefiles (Delete Files Dev Only)
+/upload ~ (Upload Speed)
+/download ~ (Download speed)
+/senddb ~ (Send Database)
+/listfiles ~ (List Files All Users)
+/deletefiles ~ (Delete Files Dev Only)
+/nightmode ~ (Enables Night Mode from 12 to 6 AM)
 
 ~~~ *ꜱʏꜱᴛᴇᴍ ᴜᴘᴛɪᴍᴇ:* ${formattedUptime} ~~~ `, 
         {
