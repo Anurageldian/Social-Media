@@ -4369,6 +4369,9 @@ bot.on('message', async (msg) => {
   const text = msg.text?.toLowerCase();
   if (!text) return;
 
+  // Make sure the command is a reply to someone else's message
+  if (!msg.reply_to_message) return;
+
   // Check if it starts with + or /
   const match = text.match(/^(\+|\/)(\w+)/);
   if (!match) return;
@@ -4380,12 +4383,13 @@ bot.on('message', async (msg) => {
 
   const gif = await getAnimeGif(tag);
   if (gif) {
+    // Reply to the original user's message (not the command)
     bot.sendAnimation(msg.chat.id, gif, {
-      reply_to_message_id: msg.message_id
+      reply_to_message_id: msg.reply_to_message.message_id
     });
   } else {
     bot.sendMessage(msg.chat.id, "No anime GIF found for that command!", {
-      reply_to_message_id: msg.message_id
+      reply_to_message_id: msg.reply_to_message.message_id
     });
   }
 });
