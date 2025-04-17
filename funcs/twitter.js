@@ -68,9 +68,15 @@ async function twitterdl2(url) {
     return result
   }
 }
+function escapeMarkdownV2(text) {
+  return text.replace(/([_*\[\]()~`>#+\-=|{}.!\\])/g, '\\$1');
+}
 
 async function getDataTwitter(bot, chatId, url, userName) {
   // let surl = url.replace('https://twitter.com/', '');
+
+const escapedUrl = escapeMarkdownV2(url);
+const caption = `[Source](${escapedUrl})\n> Bot by @firespower`;
      let surl = url.replace(/https:\/\/(?:twitter|x)\.com\//, '');
   let load = await bot.sendMessage(chatId, 'Loading, please wait.');
   try {
@@ -80,7 +86,11 @@ async function getDataTwitter(bot, chatId, url, userName) {
         let get2 = await twitterdl2(url);
         if (get2.type == 'video') {
           await bot.sendChatAction(chatId, 'upload_video');
-          await bot.sendVideo(chatId, get2.media[0].url, { caption: `Bot by @firespower` })
+          await bot.sendVideo(chatId, get2.media[0].url, {
+              caption,
+              parse_mode: 'MarkdownV2',
+              disable_web_page_preview: true
+            });
           return bot.deleteMessage(chatId, load.message_id);
         } else if (get2.type == 'image') {
           for (let i = 0;i < get2.media.length;i++) {
@@ -126,7 +136,11 @@ async function downloadTwitterHigh(bot, chatId, userName) {
   let load = await bot.sendMessage(chatId, 'Loading, please wait.');
   let db = await readDb('./database.json');
   try {
-    await bot.sendVideo(chatId, db[chatId].twhd, { caption: `Bot by @firespower` });
+    await bot.sendVideo(chatId, db[chatId].twhd, {
+              caption,
+              parse_mode: 'MarkdownV2',
+              disable_web_page_preview: true
+            });
     await bot.deleteMessage(chatId, load.message_id);
     db[chatId] = {
       twhd: '',
@@ -150,7 +164,11 @@ async function downloadTwitterLow(bot, chatId, userName) {
   let load = await bot.sendMessage(chatId, 'Loading, please wait.');
   let db = await readDb('./database.json');
   try {
-    await bot.sendVideo(chatId, db[chatId].twsd, { caption: `Bot by @firespower` });
+    await bot.sendVideo(chatId, db[chatId].twsd, {
+              caption,
+              parse_mode: 'MarkdownV2',
+              disable_web_page_preview: true
+            });
     await bot.deleteMessage(chatId, load.message_id);
     db[chatId] = {
       twhd: '',
@@ -176,7 +194,11 @@ async function downloadTwitterAudio(bot, chatId, userName) {
   try {
     let buff = await getBuffer(db[chatId].twaud)
     await fs.writeFileSync('content/Twitt_audio_' + chatId + '.mp3', buff);
-    await bot.sendAudio(chatId, 'content/Twitt_audio_' + chatId + '.mp3', { caption: `Bot by @firespower` });
+    await bot.sendAudio(chatId, 'content/Twitt_audio_' + chatId + '.mp3', {
+              caption,
+              parse_mode: 'MarkdownV2',
+              disable_web_page_preview: true
+            });
     await bot.deleteMessage(chatId, load.message_id);
     db[chatId] = {
       twhd: '',
