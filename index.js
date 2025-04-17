@@ -4250,11 +4250,19 @@ bot.on('callback_query', async (query) => {
 
     saveNightModeGroups(updatedGroups);
 
-    bot.editMessageText(`🌙 *Night Mode*\nStatus: ${action === 'on' ? '✅ Enabled' : '❌ Disabled'}`, {
-      chat_id: chatId,
-      message_id: query.message.message_id,
-      parse_mode: 'Markdown',
-    });
+   bot.editMessageText(`🌙 *Night Mode*\nStatus: ${action === 'on' ? '✅ Enabled' : '❌ Disabled'}`, {
+  chat_id: chatId,
+  message_id: query.message.message_id,
+  parse_mode: 'Markdown',
+});
+
+// 🕔 Delete the panel after 5 minutes
+setTimeout(() => {
+  bot.deleteMessage(chatId, query.message.message_id).catch((err) => {
+    console.error("Failed to delete nightmode message:", err.message);
+  });
+}, 2 * 60 * 1000);
+
 
     bot.answerCallbackQuery(query.id);
   }
