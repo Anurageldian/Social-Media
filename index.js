@@ -4226,14 +4226,14 @@ bot.onText(/\/nightmode/, async (msg) => {
 bot.on('callback_query', async (query) => {
   const chatId = query.message.chat.id;
   const userId = query.from.id;
-
-  const member = await bot.getChatMember(chatId, userId);
-  if (!['creator', 'administrator'].includes(member.status)) {
-    return bot.answerCallbackQuery(query.id, { text: 'Admins only.', show_alert: true });
-  }
-
   const data = query.data;
+
   if (data.startsWith('toggle_nightmode:')) {
+    const member = await bot.getChatMember(chatId, userId);
+    if (!['creator', 'administrator'].includes(member.status)) {
+      return bot.answerCallbackQuery(query.id, { text: 'Admins only.', show_alert: true });
+    }
+
     const action = data.split(':')[1];
     const enabledGroups = loadNightModeGroups();
     let updatedGroups = [...enabledGroups];
@@ -4241,32 +4241,34 @@ bot.on('callback_query', async (query) => {
     if (action === 'on' && !enabledGroups.includes(chatId)) {
       updatedGroups.push(chatId);
       if (isNightModeActiveIST()) {
-        await setGroupLock(chatId, true); // 🔒 Lock now if it's currently night
+        await setGroupLock(chatId, true);
       }
     } else if (action === 'off') {
       updatedGroups = updatedGroups.filter(id => id !== chatId);
-      await setGroupLock(chatId, false); // 🔓 Unlock immediately
+      await setGroupLock(chatId, false);
     }
 
     saveNightModeGroups(updatedGroups);
 
-   bot.editMessageText(`🌙 *Night Mode*\nStatus: ${action === 'on' ? '✅ Enabled' : '❌ Disabled'}`, {
-  chat_id: chatId,
-  message_id: query.message.message_id,
-  parse_mode: 'Markdown',
-});
+    bot.editMessageText(`🌙 *Night Mode*\nStatus: ${action === 'on' ? '✅ Enabled' : '❌ Disabled'}`, {
+      chat_id: chatId,
+      message_id: query.message.message_id,
+      parse_mode: 'Markdown',
+    });
 
-// 🕔 Delete the panel after 5 minutes
-setTimeout(() => {
-  bot.deleteMessage(chatId, query.message.message_id).catch((err) => {
-    console.error("Failed to delete nightmode message:", err.message);
-  });
-}, 2 * 60 * 1000);
+    // Delete message after 2 minutes
+    setTimeout(() => {
+      bot.deleteMessage(chatId, query.message.message_id).catch((err) => {
+        console.error("Failed to delete nightmode message:", err.message);
+      });
+    }, 2 * 60 * 1000);
 
-
-    bot.answerCallbackQuery(query.id);
+    return bot.answerCallbackQuery(query.id);
   }
+
+  // other callback handlers go here...
 });
+
 
 
 // Scheduler (runs every minute)
