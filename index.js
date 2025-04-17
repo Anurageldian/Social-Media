@@ -4168,7 +4168,7 @@ async function setGroupLock(chatId, lock) {
 bot.onText(/\/nightmode/, async (msg) => {
   const chatId = msg.chat.id;
   if (msg.chat.type === 'private') {
-    return bot.sendMessage(chatId, '❌ This command only works in groups./n/nNight-Mode/nBy using this module, bot will automatically turn off messages for non-admins in a group chat from 12 AM [IST] to 6 AM [IST]./n/nAdmin Command:/n• /nightmode: Shows control panel for nightmode module.');
+    return bot.sendMessage(chatId, '❌ This command only works in groups./n/nNight-Mode/nBy using this module, bot will automatically turn off messages for non-admins in a group chat from 12 AM [IST] to 6 AM [IST]./n/nAdmin Command:/n• /nightmode: Shows control panel for nightmode module.', { parse_mode: "Markdown" });
   }
   const member = await bot.getChatMember(chatId, msg.from.id);
   if (!['creator', 'administrator'].includes(member.status)) return;
