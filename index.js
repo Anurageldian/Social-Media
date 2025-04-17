@@ -4297,6 +4297,99 @@ setInterval(() => {
   }
 }, 60 * 1000);
 
+
+const waifuCommands = {
+  "bite": "bite",
+  "bonk": "bonk",
+  "cuddle": "cuddle",
+  "hug": "hug",
+  "kick": "kick",
+  "kill": "slap", // fallback
+  "kiss": "kiss",
+  "lick": "lick",
+  "peropero": "lick",
+  "pat": "pat",
+  "poke": "pat", // fallback
+  "punch": "slap",
+  "slap": "slap",
+  "smug": "smug",
+  "tickle": "tickle",
+  "baka": "baka",
+  "idiot": "baka",
+  "blush": "blush",
+  "clap": "smile", // fallback
+  "applause": "smile",
+  "cry": "cry",
+  "cute": "smile",
+  "dance": "dance",
+  "feed": "feed",
+  "fumo": "happy", // fallback
+  "laugh": "laugh",
+  "lol": "laugh",
+  "lmao": "laugh",
+  "lmfao": "laugh",
+  "haha": "laugh",
+  "meme": "smile",
+  "funny": "smile",
+  "neko": "neko",
+  "catgirl": "neko",
+  "rage": "smug",
+  "angry": "smug",
+  "sad": "cry",
+  "scary": "smug",
+  "horror": "smug",
+  "shy": "blush",
+  "sleep": "sleepy",
+  "zzz": "sleepy",
+  "smile": "smile",
+  "happy": "smile",
+  "stare": "stare",
+  "eyes": "stare",
+  "vibe": "dance",
+  "wink": "wink",
+  "wow": "blush",
+  "surprised": "blush",
+  "wtf": "smug",
+  "yawn": "yawn",
+  "unsorted": "waifu",
+  "clips": "waifu"
+};
+
+async function getAnimeGif(tag) {
+  try {
+    const res = await axios.get(`https://api.waifu.pics/sfw/${tag}`);
+    return res.data.url;
+  } catch (error) {
+    console.error("Failed to fetch gif for", tag, error);
+    return null;
+  }
+}
+
+bot.on('message', async (msg) => {
+  const text = msg.text?.toLowerCase();
+  if (!text) return;
+
+  // Check if it starts with + or /
+  const match = text.match(/^(\+|\/)(\w+)/);
+  if (!match) return;
+
+  const cmd = match[2];
+  const tag = waifuCommands[cmd];
+
+  if (!tag) return;
+
+  const gif = await getAnimeGif(tag);
+  if (gif) {
+    bot.sendAnimation(msg.chat.id, gif, {
+      reply_to_message_id: msg.message_id
+    });
+  } else {
+    bot.sendMessage(msg.chat.id, "No anime GIF found for that command!", {
+      reply_to_message_id: msg.message_id
+    });
+  }
+});
+
 // setInterval(() => {
 //   const enabledGroups = loadNightModeGroups();
 //   const active = isNightModeActiveIST();
