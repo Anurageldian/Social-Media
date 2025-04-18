@@ -4435,7 +4435,7 @@ bot.onText(/\/nsfw(?:\s+(\w+))?/, async (msg, match) => {
     }
 
     const escapedUrl = imageUrl.replace(/([_*\[\]()~`>#+\-=|{}.!\\])/g, '\\$1');
-    const caption = `> Here's your NSFW *${category}* 💦\n\n[Source](${escapedUrl})`;
+    const caption = `>[Source](${escapedUrl})\nHere's your NSFW *${category}* 💦`;
 
     await bot.sendPhoto(chatId, imageUrl, {
       reply_to_message_id: replyId,
