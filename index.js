@@ -4365,7 +4365,7 @@ async function getAnimeGif(tag) {
   }
 }
 
-bot.on('message', async (msg) => {
+bot.on("message", async (msg) => {
   const text = msg.text?.toLowerCase();
   if (!text) return;
 
@@ -4373,32 +4373,31 @@ bot.on('message', async (msg) => {
   if (!match) return;
 
   const cmd = match[2];
-  const tag = waifuCommands[cmd];
-  if (!tag) return;
+  console.log("Command:", cmd);
 
-  try {
-    // Special handling for 'waifu' (random image)
-if (cmd === "waifu") {
-  try {
-    const res = await axios.get(`https://api.waifu.pics/sfw/waifu`);
-    const image = res.data.url;
-
-    if (image) {
-      await bot.sendPhoto(msg.chat.id, image, {
-        reply_to_message_id: msg.message_id,
-        caption: `> Here’s a random waifu just for you 💕`
+  // Special handler for /waifu or +waifu
+  if (cmd === "waifu") {
+    try {
+      const res = await axios.get("https://api.waifu.pics/sfw/waifu");
+      const imageUrl = res.data.url;
+      if (imageUrl) {
+        await bot.sendPhoto(msg.chat.id, imageUrl, {
+          reply_to_message_id: msg.message_id,
+          caption: `> Here’s a random waifu just for you 💕`
+        });
+      } else {
+        await bot.sendMessage(msg.chat.id, "Couldn't get waifu image 😔", {
+          reply_to_message_id: msg.message_id
+        });
+      }
+    } catch (err) {
+      console.error("Waifu API error:", err?.response?.data || err.message);
+      await bot.sendMessage(msg.chat.id, "Error fetching waifu image 😢", {
+        reply_to_message_id: msg.message_id
       });
     }
-  } catch (err) {
-    console.error("Error fetching waifu image:", err?.response?.data || err);
-    bot.sendMessage(msg.chat.id, "Couldn't fetch waifu at the moment 😢", {
-      reply_to_message_id: msg.message_id
-    });
+    return;
   }
-
-  return;
-}
-
 
     // If user replied to someone’s message
     const replyId = msg.reply_to_message?.message_id || msg.message_id;
