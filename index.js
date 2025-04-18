@@ -4401,6 +4401,56 @@ bot.onText(/\/waifu(?: (.+))?/, async (msg, match) => {
   }
 });
 
+bot.onText(/\/nsfw(?:\s+(\w+))?/, async (msg, match) => {
+  const chatId = msg.chat.id;
+  const replyId = msg.message_id;
+  const category = match[1]?.toLowerCase() || "waifu";
+
+  // Optional: allow only in private chats
+  if (msg.chat.type !== "private") {
+    return bot.sendMessage(chatId, "🚫 NSFW commands are only allowed in private chats.", {
+      reply_to_message_id: replyId,
+    });
+  }
+
+  // Valid categories from waifu.pics NSFW API
+  const validCategories = [
+    "waifu", "neko", "trap", "blowjob"
+  ];
+
+  if (!validCategories.includes(category)) {
+    return bot.sendMessage(chatId, `❌ Invalid category.\n\nAvailable: ${validCategories.join(", ")}`, {
+      reply_to_message_id: replyId,
+    });
+  }
+
+  try {
+    const res = await axios.get(`https://api.waifu.pics/nsfw/${category}`);
+    const imageUrl = res.data.url;
+
+    if (!imageUrl) {
+      return bot.sendMessage(chatId, "😢 Couldn't get NSFW image.", {
+        reply_to_message_id: replyId
+      });
+    }
+
+    const escapedUrl = imageUrl.replace(/([_*\[\]()~`>#+\-=|{}.!\\])/g, '\\$1');
+    const caption = `> Here's your NSFW *${category}* 💦\n\n[Source](${escapedUrl})`;
+
+    await bot.sendPhoto(chatId, imageUrl, {
+      reply_to_message_id: replyId,
+      caption,
+      parse_mode: 'MarkdownV2',
+      disable_web_page_preview: true
+    });
+  } catch (err) {
+    console.error("NSFW API error:", err?.response?.data || err.message);
+    await bot.sendMessage(chatId, "❌ Error fetching NSFW image.", {
+      reply_to_message_id: replyId
+    });
+  }
+});
+
 // function escapeMarkdownV2(text) {
 //   return text.replace(/([_*\[\]()~`>#+\-=|{}.!\\])/g, '\\$1');
 // }
