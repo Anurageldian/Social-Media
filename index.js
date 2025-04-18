@@ -4302,9 +4302,6 @@ setInterval(() => {
 function escapeMarkdownV2(text) {
   return text.replace(/([_*\[\]()~`>#+\-=|{}.!\\])/g, '\\$1');
 }
-const escapedUrl = escapeMarkdownV2(imageUrl);
-const caption = `[Source](${escapedUrl})\n> Bot by @firespower`;
-
 const waifuCommands = {
   "bite": "bite",
   "bonk": "bonk",
@@ -4376,7 +4373,8 @@ bot.on("message", async (msg) => {
     try {
       const res = await axios.get("https://api.waifu.pics/sfw/waifu");
       const imageUrl = res.data.url;
-
+      const escapedUrl = escapeMarkdownV2(imageUrl);
+      const caption = `[Source](${escapedUrl})\n> Bot by @firespower`;
       if (imageUrl) {
         await bot.sendPhoto(msg.chat.id, imageUrl, {
               reply_to_message_id: msg.message_id,
