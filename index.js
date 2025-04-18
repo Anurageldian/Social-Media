@@ -4131,7 +4131,7 @@ function saveNightModeGroups(groupIds) {
 function isNightModeActiveIST() {
   const now = new Date();
   const utcHour = now.getUTCHours();
-  const istHour = (utcHour + 5 + 30 / 60) % 24;
+  const istHour = (utcHour + 5.5) % 24;
   return istHour >= NIGHT_START_HOUR && istHour < NIGHT_END_HOUR;
 }
 
@@ -4177,21 +4177,52 @@ bot.onText(/\/nightmode/, async (msg) => {
   const enabledGroups = loadNightModeGroups();
   const enabled = enabledGroups.includes(chatId);
   const statusText = enabled ? '✅ Enabled' : '❌ Disabled';
+bot.on("message", async (msg) => {
+  const chatId = msg.chat.id;
+  if (msg.chat.type !== "supergroup" && msg.chat.type !== "group") return;
 
-  bot.sendMessage(chatId, `🌙 *Night Mode*\nStatus: ${statusText}`, {
-    parse_mode: 'Markdown',
-    reply_markup: {
-      inline_keyboard: [
-        [
-          {
-            text: enabled ? 'Disable Night Mode' : 'Enable Night Mode',
-            callback_data: `toggle_nightmode:${enabled ? 'off' : 'on'}`,
-          },
-        ],
-      ],
-    },
-  });
+  const enabledGroups = loadNightModeGroups();
+  if (!enabledGroups.includes(chatId)) return;
+
+  const isNight = isNightModeActiveIST();
+
+  if (isNight) {
+    // Only lock if not already locked
+    const chat = await bot.getChat(chatId);
+    const perms = chat.permissions;
+    if (perms?.can_send_messages !== false) {
+      await setGroupLock(chatId, true);
+      await bot.sendMessage(chatId, `🌙 *Night Mode Activated*\nChat is now locked for non-admins until 6 AM IST.`, {
+        parse_mode: "Markdown"
+      });
+    }
+  } else {
+    // Auto unlock if it’s past night time
+    const chat = await bot.getChat(chatId);
+    const perms = chat.permissions;
+    if (perms?.can_send_messages === false) {
+      await setGroupLock(chatId, false);
+      await bot.sendMessage(chatId, `☀️ *Good Morning!*\nNight Mode has ended. Everyone can now chat freely.`, {
+        parse_mode: "Markdown"
+      });
+    }
+  }
 });
+
+//   bot.sendMessage(chatId, `🌙 *Night Mode*\nStatus: ${statusText}`, {
+//     parse_mode: 'Markdown',
+//     reply_markup: {
+//       inline_keyboard: [
+//         [
+//           {
+//             text: enabled ? 'Disable Night Mode' : 'Enable Night Mode',
+//             callback_data: `toggle_nightmode:${enabled ? 'off' : 'on'}`,
+//           },
+//         ],
+//       ],
+//     },
+//   });
+// });
 
 // Handle toggling
 // bot.on('callback_query', async (query) => {
