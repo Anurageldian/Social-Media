@@ -4355,16 +4355,6 @@ const waifuCommands = {
   "clips": "waifu"
 };
 
-async function getAnimeGif(tag) {
-  try {
-    const res = await axios.get(`https://api.waifu.pics/sfw/${tag}`);
-    return res.data.url;
-  } catch (error) {
-    console.error("Failed to fetch gif for", tag, error);
-    return null;
-  }
-}
-
 bot.on("message", async (msg) => {
   const text = msg.text?.toLowerCase();
   if (!text) return;
@@ -4375,11 +4365,11 @@ bot.on("message", async (msg) => {
   const cmd = match[2];
   console.log("Command:", cmd);
 
-  // Special handler for /waifu or +waifu
   if (cmd === "waifu") {
     try {
       const res = await axios.get("https://api.waifu.pics/sfw/waifu");
       const imageUrl = res.data.url;
+
       if (imageUrl) {
         await bot.sendPhoto(msg.chat.id, imageUrl, {
           reply_to_message_id: msg.message_id,
@@ -4399,9 +4389,12 @@ bot.on("message", async (msg) => {
     return;
   }
 
-    // If user replied to someone’s message
-    const replyId = msg.reply_to_message?.message_id || msg.message_id;
+  const tag = waifuCommands[cmd];
+  if (!tag) return;
 
+  const replyId = msg.reply_to_message?.message_id || msg.message_id;
+
+  try {
     const res = await axios.get(`https://api.waifu.pics/sfw/${tag}`);
     if (res.data.url) {
       await bot.sendAnimation(msg.chat.id, res.data.url, {
@@ -4409,7 +4402,7 @@ bot.on("message", async (msg) => {
       });
     }
   } catch (err) {
-    console.error("GIF fetch error:", err?.response?.data || err);
+    console.error("GIF fetch error:", err?.response?.data || err.message);
     bot.sendMessage(msg.chat.id, "Sorry, I couldn't find a gif/image for that!", {
       reply_to_message_id: msg.message_id
     });
