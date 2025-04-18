@@ -4367,9 +4367,7 @@ setInterval(() => {
     lastNightModeState = isNight;
   }
 }, 60 * 1000);
-
-
-
+//WAIFU
 bot.onText(/\/waifu(?: (.+))?/, async (msg, match) => {
   const chatId = msg.chat.id;
   const replyId = msg.message_id;
@@ -4400,7 +4398,7 @@ bot.onText(/\/waifu(?: (.+))?/, async (msg, match) => {
     });
   }
 });
-
+//NSFW
 bot.onText(/\/nsfw(?:\s+(\w+))?/, async (msg, match) => {
   const chatId = msg.chat.id;
   const replyId = msg.message_id;
@@ -4446,6 +4444,42 @@ bot.onText(/\/nsfw(?:\s+(\w+))?/, async (msg, match) => {
   } catch (err) {
     console.error("NSFW API error:", err?.response?.data || err.message);
     await bot.sendMessage(chatId, "❌ Error fetching NSFW image.", {
+      reply_to_message_id: replyId
+    });
+  }
+});
+//NEKO
+bot.onText(/\/neko/, async (msg) => {
+  const chatId = msg.chat.id;
+  const replyId = msg.message_id;
+
+  const sources = [
+    async () => {
+      const res = await axios.get("https://api.waifu.pics/sfw/neko");
+      return res.data.url;
+    },
+    async () => {
+      const res = await axios.get("https://nekos.life/api/v2/img/neko");
+      return res.data.url;
+    },
+  ];
+
+  try {
+    const randomSource = sources[Math.floor(Math.random() * sources.length)];
+    const imageUrl = await randomSource();
+
+    const escapedUrl = imageUrl.replace(/([_*\[\]()~`>#+\-=|{}.!\\])/g, '\\$1');
+    const caption = `>[Source](${escapedUrl})\nHere's a neko for you 🐱`;
+
+    await bot.sendPhoto(chatId, imageUrl, {
+      reply_to_message_id: replyId,
+      caption,
+      parse_mode: "MarkdownV2",
+      disable_web_page_preview: true
+    });
+  } catch (err) {
+    console.error("Neko API error:", err?.response?.data || err.message);
+    bot.sendMessage(chatId, "❌ Couldn't fetch neko image.", {
       reply_to_message_id: replyId
     });
   }
