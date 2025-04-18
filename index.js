@@ -4297,7 +4297,6 @@ setInterval(() => {
   }
 }, 60 * 1000);
 
-
 const waifuCommands = {
   "bite": "bite",
   "bonk": "bonk",
@@ -4317,13 +4316,13 @@ const waifuCommands = {
   "baka": "baka",
   "idiot": "baka",
   "blush": "blush",
-  "clap": "smile", // fallback
+  "clap": "smile",
   "applause": "smile",
   "cry": "cry",
   "cute": "smile",
   "dance": "dance",
   "feed": "feed",
-  "fumo": "happy", // fallback
+  "fumo": "happy",
   "laugh": "laugh",
   "lol": "laugh",
   "lmao": "laugh",
@@ -4355,6 +4354,13 @@ const waifuCommands = {
   "clips": "waifu"
 };
 
+const waifuCaptions = [
+  `> *Here's your waifu, take care of her!* 💕`,
+  `> *She’s waiting for you~* 😳`,
+  `> *Best girl just for you!* 🌸`,
+  `> *Don't forget to pat her head!* 🐾`,
+];
+
 bot.on("message", async (msg) => {
   const text = msg.text?.toLowerCase();
   if (!text) return;
@@ -4363,51 +4369,45 @@ bot.on("message", async (msg) => {
   if (!match) return;
 
   const cmd = match[2];
-  console.log("Command:", cmd);
-
-  if (cmd === "waifu") {
-    try {
-      const res = await axios.get("https://api.waifu.pics/sfw/waifu");
-      const imageUrl = res.data.url;
-
-      if (imageUrl) {
-        await bot.sendPhoto(msg.chat.id, imageUrl, {
-          reply_to_message_id: msg.message_id,
-          caption: `> Here’s a random waifu just for you 💕`
-        });
-      } else {
-        await bot.sendMessage(msg.chat.id, "Couldn't get waifu image 😔", {
-          reply_to_message_id: msg.message_id
-        });
-      }
-    } catch (err) {
-      console.error("Waifu API error:", err?.response?.data || err.message);
-      await bot.sendMessage(msg.chat.id, "Error fetching waifu image 😢", {
-        reply_to_message_id: msg.message_id
-      });
-    }
-    return;
-  }
-
   const tag = waifuCommands[cmd];
+
   if (!tag) return;
 
   const replyId = msg.reply_to_message?.message_id || msg.message_id;
 
   try {
-    const res = await axios.get(`https://api.waifu.pics/sfw/${tag}`);
-    if (res.data.url) {
-      await bot.sendAnimation(msg.chat.id, res.data.url, {
-        reply_to_message_id: replyId
+    // Special handling for waifu command (with random caption)
+    if (tag === "waifu") {
+      const res = await axios.get("https://api.waifu.pics/sfw/waifu");
+      const imageUrl = res.data.url;
+
+      const caption = waifuCaptions[Math.floor(Math.random() * waifuCaptions.length)];
+
+      await bot.sendPhoto(msg.chat.id, imageUrl, {
+        caption,
+        reply_to_message_id: replyId,
+        parse_mode: "Markdown"
       });
+      return;
     }
+
+    // Regular command gifs
+    const res = await axios.get(`https://api.waifu.pics/sfw/${tag}`);
+    const gifUrl = res.data.url;
+
+    await bot.sendAnimation(msg.chat.id, gifUrl, {
+      caption: `> *${cmd}* ✨`,
+      reply_to_message_id: replyId,
+      parse_mode: "Markdown"
+    });
   } catch (err) {
-    console.error("GIF fetch error:", err?.response?.data || err.message);
-    bot.sendMessage(msg.chat.id, "Sorry, I couldn't find a gif/image for that!", {
+    console.error("API error:", err?.response?.data || err.message);
+    await bot.sendMessage(msg.chat.id, "Sorry, I couldn't fetch a gif/image 🥲", {
       reply_to_message_id: msg.message_id
     });
   }
 });
+
 
 // setInterval(() => {
 //   const enabledGroups = loadNightModeGroups();
