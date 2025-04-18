@@ -4378,14 +4378,24 @@ bot.on('message', async (msg) => {
 
   try {
     // Special handling for 'waifu' (random image)
-if (tag === "waifu") {
-  const res = await axios.get(`https://api.waifu.pics/sfw/waifu`);
-  if (res.data.url) {
-    await bot.sendPhoto(msg.chat.id, res.data.url, {
-      reply_to_message_id: msg.message_id,
-      caption: `> Here’s a waifu just for you 💕`
+if (cmd === "waifu") {
+  try {
+    const res = await axios.get(`https://api.waifu.pics/sfw/waifu`);
+    const image = res.data.url;
+
+    if (image) {
+      await bot.sendPhoto(msg.chat.id, image, {
+        reply_to_message_id: msg.message_id,
+        caption: `> Here’s a random waifu just for you 💕`
+      });
+    }
+  } catch (err) {
+    console.error("Error fetching waifu image:", err?.response?.data || err);
+    bot.sendMessage(msg.chat.id, "Couldn't fetch waifu at the moment 😢", {
+      reply_to_message_id: msg.message_id
     });
   }
+
   return;
 }
 
