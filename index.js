@@ -4227,38 +4227,6 @@ bot.onText(/\/nightmode/, async (msg) => {
 bot.on('callback_query', async (query) => {
   const chatId = query.message.chat.id;
   const userId = query.from.id;
-
-  const member = await bot.getChatMember(chatId, userId);
-  if (!['creator', 'administrator'].includes(member.status)) {
-    return bot.answerCallbackQuery(query.id, { text: 'Admins only.', show_alert: true });
-  }
-
-  const data = query.data;
-  if (data.startsWith('toggle_nightmode:')) {
-    const action = data.split(':')[1];
-    const enabledGroups = loadNightModeGroups();
-    let updatedGroups = [...enabledGroups];
-
-    if (action === 'on' && !enabledGroups.includes(chatId)) {
-      updatedGroups.push(chatId);
-    } else if (action === 'off') {
-      updatedGroups = updatedGroups.filter(id => id !== chatId);
-    }
-
-    saveNightModeGroups(updatedGroups);
-
-    bot.editMessageText(`🌙 *Night Mode*\nStatus: ${action === 'on' ? '✅ Enabled' : '❌ Disabled'}`, {
-      chat_id: chatId,
-      message_id: query.message.message_id,
-      parse_mode: 'Markdown',
-    });
-
-    bot.answerCallbackQuery(query.id);
-  }
-});
-bot.on('callback_query', async (query) => {
-  const chatId = query.message.chat.id;
-  const userId = query.from.id;
   const data = query.data;
 
   if (data.startsWith('toggle_nightmode:')) {
@@ -4283,11 +4251,20 @@ bot.on('callback_query', async (query) => {
 
     saveNightModeGroups(updatedGroups);
 
-    bot.editMessageText(`🌙 *Night Mode*\nStatus: ${action === 'on' ? '✅ Enabled' : '❌ Disabled'}`, {
-      chat_id: chatId,
-      message_id: query.message.message_id,
-      parse_mode: 'Markdown',
-    });
+    const newStatusText = `🌙 *Night Mode*\nStatus: ${action === 'on' ? '✅ Enabled' : '❌ Disabled'}`;
+
+    try {
+      await bot.editMessageText(newStatusText, {
+        chat_id: chatId,
+        message_id: query.message.message_id,
+        parse_mode: 'Markdown',
+      });
+    } catch (err) {
+      // Ignore "message is not modified" error
+      if (!err.message.includes("message is not modified")) {
+        console.error("Edit message error:", err.message);
+      }
+    }
 
     // Delete message after 2 minutes
     setTimeout(() => {
@@ -4299,7 +4276,7 @@ bot.on('callback_query', async (query) => {
     return bot.answerCallbackQuery(query.id);
   }
 
-  // other callback handlers go here...
+  // other callbacks...
 });
 
 
