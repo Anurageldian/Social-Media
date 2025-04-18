@@ -4484,6 +4484,38 @@ bot.onText(/\/neko/, async (msg) => {
     });
   }
 });
+// FUN
+
+const actionCommands = [
+  "pat", "bite", "cuddle", "hug", "lick", "poke", "slap", "tickle", "blush", "cry",
+  "feed", "angry", "sad", "zzz", "sleepy", "stare", "wink", "wtf", "yawn", "kiss", "fuck"
+];
+
+actionCommands.forEach((cmd) => {
+  bot.onText(new RegExp(`^/${cmd}(?:@\\w+)?$`, "i"), async (msg) => {
+    const replyId = msg.reply_to_message?.message_id;
+    if (!replyId) return bot.sendMessage(msg.chat.id, "❌ You must reply to a user's message to use this command.", {
+      reply_to_message_id: msg.message_id
+    });
+
+    try {
+      const apiType = cmd === "fuck" ? "nsfw" : "sfw";
+      const url = `https://api.waifu.pics/${apiType}/${cmd === "zzz" ? "sleepy" : cmd}`;
+
+      const res = await axios.get(url);
+      const media = res.data.url;
+
+      await bot.sendAnimation(msg.chat.id, media, {
+        reply_to_message_id: replyId
+      });
+    } catch (err) {
+      console.error(`Error fetching for /${cmd}:`, err.message);
+      await bot.sendMessage(msg.chat.id, `❌ Couldn't fetch a ${cmd} gif.`, {
+        reply_to_message_id: msg.message_id
+      });
+    }
+  });
+});
 
 // function escapeMarkdownV2(text) {
 //   return text.replace(/([_*\[\]()~`>#+\-=|{}.!\\])/g, '\\$1');
