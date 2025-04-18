@@ -4177,8 +4177,11 @@ bot.onText(/\/nightmode/, async (msg) => {
   const enabledGroups = loadNightModeGroups();
   const enabled = enabledGroups.includes(chatId);
   const statusText = enabled ? '✅ Enabled' : '❌ Disabled';
-bot.on("message", async (msg) => {
+
+ bot.on("message", async (msg) => {
   const chatId = msg.chat.id;
+
+  // Only apply in groups
   if (msg.chat.type !== "supergroup" && msg.chat.type !== "group") return;
 
   const enabledGroups = loadNightModeGroups();
@@ -4186,28 +4189,30 @@ bot.on("message", async (msg) => {
 
   const isNight = isNightModeActiveIST();
 
-  if (isNight) {
-    // Only lock if not already locked
+  try {
     const chat = await bot.getChat(chatId);
     const perms = chat.permissions;
-    if (perms?.can_send_messages !== false) {
-      await setGroupLock(chatId, true);
-      await bot.sendMessage(chatId, `🌙 *Night Mode Activated*\nChat is now locked for non-admins until 6 AM IST.`, {
-        parse_mode: "Markdown"
-      });
+
+    if (isNight) {
+      if (perms?.can_send_messages !== false) {
+        await setGroupLock(chatId, true);
+        await bot.sendMessage(chatId, `🌙 *Night Mode Activated*\nChat is now locked for non-admins until 6 AM IST.`, {
+          parse_mode: "Markdown"
+        });
+      }
+    } else {
+      if (perms?.can_send_messages === false) {
+        await setGroupLock(chatId, false);
+        await bot.sendMessage(chatId, `☀️ *Good Morning!*\nNight Mode has ended. Everyone can now chat freely.`, {
+          parse_mode: "Markdown"
+        });
+      }
     }
-  } else {
-    // Auto unlock if it’s past night time
-    const chat = await bot.getChat(chatId);
-    const perms = chat.permissions;
-    if (perms?.can_send_messages === false) {
-      await setGroupLock(chatId, false);
-      await bot.sendMessage(chatId, `☀️ *Good Morning!*\nNight Mode has ended. Everyone can now chat freely.`, {
-        parse_mode: "Markdown"
-      });
-    }
+  } catch (err) {
+    console.error("Night mode error:", err);
   }
 });
+
 
 //   bot.sendMessage(chatId, `🌙 *Night Mode*\nStatus: ${statusText}`, {
 //     parse_mode: 'Markdown',
