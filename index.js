@@ -4224,6 +4224,60 @@ bot.onText(/\/nightmode/, async (msg) => {
 });
 
 // Handle toggling
+// bot.on('callback_query', async (query) => {
+//   const chatId = query.message.chat.id;
+//   const userId = query.from.id;
+//   const data = query.data;
+
+//   if (data.startsWith('toggle_nightmode:')) {
+//     const member = await bot.getChatMember(chatId, userId);
+//     if (!['creator', 'administrator'].includes(member.status)) {
+//       return bot.answerCallbackQuery(query.id, { text: 'Admins only.', show_alert: true });
+//     }
+
+//     const action = data.split(':')[1];
+//     const enabledGroups = loadNightModeGroups();
+//     let updatedGroups = [...enabledGroups];
+
+//     if (action === 'on' && !enabledGroups.includes(chatId)) {
+//       updatedGroups.push(chatId);
+//       if (isNightModeActiveIST()) {
+//         await setGroupLock(chatId, true);
+//       }
+//     } else if (action === 'off') {
+//       updatedGroups = updatedGroups.filter(id => id !== chatId);
+//       await setGroupLock(chatId, false);
+//     }
+
+//     saveNightModeGroups(updatedGroups);
+
+//     const newStatusText = `🌙 *Night Mode*\nStatus: ${action === 'on' ? '✅ Enabled' : '❌ Disabled'}`;
+
+//     try {
+//       await bot.editMessageText(newStatusText, {
+//         chat_id: chatId,
+//         message_id: query.message.message_id,
+//         parse_mode: 'Markdown',
+//       });
+//     } catch (err) {
+//       // Ignore "message is not modified" error
+//       if (!err.message.includes("message is not modified")) {
+//         console.error("Edit message error:", err.message);
+//       }
+//     }
+
+//     // Delete message after 2 minutes
+//     setTimeout(() => {
+//       bot.deleteMessage(chatId, query.message.message_id).catch((err) => {
+//         console.error("Failed to delete nightmode message:", err.message);
+//       });
+//     }, 2 * 60 * 1000);
+
+//     return bot.answerCallbackQuery(query.id);
+//   }
+
+//   // other callbacks...
+// });
 bot.on('callback_query', async (query) => {
   const chatId = query.message.chat.id;
   const userId = query.from.id;
@@ -4239,11 +4293,23 @@ bot.on('callback_query', async (query) => {
     const enabledGroups = loadNightModeGroups();
     let updatedGroups = [...enabledGroups];
 
-    if (action === 'on' && !enabledGroups.includes(chatId)) {
-      updatedGroups.push(chatId);
-      if (isNightModeActiveIST()) {
-        await setGroupLock(chatId, true);
+    if (action === 'on') {
+      if (enabledGroups.includes(chatId)) {
+        return bot.answerCallbackQuery(query.id, {
+          text: 'Night Mode is already enabled.',
+          show_alert: true,
+        });
       }
+
+      if (!isNightModeActiveIST()) {
+        return bot.answerCallbackQuery(query.id, {
+          text: '🌞 You can only enable Night Mode during night hours (12 AM to 6 AM IST).',
+          show_alert: true,
+        });
+      }
+
+      updatedGroups.push(chatId);
+      await setGroupLock(chatId, true);
     } else if (action === 'off') {
       updatedGroups = updatedGroups.filter(id => id !== chatId);
       await setGroupLock(chatId, false);
@@ -4260,13 +4326,11 @@ bot.on('callback_query', async (query) => {
         parse_mode: 'Markdown',
       });
     } catch (err) {
-      // Ignore "message is not modified" error
       if (!err.message.includes("message is not modified")) {
         console.error("Edit message error:", err.message);
       }
     }
 
-    // Delete message after 2 minutes
     setTimeout(() => {
       bot.deleteMessage(chatId, query.message.message_id).catch((err) => {
         console.error("Failed to delete nightmode message:", err.message);
