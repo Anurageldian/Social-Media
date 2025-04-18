@@ -4370,6 +4370,37 @@ setInterval(() => {
 
 
 
+bot.onText(/\/waifu(?: (.+))?/, async (msg, match) => {
+  const chatId = msg.chat.id;
+  const replyId = msg.message_id;
+
+  try {
+    const res = await axios.get("https://api.waifu.pics/sfw/waifu");
+    const imageUrl = res.data.url;
+
+    if (!imageUrl) {
+      return bot.sendMessage(chatId, "😢 Couldn't get waifu image.", {
+        reply_to_message_id: replyId
+      });
+    }
+
+    const escapedUrl = imageUrl.replace(/([_*\[\]()~`>#+\-=|{}.!\\])/g, '\\$1');
+    const caption = `> Here's your waifu, take care of her\\!\n\n[Source](${escapedUrl})`;
+
+    await bot.sendPhoto(chatId, imageUrl, {
+      reply_to_message_id: replyId,
+      caption,
+      parse_mode: 'MarkdownV2',
+      disable_web_page_preview: true
+    });
+  } catch (err) {
+    console.error("Waifu API error:", err?.response?.data || err.message);
+    await bot.sendMessage(chatId, "❌ Error fetching waifu image.", {
+      reply_to_message_id: replyId
+    });
+  }
+});
+
 // function escapeMarkdownV2(text) {
 //   return text.replace(/([_*\[\]()~`>#+\-=|{}.!\\])/g, '\\$1');
 // }
