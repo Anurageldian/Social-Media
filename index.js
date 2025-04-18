@@ -5018,4 +5018,4 @@ bot.on('callback_query', async (mil) => {
   }
 })
 
-process.on('uncaughtException', console.error)
+process.on('uncaughtException', console.error);
