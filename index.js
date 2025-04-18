@@ -4369,27 +4369,40 @@ bot.on('message', async (msg) => {
   const text = msg.text?.toLowerCase();
   if (!text) return;
 
-  // Make sure the command is a reply to someone else's message
-  if (!msg.reply_to_message) return;
-
-  // Check if it starts with + or /
   const match = text.match(/^(\+|\/)(\w+)/);
   if (!match) return;
 
   const cmd = match[2];
   const tag = waifuCommands[cmd];
-
   if (!tag) return;
 
-  const gif = await getAnimeGif(tag);
-  if (gif) {
-    // Reply to the original user's message (not the command)
-    bot.sendAnimation(msg.chat.id, gif, {
-      reply_to_message_id: msg.reply_to_message.message_id
+  try {
+    // Special handling for 'waifu' (random image)
+if (tag === "waifu") {
+  const res = await axios.get(`https://api.waifu.pics/sfw/waifu`);
+  if (res.data.url) {
+    await bot.sendPhoto(msg.chat.id, res.data.url, {
+      reply_to_message_id: msg.message_id,
+      caption: `> Here’s a waifu just for you 💕`
     });
-  } else {
-    bot.sendMessage(msg.chat.id, "No anime GIF found for that command!", {
-      reply_to_message_id: msg.reply_to_message.message_id
+  }
+  return;
+}
+
+
+    // If user replied to someone’s message
+    const replyId = msg.reply_to_message?.message_id || msg.message_id;
+
+    const res = await axios.get(`https://api.waifu.pics/sfw/${tag}`);
+    if (res.data.url) {
+      await bot.sendAnimation(msg.chat.id, res.data.url, {
+        reply_to_message_id: replyId
+      });
+    }
+  } catch (err) {
+    console.error("GIF fetch error:", err?.response?.data || err);
+    bot.sendMessage(msg.chat.id, "Sorry, I couldn't find a gif/image for that!", {
+      reply_to_message_id: msg.message_id
     });
   }
 });
