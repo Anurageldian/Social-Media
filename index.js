@@ -4405,7 +4405,7 @@ bot.on("message", async (msg) => {
       const res = await axios.get("https://api.waifu.pics/sfw/waifu");
       const imageUrl = res.data.url;
       const escapedUrl = escapeMarkdownV2(imageUrl);
-      const caption = `[Source](${escapedUrl})\n> Bot by @firespower`;
+      const caption = `[Source](${escapedUrl})\n>Here's your waifu, take care of her!`;
       if (imageUrl) {
         await bot.sendPhoto(msg.chat.id, imageUrl, {
               reply_to_message_id: msg.message_id,
