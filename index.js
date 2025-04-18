@@ -4100,13 +4100,7 @@ bot.onText(/\/getsticker/, async (msg) => {
   }
 });
 
-NIGHT MODE 
-
-const fs = require('fs');
-const path = require('path');
-const TelegramBot = require('node-telegram-bot-api');
-
-const bot = new TelegramBot('YOUR_BOT_TOKEN', { polling: true });
+// NIGHT MODE 
 
 const NIGHT_START_HOUR = 0; // 12 AM IST
 const NIGHT_END_HOUR = 6;   // 6 AM IST
@@ -4229,7 +4223,7 @@ bot.onText(/\/nightmode/, async (msg) => {
   });
 });
 
-Handle toggling
+// Handle toggling
 bot.on('callback_query', async (query) => {
   const chatId = query.message.chat.id;
   const userId = query.from.id;
