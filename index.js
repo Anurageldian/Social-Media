@@ -1249,6 +1249,7 @@ bot.onText(/\/free(?:\s+(\d+))?/, async (msg, match) => {
 });
 
 
+const util = require('util');
 
 const execFilePromise = util.promisify(execFile);
 
