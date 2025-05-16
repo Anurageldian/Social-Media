@@ -1249,62 +1249,6 @@ bot.onText(/\/free(?:\s+(\d+))?/, async (msg, match) => {
 });
 
 
-const util = require('util');
-
-const execFilePromise = util.promisify(execFile);
-
-const TEMP_VIDEO_FILE = path.join(__dirname, 'video.mp4');
-
-bot.onText(/\/hams(.+)/, async (msg, match) => {
-    const chatId = msg.chat.id;
-    const url = match[1];
-
-    if (!url) {
-        bot.sendMessage(chatId, 'Please provide a URL after /download.');
-        return;
-    }
-
-    try {
-        await bot.sendMessage(chatId, 'Processing...');
-
-        // Run yt-dlp to get the direct video URL (-g option)
-        const { stdout: videoUrl } = await execFilePromise('yt-dlp', ['-g', url]);
-
-        const directVideoUrl = videoUrl.trim();
-        if (!directVideoUrl) {
-            await bot.sendMessage(chatId, 'Failed to extract video URL.');
-            return;
-        }
-
-        await bot.sendMessage(chatId, 'Downloading video...');
-
-        // Download the video using wget
-        await execFilePromise('wget', ['-O', TEMP_VIDEO_FILE, directVideoUrl]);
-
-        // Check file size (Telegram video limit 50MB)
-        const stats = fs.statSync(TEMP_VIDEO_FILE);
-        const fileSizeMB = stats.size / (1024 * 1024);
-        if (fileSizeMB > 50) {
-            await bot.sendMessage(chatId, `Video is too large to send (size: ${fileSizeMB.toFixed(2)}MB). Telegram max limit is 50MB.`);
-            fs.unlinkSync(TEMP_VIDEO_FILE);
-            return;
-        }
-
-        // Send video file
-        await bot.sendVideo(chatId, TEMP_VIDEO_FILE);
-    } catch (error) {
-        console.error('Error:', error);
-        await bot.sendMessage(chatId, `Error occurred: ${error.message || error}`);
-    } finally {
-        // Clean up temp file if exists
-        if (fs.existsSync(TEMP_VIDEO_FILE)) {
-            fs.unlinkSync(TEMP_VIDEO_FILE);
-        }
-    }
-});
-
-
-
 
 
 // Helper function to load the current service settings on bot startup
