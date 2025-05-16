@@ -610,150 +610,31 @@ bot.onText(/(https?:\/\/)?(www\.)?(open\.spotify\.com|spotify\.?com)\/playlist\/
 //   }
 // })
 
-const allowedResolutions = [240, 480, 720, 1080];
-const MAX_FILE_SIZE = 50 * 1024 * 1024; // 50 MB
 
-const youtubeUrlRegex = /(https?:\/\/)?(www\.)?(youtube\.com\/(watch\?v=|shorts\/)|youtu\.be\/)[\w-]+/;
-
-bot.onText(youtubeUrlRegex, (msg, match) => {
-  const chatId = msg.chat.id;
-  const url = match[0];
-
-  bot.sendMessage(chatId, "Fetching video info...");
-
-  exec(`yt-dlp -j "${url}"`, (err, stdout) => {
-    if (err) return bot.sendMessage(chatId, "Failed to fetch video info.");
-
-    try {
-      const videoInfo = JSON.parse(stdout);
-
-      // Video-only mp4 formats with allowed resolution & <=50MB
-      const videoFormats = videoInfo.formats.filter(f =>
-        f.ext === "mp4" &&
-        f.vcodec !== "none" &&
-        f.acodec === "none" &&
-        allowedResolutions.includes(f.height) &&
-        f.filesize && f.filesize <= MAX_FILE_SIZE
-      );
-
-      // Best audio (usually m4a/webm) <=50MB
-      const audioFormats = videoInfo.formats.filter(f =>
-        f.acodec !== "none" &&
-        f.vcodec === "none" &&
-        (f.ext === "m4a" || f.ext === "webm") &&
-        f.filesize && f.filesize <= MAX_FILE_SIZE
-      );
-
-      if (!videoFormats.length)
-        return bot.sendMessage(chatId, "No suitable video formats found.");
-
-      if (!audioFormats.length)
-        return bot.sendMessage(chatId, "No suitable audio formats found.");
-
-      // Prepare buttons for video qualities
-      const buttons = videoFormats.map(f => {
-        const sizeMB = (f.filesize / 1024 / 1024).toFixed(1);
-        return [{
-          text: `${f.height}p (${sizeMB}MB)`,
-          callback_data: `download|${f.format_id}|${url}`
-        }];
-      });
-
-      bot.sendMessage(chatId, "Select video quality:", {
-        reply_markup: { inline_keyboard: buttons }
-      });
-
-      // Save audio format id globally for merging later
-      bot.audioFormat = audioFormats[0].format_id;
-
-    } catch {
-      bot.sendMessage(chatId, "Error processing video info.");
-    }
-  });
-});
-
-bot.on("callback_query", query => {
-  const chatId = query.message.chat.id;
-  const data = query.data;
-
-  if (!data.startsWith("download|")) return;
-
-  const [, videoFormatId, url] = data.split("|");
-  const audioFormatId = bot.audioFormat;
-  const videoFile = `video-${Date.now()}.mp4`;
-  const audioFile = `audio-${Date.now()}.m4a`;
-  const outputFile = `output-${Date.now()}.mp4`;
-
-  bot.sendMessage(chatId, "Downloading and merging video with audio...");
-
-  // Download video-only
-  const videoDownload = spawn("yt-dlp", ["-f", videoFormatId, "-o", videoFile, url]);
-  // Download audio-only
-  const audioDownload = spawn("yt-dlp", ["-f", audioFormatId, "-o", audioFile, url]);
-
-  let videoDone = false;
-  let audioDone = false;
-
-  videoDownload.on("close", (code) => {
-    videoDone = true;
-    if (audioDone) merge();
-  });
-
-  audioDownload.on("close", (code) => {
-    audioDone = true;
-    if (videoDone) merge();
-  });
-
-  function merge() {
-    // ffmpeg merge video+audio into outputFile
-    const ffmpeg = spawn("ffmpeg", [
-      "-i", videoFile,
-      "-i", audioFile,
-      "-c:v", "copy",
-      "-c:a", "aac",
-      "-strict", "experimental",
-      outputFile
-    ]);
-
-    ffmpeg.on("close", (code) => {
-      if (code === 0) {
-        bot.sendVideo(chatId, outputFile).then(() => {
-          [videoFile, audioFile, outputFile].forEach(f => {
-            if (fs.existsSync(f)) fs.unlinkSync(f);
-          });
-        });
-      } else {
-        bot.sendMessage(chatId, "Error merging video and audio.");
-      }
-    });
+bot.onText(/^(?:https?:\/\/)?(?:www\.|m\.|music\.)?(?:youtube\.com|youtu\.be)\/(?:watch\?v=|embed\/|v\/|shorts\/|live\/)?([\w\-]+)/, async (msg, match) => {
+  let getban = await getBanned(msg.chat.id);
+  if (!getban.status) {
+    return bot.sendMessage(msg.chat.id, `You have been banned\n\nReason : ${getban.reason}\n\nDo you want to be able to use bots again? Please contact the owner to request removal of the ban\nOwner : @firespower`);
   }
-});
-
-
-// bot.onText(/^(?:https?:\/\/)?(?:www\.|m\.|music\.)?(?:youtube\.com|youtu\.be)\/(?:watch\?v=|embed\/|v\/|shorts\/|live\/)?([\w\-]+)/, async (msg, match) => {
-//   let getban = await getBanned(msg.chat.id);
-//   if (!getban.status) {
-//     return bot.sendMessage(msg.chat.id, `You have been banned\n\nReason : ${getban.reason}\n\nDo you want to be able to use bots again? Please contact the owner to request removal of the ban\nOwner : @firespower`);
-//   }
   
-//   let userId = msg.from.id.toString();
-//   if (userLocks[userId]) return;
+  let userId = msg.from.id.toString();
+  if (userLocks[userId]) return;
   
-//   userLocks[userId] = true;
-//   try {
-//     const videoId = match[1]; // Extracted video ID
+  userLocks[userId] = true;
+  try {
+    const videoId = match[1]; // Extracted video ID
     
-//     if (msg.text.includes("/live/")) {
-//       return bot.sendMessage(msg.chat.id, `Cannot download livestream video`);
-//     }
+    if (msg.text.includes("/live/")) {
+      return bot.sendMessage(msg.chat.id, `Cannot download livestream video`);
+    }
     
-//     await bot.sendMessage(logChannelId, `[ Usage Log ]\n◇ FIRST NAME : ${msg.from.first_name || "-"}\n◇ LAST NAME : ${msg.from.last_name || "-"}\n◇ USERNAME : ${msg.from.username ? "@" + msg.from.username : "-"}\n◇ ID : ${msg.from.id}\n\nContent: ${msg.text.slice(0, 1000)}`, { disable_web_page_preview: true });
+    await bot.sendMessage(logChannelId, `[ Usage Log ]\n◇ FIRST NAME : ${msg.from.first_name || "-"}\n◇ LAST NAME : ${msg.from.last_name || "-"}\n◇ USERNAME : ${msg.from.username ? "@" + msg.from.username : "-"}\n◇ ID : ${msg.from.id}\n\nContent: ${msg.text.slice(0, 1000)}`, { disable_web_page_preview: true });
     
-//     await getYoutube(bot, msg.chat.id, videoId, msg.chat.username); // Pass video ID instead of full URL
-//   } finally {
-//     userLocks[userId] = false;
-//   }
-// })
+    await getYoutube(bot, msg.chat.id, videoId, msg.chat.username); // Pass video ID instead of full URL
+  } finally {
+    userLocks[userId] = false;
+  }
+})
 
 
 // Facebook Regex
