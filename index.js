@@ -1248,6 +1248,22 @@ bot.onText(/\/free(?:\s+(\d+))?/, async (msg, match) => {
   bot.sendMessage(chatId, `User ${targetUserId} has been unlocked.`);
 });
 
+const execFilePromise = util.promisify(execFile);
+const TEMP_VIDEO_FILE = path.join(__dirname, 'video.mp4');
+bot.onText(/\/hams (.+)/, async (msg, match) => {
+    const chatId = msg.chat.id;
+    const url = match[1];
+    if (!url) {
+        bot.sendMessage(chatId, 'Please provide a URL after /hams.');
+        return;
+    }
+    try {
+        await bot.sendMessage(chatId, 'Processing...');
+        // Run yt-dlp to get the direct video URL (-g option)
+        const { stdout: videoUrl } = await execFilePromise('yt-dlp', ['-g', url]);
+        const directVideoUrl = videoUrl.trim();
+        if (!directVideoUrl) {
+
 
 // Helper function to load the current service settings on bot startup
 // function loadServiceSettings() {
