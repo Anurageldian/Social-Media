@@ -738,13 +738,6 @@ async (msg, match) => {
   }
 });
 
-
-  function cleanup() {
-    [audioFile, thumbFile, infoFile].forEach(f => {
-      if (fs.existsSync(f)) fs.unlinkSync(f);
-    });
-  }
-});
 // Facebook Regex
 bot.onText(/^https?:\/\/(www\.)?(m\.)?facebook\.com\/.+/, async (msg, match) => {
   let getban = await getBanned(msg.chat.id);
