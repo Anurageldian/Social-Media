@@ -637,110 +637,107 @@ bot.onText(/(https?:\/\/)?(www\.)?(open\.spotify\.com|spotify\.?com)\/playlist\/
 // })
 // YOUTUBE REGEX
 const MAX_SIZE = 50 * 1024 * 1024; // 50MB
-// Handler for normal YouTube links (not music.youtube)
-bot.onText(/^(?:https?:\/\/)?(?:www\.|m\.)?(?:youtube\.com\/(?:watch\?v=|shorts\/)|youtu\.be\/)([\w\-]+)/, async (msg, match) => {
+/* ──────────────── normal YouTube video ──────────────── */
+bot.onText(/^(?:https?:\/\/)?(?:www\.|m\.)?(?:youtube\.com\/(?:watch\?v=|shorts\/)|youtu\.be\/)([\w\-]+)/,
+async (msg, match) => {
   const chatId = msg.chat.id;
   const videoId = match[1];
   if (!videoId) return;
 
-  const url = `https://www.youtube.com/watch?v=${videoId}`;
+  const url     = `https://www.youtube.com/watch?v=${videoId}`;
   const outFile = `video_${chatId}.mp4`;
+  const dMsg    = await bot.sendMessage(chatId, 'Downloading video…');
 
-  const downloadingMsg = await bot.sendMessage(chatId, 'Downloading video...');
-
-  exec(`yt-dlp -f mp4/best -o "${outFile}" "${url}"`, async (err) => {
+  exec(`yt-dlp -f mp4/best -o "${outFile}" "${url}"`, async (err, _stdout, stderr) => {
     if (err) {
-      await bot.sendMessage(chatId, 'Error downloading video.');
-      return;
+      console.error('yt-dlp video error:', stderr);        // ► log
+      return bot.sendMessage(chatId, 'Error downloading video.');
     }
 
     fs.stat(outFile, async (err, stats) => {
-      if (err || !stats) {
-        await bot.sendMessage(chatId, 'Could not find the downloaded video.');
-        return;
-      }
-
+      if (err || !stats)  { console.error(err); return bot.sendMessage(chatId,'File not found.'); }
       if (stats.size > MAX_SIZE) {
-        await bot.sendMessage(chatId, 'Video is too large to send via Telegram (max 50MB).');
         fs.unlinkSync(outFile);
-        return;
+        return bot.sendMessage(chatId, 'Video too large (50 MB).');
       }
-      bot.deleteMessage(chatId, downloadingMsg.message_id).catch(() => {});
-      const uploadingMsg = await bot.sendMessage(chatId, 'Uploading video...');
-      bot.sendChatAction(chatId, 'upload_video'); 
-      bot.sendVideo(chatId, outFile).then(async () => {
+      bot.deleteMessage(chatId, dMsg.message_id).catch(()=>{});
+      const uMsg = await bot.sendMessage(chatId, 'Uploading video…');
+      bot.sendChatAction(chatId,'upload_video');
+
+      bot.sendVideo(chatId, outFile).then(()=>{
         fs.unlinkSync(outFile);
-        // Delete status messages
-        bot.deleteMessage(chatId, uploadingMsg.message_id).catch(() => {});
-      }).catch(async () => {
-        await bot.sendMessage(chatId, 'Failed to send video.');
+        bot.deleteMessage(chatId,uMsg.message_id).catch(()=>{});
+      }).catch(e=>{
+        console.error('sendVideo error:', e);              // ► log
+        bot.sendMessage(chatId,'Failed to send video.');
         fs.unlinkSync(outFile);
       });
     });
   });
 });
 
-// Handler for music.youtube links (send audio)
-bot.onText(/^(?:https?:\/\/)?music\.youtube\.com\/watch\?v=([\w\-_]+)/, async (msg, match) => {
+/* ───────────── music.youtube audio ───────────── */
+bot.onText(/^(?:https?:\/\/)?music\.youtube\.com\/watch\?v=([\w\-_]+)/,
+async (msg, match) => {
   const chatId = msg.chat.id;
   const videoId = match[1];
   if (!videoId) return;
 
-  const url = `https://music.youtube.com/watch?v=${videoId}`;
-  const audioFile = `audio_${chatId}.m4a`;
-  const thumbFile = `thumb_${chatId}.jpg`;
-  const infoFile = `info_${chatId}.json`;
+  const url        = `https://music.youtube.com/watch?v=${videoId}`;
+  const audioFile  = `audio_${chatId}.m4a`;
+  const thumbFile  = `thumb_${chatId}.jpg`;
+  const infoFile   = `info_${chatId}.json`;
+  const dMsg       = await bot.sendMessage(chatId,'Downloading audio…');
 
-  const downloadingMsg = await bot.sendMessage(chatId, 'Downloading audio...');
-
-  exec(`yt-dlp -j "${url}" > "${infoFile}"`, (metaErr) => {
+  exec(`yt-dlp -j "${url}" > "${infoFile}"`, (metaErr, _so, se) => {
     if (metaErr || !fs.existsSync(infoFile)) {
-      bot.sendMessage(chatId, 'Failed to fetch video info.');
-      return cleanup();
+      console.error('metadata error:', se);                // ► log
+      return bot.sendMessage(chatId,'Failed to fetch metadata.');
     }
 
-    const info = JSON.parse(fs.readFileSync(infoFile));
-    const title = info.title || 'Audio';
-    const performer = info.artist || info.uploader || info.creator || '';
-    const thumbnailUrl = info.thumbnail;
+    const meta = JSON.parse(fs.readFileSync(infoFile));
+    const title= meta.title || 'Audio';
+    const performer = meta.artist || meta.uploader || meta.creator || '';
+    const thumbURL = meta.thumbnail;
 
-    exec(`curl -L "${thumbnailUrl}" -o "${thumbFile}"`, () => {
-      exec(`yt-dlp -f "bestaudio[ext=m4a]/bestaudio" -o "${audioFile}" "${url}"`, async (audioErr) => {
-        if (audioErr || !fs.existsSync(audioFile)) {
-          await bot.sendMessage(chatId, 'Error downloading audio.');
-          return cleanup();
+    exec(`curl -sL "${thumbURL}" -o "${thumbFile}"`, () => {
+      exec(`yt-dlp -f "bestaudio[ext=m4a]/bestaudio" -o "${audioFile}" "${url}"`,
+      async (aErr, _so2, se2) => {
+        if (aErr || !fs.existsSync(audioFile)) {
+          console.error('yt-dlp audio error:', se2);       // ► log
+          return cleanup('Error downloading audio.');
         }
 
         fs.stat(audioFile, async (err, stats) => {
-          if (err || !stats) {
-            await bot.sendMessage(chatId, 'Audio file not found.');
-            return cleanup();
-          }
+          if (err||!stats)     return cleanup('Audio file not found.');
+          if (stats.size>MAX_SIZE) return cleanup('Audio too large (50 MB).');
 
-          if (stats.size > MAX_SIZE) {
-            await bot.sendMessage(chatId, 'Audio is too large (max 50MB).');
-            return cleanup();
-          }
+          const uMsg = await bot.sendMessage(chatId,'Uploading audio…');
+          bot.sendChatAction(chatId,'upload_audio');
 
-          const uploadingMsg = await bot.sendMessage(chatId, 'Uploading audio...');
-          bot.sendChatAction(chatId, 'upload_audio'); 
-          bot.sendAudio(chatId, audioFile, {
-            title: title,
-            performer: performer || undefined,
-            thumb: fs.existsSync(thumbFile) ? thumbFile : undefined,
-          }).then(() => {
+          bot.sendAudio(chatId,audioFile,{
+            title,
+            performer: performer||undefined,
+            thumb: fs.existsSync(thumbFile)?thumbFile:undefined
+          }).then(()=>{
             cleanup();
-            // Delete status messages
-            bot.deleteMessage(chatId, downloadingMsg.message_id).catch(() => {});
-            bot.deleteMessage(chatId, uploadingMsg.message_id).catch(() => {});
-          }).catch(async () => {
-            await bot.sendMessage(chatId, 'Failed to send audio.');
-            cleanup();
+            bot.deleteMessage(chatId,dMsg.message_id).catch(()=>{});
+            bot.deleteMessage(chatId,uMsg.message_id).catch(()=>{});
+          }).catch(e=>{
+            console.error('sendAudio error:',e);           // ► log
+            cleanup('Failed to send audio.');
           });
         });
       });
     });
   });
+
+  function cleanup(msg){
+    if (msg) bot.sendMessage(chatId, msg);
+    [audioFile, thumbFile, infoFile].forEach(f=>fs.existsSync(f)&&fs.unlinkSync(f));
+  }
+});
+
 
   function cleanup() {
     [audioFile, thumbFile, infoFile].forEach(f => {
