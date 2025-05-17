@@ -670,7 +670,7 @@ bot.onText(/^(?:https?:\/\/)?(?:www\.|m\.)?(?:youtube\.com\/(?:watch\?v=|shorts\
 
       bot.deleteMessage(chatId, downloadingMsg.message_id).catch(() => {});
       const uploadingMsg = await bot.sendMessage(chatId, 'Uploading video...');
-      bot.sendChatAction(chatId, 'upload_video');
+      await bot.sendChatAction(chatId, 'upload_video');
       bot.sendVideo(chatId, outFile).then(async () => {
         fs.unlinkSync(outFile);
         bot.deleteMessage(chatId, uploadingMsg.message_id).catch(() => {});
@@ -725,7 +725,7 @@ bot.onText(/^(?:https?:\/\/)?music\.youtube\.com\/watch\?v=([\w\-_]+)/, async (m
           }
 
           const uploadingMsg = await bot.sendMessage(chatId, 'Uploading audio...');
-          bot.sendChatAction(chatId, 'upload_audio');
+          await bot.sendChatAction(chatId, 'upload_audio');
           bot.sendAudio(chatId, audioFile, {
             title: title,
             performer: performer || undefined,
