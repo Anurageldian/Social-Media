@@ -6,7 +6,7 @@ let express = require('express');
 const { formatUptime } = require('./funcs/utils'); // Import the formatUptime function from utils.js
 const os = require('os');
 const { execSync } = require('child_process');
-const { exec, spawn } = require("child_process");
+const { exec } = require("child_process");
 let app = express();
 let TelegramBot = require('node-telegram-bot-api')
 const { loadImage, createCanvas } = require('canvas');
@@ -611,32 +611,143 @@ bot.onText(/(https?:\/\/)?(www\.)?(open\.spotify\.com|spotify\.?com)\/playlist\/
 // })
 
 
-bot.onText(/^(?:https?:\/\/)?(?:www\.|m\.|music\.)?(?:youtube\.com|youtu\.be)\/(?:watch\?v=|embed\/|v\/|shorts\/|live\/)?([\w\-]+)/, async (msg, match) => {
-  let getban = await getBanned(msg.chat.id);
-  if (!getban.status) {
-    return bot.sendMessage(msg.chat.id, `You have been banned\n\nReason : ${getban.reason}\n\nDo you want to be able to use bots again? Please contact the owner to request removal of the ban\nOwner : @firespower`);
-  }
+// bot.onText(/^(?:https?:\/\/)?(?:www\.|m\.|music\.)?(?:youtube\.com|youtu\.be)\/(?:watch\?v=|embed\/|v\/|shorts\/|live\/)?([\w\-]+)/, async (msg, match) => {
+//   let getban = await getBanned(msg.chat.id);
+//   if (!getban.status) {
+//     return bot.sendMessage(msg.chat.id, `You have been banned\n\nReason : ${getban.reason}\n\nDo you want to be able to use bots again? Please contact the owner to request removal of the ban\nOwner : @firespower`);
+//   }
   
-  let userId = msg.from.id.toString();
-  if (userLocks[userId]) return;
+//   let userId = msg.from.id.toString();
+//   if (userLocks[userId]) return;
   
-  userLocks[userId] = true;
-  try {
-    const videoId = match[1]; // Extracted video ID
+//   userLocks[userId] = true;
+//   try {
+//     const videoId = match[1]; // Extracted video ID
     
-    if (msg.text.includes("/live/")) {
-      return bot.sendMessage(msg.chat.id, `Cannot download livestream video`);
+//     if (msg.text.includes("/live/")) {
+//       return bot.sendMessage(msg.chat.id, `Cannot download livestream video`);
+//     }
+    
+//     await bot.sendMessage(logChannelId, `[ Usage Log ]\n◇ FIRST NAME : ${msg.from.first_name || "-"}\n◇ LAST NAME : ${msg.from.last_name || "-"}\n◇ USERNAME : ${msg.from.username ? "@" + msg.from.username : "-"}\n◇ ID : ${msg.from.id}\n\nContent: ${msg.text.slice(0, 1000)}`, { disable_web_page_preview: true });
+    
+//     await getYoutube(bot, msg.chat.id, videoId, msg.chat.username); // Pass video ID instead of full URL
+//   } finally {
+//     userLocks[userId] = false;
+//   }
+// })
+// YOUTUBE REGEX
+const MAX_SIZE = 50 * 1024 * 1024; // 50MB
+// Handler for normal YouTube links (not music.youtube)
+bot.onText(/^(?:https?:\/\/)?(?:www\.|m\.)?(?:youtube\.com\/(?:watch\?v=|shorts\/)|youtu\.be\/)([\w\-]+)/, async (msg, match) => {
+  const chatId = msg.chat.id;
+  const videoId = match[1];
+  if (!videoId) return;
+
+  const url = `https://www.youtube.com/watch?v=${videoId}`;
+  const outFile = `video_${chatId}.mp4`;
+
+  const downloadingMsg = await bot.sendMessage(chatId, 'Downloading video...');
+
+  exec(`yt-dlp -f mp4/best -o "${outFile}" "${url}"`, async (err) => {
+    if (err) {
+      await bot.sendMessage(chatId, 'Error downloading video.');
+      return;
     }
-    
-    await bot.sendMessage(logChannelId, `[ Usage Log ]\n◇ FIRST NAME : ${msg.from.first_name || "-"}\n◇ LAST NAME : ${msg.from.last_name || "-"}\n◇ USERNAME : ${msg.from.username ? "@" + msg.from.username : "-"}\n◇ ID : ${msg.from.id}\n\nContent: ${msg.text.slice(0, 1000)}`, { disable_web_page_preview: true });
-    
-    await getYoutube(bot, msg.chat.id, videoId, msg.chat.username); // Pass video ID instead of full URL
-  } finally {
-    userLocks[userId] = false;
+
+    fs.stat(outFile, async (err, stats) => {
+      if (err || !stats) {
+        await bot.sendMessage(chatId, 'Could not find the downloaded video.');
+        return;
+      }
+
+      if (stats.size > MAX_SIZE) {
+        await bot.sendMessage(chatId, 'Video is too large to send via Telegram (max 50MB).');
+        fs.unlinkSync(outFile);
+        return;
+      }
+      bot.deleteMessage(chatId, downloadingMsg.message_id).catch(() => {});
+      const uploadingMsg = await bot.sendMessage(chatId, 'Uploading video...');
+      bot.sendChatAction(chatId, 'upload_video'); 
+      bot.sendVideo(chatId, outFile).then(async () => {
+        fs.unlinkSync(outFile);
+        // Delete status messages
+        bot.deleteMessage(chatId, uploadingMsg.message_id).catch(() => {});
+      }).catch(async () => {
+        await bot.sendMessage(chatId, 'Failed to send video.');
+        fs.unlinkSync(outFile);
+      });
+    });
+  });
+});
+
+// Handler for music.youtube links (send audio)
+bot.onText(/^(?:https?:\/\/)?music\.youtube\.com\/watch\?v=([\w\-_]+)/, async (msg, match) => {
+  const chatId = msg.chat.id;
+  const videoId = match[1];
+  if (!videoId) return;
+
+  const url = `https://music.youtube.com/watch?v=${videoId}`;
+  const audioFile = `audio_${chatId}.m4a`;
+  const thumbFile = `thumb_${chatId}.jpg`;
+  const infoFile = `info_${chatId}.json`;
+
+  const downloadingMsg = await bot.sendMessage(chatId, 'Downloading audio...');
+
+  exec(`yt-dlp -j "${url}" > "${infoFile}"`, (metaErr) => {
+    if (metaErr || !fs.existsSync(infoFile)) {
+      bot.sendMessage(chatId, 'Failed to fetch video info.');
+      return cleanup();
+    }
+
+    const info = JSON.parse(fs.readFileSync(infoFile));
+    const title = info.title || 'Audio';
+    const performer = info.artist || info.uploader || info.creator || '';
+    const thumbnailUrl = info.thumbnail;
+
+    exec(`curl -L "${thumbnailUrl}" -o "${thumbFile}"`, () => {
+      exec(`yt-dlp -f "bestaudio[ext=m4a]/bestaudio" -o "${audioFile}" "${url}"`, async (audioErr) => {
+        if (audioErr || !fs.existsSync(audioFile)) {
+          await bot.sendMessage(chatId, 'Error downloading audio.');
+          return cleanup();
+        }
+
+        fs.stat(audioFile, async (err, stats) => {
+          if (err || !stats) {
+            await bot.sendMessage(chatId, 'Audio file not found.');
+            return cleanup();
+          }
+
+          if (stats.size > MAX_SIZE) {
+            await bot.sendMessage(chatId, 'Audio is too large (max 50MB).');
+            return cleanup();
+          }
+
+          const uploadingMsg = await bot.sendMessage(chatId, 'Uploading audio...');
+          bot.sendChatAction(chatId, 'upload_audio'); 
+          bot.sendAudio(chatId, audioFile, {
+            title: title,
+            performer: performer || undefined,
+            thumb: fs.existsSync(thumbFile) ? thumbFile : undefined,
+          }).then(() => {
+            cleanup();
+            // Delete status messages
+            bot.deleteMessage(chatId, downloadingMsg.message_id).catch(() => {});
+            bot.deleteMessage(chatId, uploadingMsg.message_id).catch(() => {});
+          }).catch(async () => {
+            await bot.sendMessage(chatId, 'Failed to send audio.');
+            cleanup();
+          });
+        });
+      });
+    });
+  });
+
+  function cleanup() {
+    [audioFile, thumbFile, infoFile].forEach(f => {
+      if (fs.existsSync(f)) fs.unlinkSync(f);
+    });
   }
-})
-
-
+});
 // Facebook Regex
 bot.onText(/^https?:\/\/(www\.)?(m\.)?facebook\.com\/.+/, async (msg, match) => {
   let getban = await getBanned(msg.chat.id);
