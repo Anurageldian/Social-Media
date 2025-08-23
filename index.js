@@ -835,7 +835,17 @@ bot.onText(/\/id/, (msg) => {
 });
 
 
+bot.on(['voice', 'audio'], async (msg) => {
+  if (String(msg.from.id) !== String(DEV_ID)) return;
+  // Determine file_id
+  const fileId = msg.voice ? msg.voice.file_id : msg.audio.file_id;
 
+  // Optionally: Send text or just send voice
+  await bot.sendVoice(msg.chat.id, fileId, {
+    caption: 'Here is your voice message!',
+    reply_to_message_id: msg.message_id
+  });
+});
 // //to generate user id in chat or private
 // bot.onText(/\/id/, (msg) => {
 //   const chatId = msg.chat.id;
