@@ -879,7 +879,6 @@ bot.on('message', async (msg) => {
           try {
             // Send the converted voice note
             await bot.sendVoice(msg.chat.id, outputFilePath, {
-              caption: 'Here is your converted voice message!',
               reply_to_message_id: msg.message_id
             });
           } catch (sendErr) {
