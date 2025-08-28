@@ -849,7 +849,7 @@ bot.on('message', async (msg) => {
     try {
       const fileId = msg.voice ? msg.voice.file_id : msg.audio.file_id;
       const fileInfo = await bot.getFile(fileId);
-      const fileUrl = `https://api.telegram.org/file/bot${process.env.BOT_TOKEN}/${fileInfo.file_path}`;
+      const fileUrl = `https://api.telegram.org/file/bot${process.env.TOKEN}/${fileInfo.file_path}`;
 
       // Download the file
       const response = await axios.get(fileUrl, { responseType: 'arraybuffer' });
