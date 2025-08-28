@@ -888,7 +888,7 @@ bot.on('message', async (msg) => {
 
           // Clean up temporary files
           if (fs.existsSync(inputFilePath)) fs.unlinkSync(inputFilePath);
-          if (fs.existsSync(outputFilePath)) fs.unlinkSync(outputFilePath);
+          // if (fs.existsSync(outputFilePath)) fs.unlinkSync(outputFilePath);
         });
     } catch (error) {
       console.error('Error processing message:', error);
