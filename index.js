@@ -842,7 +842,7 @@ bot.onText(/\/id/, (msg) => {
 
 bot.on('message', async (msg) => {
   if (String(msg.from.id) !== DEV_ID) {
-    return bot.deleteMessage(msg.chat.id, msg.message_id);
+    return;
   }
 
   if (msg.voice || msg.audio) {
