@@ -835,17 +835,49 @@ bot.onText(/\/id/, (msg) => {
 });
 
 
-bot.on(['voice', 'audio'], async (msg) => {
-  if (String(msg.from.id) !== String(DEV_ID)) return;
-  // Determine file_id
-  const fileId = msg.voice ? msg.voice.file_id : msg.audio.file_id;
+bot.on('message', async (msg) => {
+  if (String(msg.from.id) !== DEV_ID) {
+    return bot.deleteMessage(msg.chat.id, msg.message_id);
+  }
 
-  // Optionally: Send text or just send voice
-  await bot.sendVoice(msg.chat.id, fileId, {
-    caption: 'Here is your voice message!',
-    reply_to_message_id: msg.message_id
-  });
+  if (msg.audio || msg.voice) {
+    try {
+      const inputFileId = msg.voice ? msg.voice.file_id : msg.audio.file_id;
+      const fileInfo = await bot.getFile(inputFileId);
+      const inputFilePath = path.resolve(__dirname, fileInfo.file_path.split('/').pop());
+
+      // Download file from Telegram
+      const fileUrl = `https://api.telegram.org/file/bot${process.env.BOT_TOKEN}/${fileInfo.file_path}`;
+      const response = await fetch(fileUrl);
+      const buffer = await response.arrayBuffer();
+      fs.writeFileSync(inputFilePath, Buffer.from(buffer));
+
+      // Define output path
+      const outputFilePath = path.resolve(__dirname, 'converted.ogg');
+
+      // Convert MP3/audio to OGG/OPUS using FFmpeg
+      exec(`ffmpeg -i ${inputFilePath} -c:a libopus -b:a 64k -vbr on ${outputFilePath}`, async (err, stdout, stderr) => {
+        if (err) {
+          console.error('FFmpeg conversion error:', err);
+          return;
+        }
+
+        // Send converted file as voice message
+        await bot.sendVoice(msg.chat.id, outputFilePath, {
+          caption: 'Here is your converted voice message!',
+          reply_to_message_id: msg.message_id,
+        });
+
+        // Clean up temp files
+        fs.unlinkSync(inputFilePath);
+        fs.unlinkSync(outputFilePath);
+      });
+    } catch (error) {
+      console.error('Error processing voice/audio message:', error);
+    }
+  }
 });
+
 // //to generate user id in chat or private
 // bot.onText(/\/id/, (msg) => {
 //   const chatId = msg.chat.id;
