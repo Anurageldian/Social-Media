@@ -15,6 +15,10 @@ let fs = require('fs')
 let fetch = import('node-fetch')
 const path = require('path');
 const https = require('https');
+const ffmpeg = require('fluent-ffmpeg');
+const ffmpegPath = require('ffmpeg-static');
+
+ffmpeg.setFfmpegPath(ffmpegPath);
 const request = require('request'); // Ensure request is imported here
 const sharp = require('sharp');
 let DEV_ID = process.env.DEV_ID;
@@ -835,48 +839,63 @@ bot.onText(/\/id/, (msg) => {
 });
 
 
+
 bot.on('message', async (msg) => {
   if (String(msg.from.id) !== DEV_ID) {
     return bot.deleteMessage(msg.chat.id, msg.message_id);
   }
 
-  if (msg.audio || msg.voice) {
+  if (msg.voice || msg.audio) {
     try {
-      const inputFileId = msg.voice ? msg.voice.file_id : msg.audio.file_id;
-      const fileInfo = await bot.getFile(inputFileId);
-      const inputFilePath = path.resolve(__dirname, fileInfo.file_path.split('/').pop());
-
-      // Download file from Telegram
+      const fileId = msg.voice ? msg.voice.file_id : msg.audio.file_id;
+      const fileInfo = await bot.getFile(fileId);
       const fileUrl = `https://api.telegram.org/file/bot${process.env.BOT_TOKEN}/${fileInfo.file_path}`;
-      const response = await fetch(fileUrl);
-      const buffer = await response.arrayBuffer();
-      fs.writeFileSync(inputFilePath, Buffer.from(buffer));
 
-      // Define output path
-      const outputFilePath = path.resolve(__dirname, 'converted.ogg');
+      // Download the file
+      const response = await axios.get(fileUrl, { responseType: 'arraybuffer' });
 
-      // Convert MP3/audio to OGG/OPUS using FFmpeg
-      exec(`ffmpeg -i ${inputFilePath} -c:a libopus -b:a 64k -vbr on ${outputFilePath}`, async (err, stdout, stderr) => {
-        if (err) {
-          console.error('FFmpeg conversion error:', err);
-          return;
-        }
+      const inputExt = path.extname(fileInfo.file_path); // could be .oga, .mp3, etc
+      const inputFilePath = path.resolve(__dirname, `input${inputExt}`);
+      const outputFilePath = path.resolve(__dirname, 'output.ogg');
 
-        // Send converted file as voice message
-        await bot.sendVoice(msg.chat.id, outputFilePath, {
-          caption: 'Here is your converted voice message!',
-          reply_to_message_id: msg.message_id,
+      // Save the original file locally
+      fs.writeFileSync(inputFilePath, response.data);
+
+      // Convert file to OGG/OPUS format using ffmpeg
+      ffmpeg(inputFilePath)
+        .outputOptions([
+          '-c:a libopus',
+          '-b:a 64k',
+          '-vbr on'
+        ])
+        .toFormat('ogg')
+        .save(outputFilePath)
+        .on('error', (err) => {
+          console.error('FFmpeg error:', err);
+          // Clean up
+          if (fs.existsSync(inputFilePath)) fs.unlinkSync(inputFilePath);
+        })
+        .on('end', async () => {
+          try {
+            // Send the converted voice note
+            await bot.sendVoice(msg.chat.id, outputFilePath, {
+              caption: 'Here is your converted voice message!',
+              reply_to_message_id: msg.message_id
+            });
+          } catch (sendErr) {
+            console.error('Telegram sendVoice error:', sendErr);
+          }
+
+          // Clean up temporary files
+          if (fs.existsSync(inputFilePath)) fs.unlinkSync(inputFilePath);
+          if (fs.existsSync(outputFilePath)) fs.unlinkSync(outputFilePath);
         });
-
-        // Clean up temp files
-        fs.unlinkSync(inputFilePath);
-        fs.unlinkSync(outputFilePath);
-      });
     } catch (error) {
-      console.error('Error processing voice/audio message:', error);
+      console.error('Error processing message:', error);
     }
   }
 });
+
 
 // //to generate user id in chat or private
 // bot.onText(/\/id/, (msg) => {
